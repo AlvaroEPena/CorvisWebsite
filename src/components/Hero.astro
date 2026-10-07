@@ -1,0 +1,287 @@
+---
+import { site } from '../content/site';
+import FloatingObject from './FloatingObject.astro';
+---
+
+<section class="hero section" id="hero" aria-labelledby="hero-title">
+  <div class="aura" style="--aura-color:rgb(255 192 131 / .6);top:-14rem;right:-12rem"></div>
+  <div class="aura" style="--aura-color:rgb(124 124 255 / .32);top:12rem;left:-26rem"></div>
+
+  <div class="container grid">
+    <div class="copy">
+      <p class="eyebrow hero-rise" style="--delay:0s">
+        {site.hero.badge}
+      </p>
+      <h1 id="hero-title">
+        The Core
+        <br />
+        <span class="vision">Vision.</span>
+      </h1>
+      <p class="lead hero-rise" style="--delay:.12s">
+        {site.hero.lead}
+      </p>
+      <div class="actions hero-rise" style="--delay:.22s">
+        <a class="btn btn-primary" href={site.cta.href} data-testid="hero-cta">
+          {site.cta.label}
+          <svg class="btn-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path
+              d="M4 10h11m-4-5 5 5-5 5"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </svg>
+        </a>
+        <a class="btn btn-ghost" href={site.secondaryCta.href}>
+          {site.secondaryCta.label}
+        </a>
+      </div>
+    </div>
+
+    <div class="stage-wrap" aria-hidden="true">
+      <div class="stage">
+        <div class="core" data-hero-obj data-parallax="6">
+          <span class="core-orb float" style="--float-duration:11s"></span>
+        </div>
+      </div>
+
+      <FloatingObject
+        kind="capsule"
+        tone="amber"
+        entrance
+        parallax={-14}
+        tilt="-26deg"
+        delay="-2s"
+        style="width:5.2rem;height:12rem;left:-1.8rem;top:3rem"
+      />
+      <FloatingObject
+        kind="capsule"
+        tone="teal"
+        entrance
+        parallax={10}
+        tilt="32deg"
+        delay="-5s"
+        style="width:3rem;height:7.2rem;right:-.6rem;bottom:6rem"
+      />
+      <FloatingObject
+        kind="bead"
+        tone="pearl"
+        entrance
+        parallax={-8}
+        delay="-1s"
+        style="width:4.2rem;height:4.2rem;right:12%;top:-1.6rem"
+      />
+      <FloatingObject
+        kind="bead"
+        tone="indigo"
+        entrance
+        parallax={14}
+        delay="-6s"
+        style="width:2.2rem;height:2.2rem;left:22%;bottom:-.8rem"
+      />
+      <FloatingObject
+        kind="spark"
+        tone="amber"
+        entrance
+        parallax={-6}
+        delay="-3s"
+        style="width:3.2rem;height:3.2rem;left:8%;bottom:34%"
+      />
+
+      <div class="card card-core glass">
+        <span class="chip core-chip"></span>
+        <div>
+          <p class="card-title">Core</p>
+          <p class="card-text">The one idea that makes you different.</p>
+        </div>
+      </div>
+      <div class="card card-vision glass">
+        <span class="chip vision-chip"></span>
+        <div>
+          <p class="card-title">Vision</p>
+          <p class="card-text">How the world sees you, on every screen.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: clamp(1.5rem, 4vw, 3rem) clamp(4rem, 8vw, 7rem);
+  }
+
+  .grid {
+    display: grid;
+    gap: 3.5rem;
+    align-items: center;
+  }
+
+  .copy {
+    display: grid;
+    gap: 1.6rem;
+    justify-items: start;
+  }
+
+  h1 {
+    font-size: clamp(3.6rem, 12vw, 8.25rem);
+    line-height: 0.92;
+    letter-spacing: -0.045em;
+  }
+
+  .vision {
+    padding-bottom: 0.08em;
+    background: linear-gradient(110deg, #f26b0e, #c4410a 85%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .lead {
+    max-width: 30rem;
+    color: var(--ink-soft);
+    font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+    line-height: 1.55;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 0.4rem;
+  }
+
+  .stage-wrap {
+    position: relative;
+    width: min(100%, 36rem);
+    margin-inline: auto;
+    padding: 0 1.2rem;
+  }
+
+  /* Glossy gradient panel: indigo depth, amber light from the lower right. */
+  .stage {
+    position: relative;
+    aspect-ratio: 1 / 1.04;
+    border-radius: 44px;
+    overflow: hidden;
+    background:
+      radial-gradient(110% 80% at 88% 104%, #ff8a2b 0%, rgb(255 138 43 / 0) 58%),
+      radial-gradient(90% 70% at 8% 0%, #7c7cff 0%, rgb(124 124 255 / 0) 62%),
+      linear-gradient(165deg, #2c2eab, #14163f 72%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.45),
+      0 50px 90px -34px rgb(59 59 214 / 0.65);
+  }
+
+  .stage::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(125deg, rgb(255 255 255 / 0.28), rgb(255 255 255 / 0) 38%);
+    pointer-events: none;
+  }
+
+  .core {
+    position: absolute;
+    inset: 15% 12% 13% 14%;
+    display: grid;
+    place-items: center;
+  }
+
+  /* The glowing core: amber heart inside a glassy indigo sphere with a specular highlight. */
+  .core-orb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(ellipse 26% 15% at 30% 20%, rgb(255 255 255 / 0.7), transparent 72%),
+      radial-gradient(
+        circle at 50% 54%,
+        #fff3e0 0,
+        #ffc083 13%,
+        #ff8a2b 27%,
+        rgb(255 138 43 / 0) 54%
+      ),
+      radial-gradient(circle at 42% 38%, #6d6dff 0, #2f31b8 52%, #14163f 100%);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.28),
+      inset -16px -24px 50px rgb(8 9 40 / 0.55),
+      0 0 90px 10px rgb(255 138 43 / 0.38);
+  }
+
+  .core-orb::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(200deg, transparent 55%, rgb(255 192 131 / 0.35));
+  }
+
+  .card {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    width: min(15.5rem, 62%);
+    padding: 0.95rem 1.1rem;
+    border-radius: 22px;
+    background: linear-gradient(140deg, rgb(255 255 255 / 0.84), rgb(255 255 255 / 0.62));
+  }
+
+  .card-core {
+    left: 0;
+    bottom: 11%;
+  }
+
+  .card-vision {
+    right: 0;
+    top: 9%;
+  }
+
+  .chip {
+    flex: none;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+  }
+
+  .core-chip {
+    background:
+      radial-gradient(circle at 34% 28%, rgb(255 255 255 / 0.9) 0 10%, transparent 30%),
+      radial-gradient(circle at 50% 55%, #7c7cff, #3b3bd6 60%, #14163f);
+  }
+
+  .vision-chip {
+    background:
+      radial-gradient(circle at 34% 28%, rgb(255 255 255 / 0.9) 0 10%, transparent 30%),
+      radial-gradient(circle at 50% 55%, #ffc083, #ff8a2b 62%, #c2410a);
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .card-text {
+    margin-top: 0.15rem;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    line-height: 1.35;
+  }
+
+  @media (min-width: 64rem) {
+    .grid {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 2rem;
+    }
+    .stage-wrap {
+      margin-inline: 0 auto;
+      margin-left: auto;
+    }
+  }
+</style>

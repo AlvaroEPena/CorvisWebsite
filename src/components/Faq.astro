@@ -1,0 +1,135 @@
+---
+import { faq } from '../content/faq';
+import { site } from '../content/site';
+---
+
+<section class="faq section" id="faq" aria-labelledby="faq-title" data-testid="faq">
+  <div class="container layout">
+    <div class="intro reveal">
+      <h2 id="faq-title">Questions, answered plainly.</h2>
+      <p>
+        Anything else? Write to <a href={`mailto:${site.email}`}>{site.email}</a> and a person will
+        reply.
+      </p>
+    </div>
+
+    <div class="list">
+      {faq.map((entry) => (
+        <details class="item panel">
+          <summary>
+            <span>{entry.question}</span>
+            <span class="plus" aria-hidden="true"></span>
+          </summary>
+          <p>{entry.answer}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .layout {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .intro {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+
+  .intro p {
+    max-width: 24rem;
+    color: var(--ink-soft);
+  }
+
+  .intro a {
+    color: var(--core-600);
+    font-weight: 600;
+  }
+
+  .list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .item {
+    border-radius: 22px;
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 3.5rem;
+    padding: 0.75rem 1.4rem;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    cursor: pointer;
+    list-style: none;
+    border-radius: 22px;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .plus {
+    position: relative;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: rgb(59 59 214 / 0.1);
+  }
+
+  .plus::before,
+  .plus::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0.8rem;
+    height: 2px;
+    margin: -1px 0 0 -0.4rem;
+    background: var(--core-600);
+    transition: transform 0.25s var(--ease-out);
+  }
+
+  .plus::after {
+    transform: rotate(90deg);
+  }
+
+  details[open] .plus::after {
+    transform: rotate(0);
+  }
+
+  details p {
+    padding: 0 1.4rem 1.4rem;
+    max-width: 40rem;
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 64rem) {
+    .layout {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+      gap: 4rem;
+    }
+    .intro {
+      position: sticky;
+      top: 7rem;
+      align-self: start;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plus::before,
+    .plus::after {
+      transition: none;
+    }
+  }
+</style>

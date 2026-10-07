@@ -1,0 +1,119 @@
+---
+import { site } from '../content/site';
+import Logo from './Logo.astro';
+
+interface Props {
+  isHome: boolean;
+}
+const { isHome } = Astro.props;
+const base = isHome ? '' : '/';
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="top">
+      <div class="about">
+        <a href={isHome ? '#main' : '/'} aria-label={`${site.name} home`}>
+          <Logo />
+        </a>
+        <p>{site.slogan}. Websites built around the one idea that makes your business different.</p>
+        <a class="mail" href={`mailto:${site.email}`}>
+          {site.email}
+        </a>
+      </div>
+      <nav aria-label="Footer">
+        <ul>
+          {site.navigation.map((link) => (
+            <li>
+              <a href={`${base}${link.href}`}>{link.label}</a>
+            </li>
+          ))}
+          <li>
+            <a href={`${base}${site.cta.href}`}>Contact</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    <div class="bottom">
+      <p>
+        &copy; {year} {site.name}. All rights reserved.
+      </p>
+      <a href="/privacy">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-block: 4rem 2.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .top {
+    display: grid;
+    gap: 2.5rem;
+    padding-bottom: 3rem;
+  }
+
+  .about {
+    display: grid;
+    gap: 1rem;
+    max-width: 24rem;
+    color: var(--ink-soft);
+  }
+
+  .mail {
+    width: fit-content;
+    color: var(--core-600);
+    font-weight: 600;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem 2rem;
+  }
+
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    color: var(--ink-soft);
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+  }
+
+  .bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-mute);
+    font-size: 0.9rem;
+  }
+
+  .bottom a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  @media (min-width: 48rem) {
+    .top {
+      grid-template-columns: 1fr auto;
+    }
+    ul {
+      grid-template-columns: repeat(3, auto);
+    }
+  }
+</style>

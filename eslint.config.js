@@ -4,7 +4,14 @@ import tseslint from 'typescript-eslint';
 
 export default [
   {
-    ignores: ['dist/**', '.astro/**', 'node_modules/**', 'playwright-report/**', 'test-results/**'],
+    ignores: [
+      '.wrangler/**',
+      'dist/**',
+      '.astro/**',
+      'node_modules/**',
+      'playwright-report/**',
+      'test-results/**',
+    ],
   },
   {
     files: ['**/*.mjs', '*.config.*'],

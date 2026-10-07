@@ -1,0 +1,231 @@
+---
+import { budgetOptions, serviceOptions } from '../content/contact-options';
+import { site } from '../content/site';
+import Field from './Field.astro';
+
+/** Cloudflare's published always-passes test key. The Worker's secret decides real validation. */
+const TURNSTILE_TEST_KEY = '1x00000000000000000000AA';
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || TURNSTILE_TEST_KEY;
+---
+
+<div class="wrap glass" data-testid="contact-form-panel">
+  <form
+    class="form"
+    method="post"
+    action="/api/contact"
+    novalidate
+    data-contact-form
+    data-contact-email={site.email}
+    data-testid="contact-form"
+    aria-label="Book a free consult"
+  >
+    <div class="row">
+      <Field name="name" label="Your name" required autocomplete="name" />
+      <Field name="email" label="Email" type="email" required autocomplete="email" />
+    </div>
+    <div class="row">
+      <Field name="company" label="Company" autocomplete="organization" />
+      <Field
+        name="website"
+        label="Current website"
+        type="url"
+        autocomplete="url"
+        hint="If you have one. example.com is fine."
+      />
+    </div>
+    <div class="row">
+      <Field
+        name="service"
+        label="What do you need?"
+        type="select"
+        required
+        options={serviceOptions}
+      />
+      <Field name="budget" label="Budget" type="select" options={budgetOptions} />
+    </div>
+    <Field
+      name="message"
+      label="Tell us about the project"
+      type="textarea"
+      required
+      hint="What you sell, who it is for, and what is not working today."
+    />
+
+    <!-- Honeypot: invisible to people and to assistive tech, irresistible to bots. -->
+    <div class="trap" aria-hidden="true">
+      <label for="cf-nickname">Leave this field empty</label>
+      <input id="cf-nickname" name="nickname" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="consent">
+      <label class="check">
+        <input
+          name="consent"
+          type="checkbox"
+          aria-describedby="cf-consent-note"
+          data-describedby="cf-consent-note"
+        />
+        <span>
+          I agree to Corvis storing my details to reply to this request.{' '}
+          <a href="/privacy">Read the privacy note</a>.
+        </span>
+      </label>
+      <p class="note" id="cf-consent-note">
+        We never share your details or add you to a mailing list.
+      </p>
+      <p class="error" id="cf-consent-error" data-error-for="consent" hidden></p>
+    </div>
+
+    <div class="check-block">
+      <div class="turnstile" data-turnstile data-sitekey={siteKey}></div>
+      <p class="error" id="cf-turnstile-error" data-error-for="turnstileToken" hidden></p>
+    </div>
+
+    <div class="status" role="status" aria-live="polite" data-form-status>
+      <p class="failure" data-form-error data-testid="form-error" hidden></p>
+    </div>
+
+    <button class="btn btn-primary submit" type="submit" data-submit>
+      Send request
+    </button>
+    <noscript>
+      <p class="note">
+        This form needs JavaScript. You can also email{' '}
+        <a href={`mailto:${site.email}`}>{site.email}</a>.
+      </p>
+    </noscript>
+  </form>
+
+  <div class="success" data-form-success data-testid="form-success" tabindex="-1" hidden>
+    <span class="success-orb" aria-hidden="true"></span>
+    <h3>Thank you. Your request is in.</h3>
+    <p>
+      We will reply to the email you gave us, usually within one working day, to set up your free
+      consult.
+    </p>
+  </div>
+</div>
+
+<script>
+  import '../scripts/contact';
+</script>
+
+<style>
+  .wrap {
+    padding: clamp(1.4rem, 3vw, 2.4rem);
+    border-radius: 32px;
+  }
+
+  .form {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .row {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .trap {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .consent {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .check {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    cursor: pointer;
+  }
+
+  .check input {
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: 0.1rem 0 0;
+    accent-color: var(--core-600);
+  }
+
+  .check a {
+    color: var(--core-600);
+    font-weight: 600;
+  }
+
+  .note {
+    color: var(--ink-mute);
+    font-size: 0.875rem;
+    padding-left: 2.3rem;
+  }
+
+  noscript .note {
+    padding-left: 0;
+  }
+
+  .error {
+    color: #b42318;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  [aria-invalid='true'] {
+    outline: 2px solid #b42318;
+    outline-offset: 2px;
+  }
+
+  .turnstile {
+    min-height: 65px;
+  }
+
+  .failure {
+    padding: 0.9rem 1.1rem;
+    border-radius: 16px;
+    background: #fff1ef;
+    border: 1.5px solid #b42318;
+    color: #7a1a12;
+    font-weight: 600;
+  }
+
+  .submit {
+    width: 100%;
+    min-height: 3.5rem;
+    font-size: 1.05rem;
+  }
+
+  .success {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: start;
+    padding-block: 1.5rem;
+  }
+
+  .success p {
+    color: var(--ink-soft);
+    max-width: 28rem;
+  }
+
+  .success-orb {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 34% 28%, #fff 0 10%, transparent 30%),
+      radial-gradient(circle at 50% 55%, #ffc083, #ff8a2b 60%, #c2410a);
+    box-shadow: 0 14px 24px -10px rgb(180 68 10 / 0.6);
+  }
+
+  @media (min-width: 40rem) {
+    .row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

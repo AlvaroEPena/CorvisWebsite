@@ -1,0 +1,102 @@
+---
+import { processSteps } from '../content/process';
+---
+
+<section class="process section" id="process" aria-labelledby="process-title" data-testid="process">
+  <div class="container">
+    <div class="section-heading reveal">
+      <h2 id="process-title">How a project moves, from hello to live.</h2>
+      <p>Five clear stages, one point of contact and no mystery about what happens next.</p>
+    </div>
+
+    <ol class="steps">
+      {processSteps.map((step) => (
+        <li class="step reveal">
+          <span class="orb" aria-hidden="true"></span>
+          <h3>{step.title}</h3>
+          <p>{step.description}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .steps {
+    position: relative;
+    display: grid;
+    gap: 2.25rem;
+    margin: 0;
+    padding: 0 0 0 2.25rem;
+    list-style: none;
+  }
+
+  /* Mobile: a vertical thread linking the orbs. */
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 0.85rem;
+    top: 0.6rem;
+    bottom: 0.6rem;
+    width: 2px;
+    background: linear-gradient(var(--core-400), var(--vision-500));
+    opacity: 0.55;
+  }
+
+  .step {
+    position: relative;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .orb {
+    position: absolute;
+    left: -2.25rem;
+    top: 0.2rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 34% 28%, #fff 0 12%, transparent 34%),
+      radial-gradient(circle at 50% 55%, #ffc083, #ff8a2b 60%, #c2410a);
+    box-shadow: 0 8px 14px -6px rgb(180 68 10 / 0.6);
+  }
+
+  h3 {
+    font-size: 1.55rem;
+  }
+
+  p {
+    color: var(--ink-soft);
+    max-width: 22rem;
+  }
+
+  @media (min-width: 64rem) {
+    .steps {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1.5rem;
+      padding: 0;
+    }
+
+    /* Desktop: a horizontal thread running through the orbs. */
+    .steps::before {
+      left: 0;
+      right: 0;
+      top: 1.05rem;
+      bottom: auto;
+      width: auto;
+      height: 2px;
+    }
+
+    .step {
+      padding-top: 3.5rem;
+    }
+
+    .orb {
+      left: 0;
+      top: 0;
+      width: 2.1rem;
+      height: 2.1rem;
+    }
+  }
+</style>

@@ -1,0 +1,94 @@
+---
+import { site } from '../content/site';
+import Layout from '../layouts/Layout.astro';
+
+const sections = [
+  {
+    title: 'What we collect',
+    body: 'Only what you type into the contact form: your name, email address, company, website, the service and budget you pick, and your message. We also receive a Cloudflare Turnstile result that tells us you are not a bot.',
+  },
+  {
+    title: 'Why we collect it',
+    body: 'To reply to your request and, if you want to go ahead, to plan your project. We do not sell your details, share them for advertising or add you to a mailing list.',
+  },
+  {
+    title: 'Who handles it',
+    body: 'Your message is delivered to us by email through Resend. Cloudflare hosts this site and runs the Turnstile check. Both act only as processors for us.',
+  },
+  {
+    title: 'How long we keep it',
+    body: 'We keep enquiries for as long as needed to answer you and for a reasonable period afterwards. You can ask us to delete your details at any time.',
+  },
+  {
+    title: 'Cookies and analytics',
+    body: 'This site sets no tracking cookies and runs no analytics. Turnstile may use short-lived technical storage to run its check.',
+  },
+  {
+    title: 'Your rights',
+    body: `You can ask to see, correct or delete the data we hold about you. Email ${site.email} and we will respond promptly.`,
+  },
+];
+---
+
+<Layout
+  title={`Privacy note | ${site.name}`}
+  description="How Corvis handles the details you send through the contact form."
+>
+  <section class="privacy section" aria-labelledby="privacy-title">
+    <div class="container narrow">
+      <p class="eyebrow">Privacy</p>
+      <h1 id="privacy-title">Privacy note</h1>
+      <p class="intro">
+        Short and plain: this is what happens to the details you send us. Last updated October 2026.
+      </p>
+      {sections.map((section) => (
+        <section class="block">
+          <h2>{section.title}</h2>
+          <p>{section.body}</p>
+        </section>
+      ))}
+      <a class="btn btn-ghost back" href="/">
+        Back to the homepage
+      </a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .narrow {
+    max-width: 44rem;
+    display: grid;
+    gap: 1.5rem;
+    justify-items: start;
+  }
+
+  h1 {
+    font-size: clamp(2.6rem, 6vw, 4.2rem);
+  }
+
+  .intro {
+    color: var(--ink-soft);
+    font-size: 1.15rem;
+  }
+
+  .block {
+    display: grid;
+    gap: 0.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    width: 100%;
+  }
+
+  .block h2 {
+    font-size: 1.4rem;
+    letter-spacing: -0.02em;
+  }
+
+  .block p {
+    color: var(--ink-soft);
+  }
+
+  .back {
+    margin-top: 1rem;
+  }
+</style>

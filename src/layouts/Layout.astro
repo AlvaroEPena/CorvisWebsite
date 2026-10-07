@@ -1,0 +1,98 @@
+---
+import { Font } from 'astro:assets';
+
+import Footer from '../components/Footer.astro';
+import Nav from '../components/Nav.astro';
+import { site } from '../content/site';
+import '../styles/global.css';
+import { absoluteUrl, canonicalPath } from './seo';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** JSON-LD objects for this page. */
+  structuredData?: Record<string, unknown>[];
+  /** Open Graph image path, relative to the site root. */
+  image?: string;
+  noindex?: boolean;
+}
+
+const {
+  title = site.title,
+  description = site.description,
+  structuredData = [],
+  image = '/og.png',
+  noindex = false,
+} = Astro.props;
+
+const origin = (Astro.site ?? new URL(site.url)).toString();
+const canonical = absoluteUrl(canonicalPath(Astro.url.pathname), origin);
+const ogImage = absoluteUrl(image, origin);
+const isHome = canonicalPath(Astro.url.pathname) === '/';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f5f3ef" />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Corvis, The Core Vision: a glowing amber core inside an indigo orb"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <Font cssVariable="--face-display" preload />
+    <Font cssVariable="--face-body" />
+
+    <!-- Progressive enhancement flags. Hidden-until-animated states apply only once these are set,
+         and the failsafe removes them if the motion module never reports ready. -->
+    <script is:inline>
+      (function () {
+        const root = document.documentElement;
+        const connection = navigator.connection;
+        if (connection && connection.saveData) root.setAttribute('data-save-data', '');
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        root.setAttribute('data-motion', 'on');
+        setTimeout(function () {
+          if (!root.hasAttribute('data-motion-ready')) root.removeAttribute('data-motion');
+        }, 4000);
+      })();
+    </script>
+    {structuredData.map((data) => (
+      <script type="application/ld+json" set:html={JSON.stringify(data)} />
+    ))}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    <Nav isHome={isHome} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer isHome={isHome} />
+    <script>
+      import '../scripts/nav';
+      import '../scripts/motion';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,465 @@
+---
+import { describePosition } from '../scripts/slider-math';
+
+const START = 50;
+---
+
+<section class="redesign section" id="redesign" aria-labelledby="redesign-title">
+  <div class="aura" style="--aura-color:rgb(255 192 131 / .5);top:-10rem;left:30%"></div>
+  <div class="container">
+    <div class="section-heading reveal">
+      <p class="eyebrow">Before and after</p>
+      <h2 id="redesign-title">Same business. A very different first impression.</h2>
+      <p>
+        Drag the handle, or focus it and use the arrow keys, to see a typical tired small-business
+        site become something people trust at a glance.
+      </p>
+    </div>
+
+    <div class="frame panel" data-ba data-testid="redesign-slider" style={`--ba-pos:${START}%`}>
+      <div class="stage" aria-hidden="true">
+        <!-- AFTER: the Corvis redesign, always underneath. -->
+        <div class="layer after">
+          <div class="a-nav">
+            <span class="a-logo">
+              <i></i>Alder &amp; Finch
+            </span>
+            <span class="a-links">
+              <b>Gardens</b>
+              <b>Projects</b>
+              <b>About</b>
+            </span>
+            <span class="a-cta">Get a quote</span>
+          </div>
+          <div class="a-hero">
+            <div class="a-copy">
+              <span class="a-badge">Landscape design</span>
+              <span class="a-title">Gardens that earn the second look.</span>
+              <span class="a-sub">
+                Design, build and care for outdoor spaces you will actually use.
+              </span>
+              <span class="a-btn">Request a quote</span>
+            </div>
+            <div class="a-art">
+              <i class="a-orb"></i>
+              <i class="a-card c1">
+                <b></b>Spring planting
+              </i>
+              <i class="a-card c2">
+                <b></b>Quote in 48 hours
+              </i>
+            </div>
+          </div>
+        </div>
+
+        <!-- BEFORE: a deliberately dated site, clipped to the left of the handle. -->
+        <div class="layer before" data-ba-before style={`clip-path:inset(0 ${100 - START}% 0 0)`}>
+          <div class="b-banner">WELCOME TO ALDER &amp; FINCH LANDSCAPING!!!</div>
+          <div class="b-nav">
+            Home | About Us | Our Services | Photo Gallery | Links | Contact Us
+          </div>
+          <div class="b-body">
+            <div class="b-text">
+              <u>Click here</u> to see our services. We have been in business for many years and we
+              do lawns, trees, hedges, patios and more!! Call today for a FREE estimate.{' '}
+              <u>Click here</u> for our coupons.
+              <span class="b-new">NEW!</span>
+            </div>
+            <div class="b-pic">[ photo ]</div>
+          </div>
+          <div class="b-foot">
+            You are visitor number 004281 &nbsp; Best viewed in Internet Explorer
+          </div>
+        </div>
+
+        <span class="tag tag-before">Before</span>
+        <span class="tag tag-after">After</span>
+        <span class="handle">
+          <span class="knob"></span>
+        </span>
+      </div>
+
+      <label class="sr-only" for="ba-range">
+        Compare the original site with the Corvis redesign. Use the left and right arrow keys.
+      </label>
+      <input
+        id="ba-range"
+        class="range"
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        value={START}
+        aria-valuetext={describePosition(START)}
+        data-ba-input
+      />
+    </div>
+  </div>
+</section>
+
+<script>
+  import '../scripts/slider';
+</script>
+
+<style>
+  .frame {
+    position: relative;
+    padding: clamp(0.5rem, 1.2vw, 0.9rem);
+    border-radius: 36px;
+  }
+
+  .stage {
+    position: relative;
+    container-type: inline-size;
+    aspect-ratio: 4 / 3;
+    border-radius: 26px;
+    overflow: hidden;
+    background: #fff;
+    user-select: none;
+  }
+
+  @media (min-width: 48rem) {
+    .stage {
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  .layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  /* ---------- BEFORE: dated mock ---------- */
+  .before {
+    background: #ece9d8;
+    color: #000;
+    font-family: 'Times New Roman', Times, serif;
+    z-index: 1;
+  }
+
+  .b-banner {
+    padding: 2.2cqw 1cqw;
+    background: #000080;
+    color: #ffff00;
+    font-family: 'Comic Sans MS', 'Comic Neue', cursive;
+    font-size: 3.4cqw;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 0.5cqw ridge #808080;
+  }
+
+  .b-nav {
+    padding: 0.9cqw 1.5cqw;
+    background: #c0c0c0;
+    border-bottom: 0.3cqw solid #808080;
+    color: #0000ee;
+    font-size: 1.7cqw;
+    text-decoration: underline;
+    white-space: nowrap;
+  }
+
+  .b-body {
+    display: flex;
+    gap: 2cqw;
+    padding: 2.5cqw 3cqw;
+  }
+
+  .b-text {
+    flex: 1;
+    font-size: 1.9cqw;
+    line-height: 1.25;
+    color: #222;
+  }
+
+  .b-text u {
+    color: #0000ee;
+  }
+
+  .b-new {
+    margin-left: 1cqw;
+    padding: 0.2cqw 1cqw;
+    background: #ff0000;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.6cqw;
+  }
+
+  .b-pic {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 24cqw;
+    height: 16cqw;
+    border: 0.7cqw outset #c0c0c0;
+    background: #a0a0a0;
+    color: #555;
+    font-size: 1.8cqw;
+  }
+
+  .b-foot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 1cqw 3cqw;
+    background: #c0c0c0;
+    border-top: 0.3cqw solid #808080;
+    font-size: 1.5cqw;
+    color: #333;
+  }
+
+  /* ---------- AFTER: Corvis redesign mock ---------- */
+  .after {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 2cqw;
+    padding: 2.4cqw 3cqw;
+    background:
+      radial-gradient(60% 60% at 90% 0%, rgb(255 192 131 / 0.7), transparent 60%),
+      radial-gradient(50% 60% at 0% 100%, rgb(124 124 255 / 0.28), transparent 60%), #f5f3ef;
+    color: #0e1024;
+    font-family: var(--font-body);
+  }
+
+  .a-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1cqw 1.4cqw;
+    border-radius: 99cqw;
+    background: rgb(255 255 255 / 0.85);
+    box-shadow: 0 1cqw 3cqw -1.4cqw rgb(59 59 214 / 0.35);
+    font-size: 1.6cqw;
+    font-weight: 600;
+  }
+
+  .a-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8cqw;
+    font-family: var(--font-display);
+    font-size: 1.9cqw;
+  }
+
+  .a-logo i {
+    width: 2.4cqw;
+    height: 2.4cqw;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff, #19b5a5 55%, #0b5d55);
+  }
+
+  .a-links {
+    display: flex;
+    gap: 2.4cqw;
+    color: #4a4d6b;
+    font-weight: 500;
+  }
+
+  .a-cta {
+    padding: 0.9cqw 2cqw;
+    border-radius: 99cqw;
+    background: #14163f;
+    color: #fff;
+  }
+
+  .a-hero {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 3cqw;
+    align-items: center;
+  }
+
+  .a-copy {
+    display: grid;
+    gap: 1.6cqw;
+    justify-items: start;
+  }
+
+  .a-badge {
+    padding: 0.5cqw 1.6cqw;
+    border-radius: 99cqw;
+    background: rgb(25 181 165 / 0.15);
+    color: #0b5d55;
+    font-size: 1.3cqw;
+    font-weight: 600;
+  }
+
+  .a-title {
+    font-family: var(--font-display);
+    font-size: 5.4cqw;
+    font-weight: 700;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+  }
+
+  .a-sub {
+    max-width: 34cqw;
+    color: #4a4d6b;
+    font-size: 1.7cqw;
+    line-height: 1.4;
+  }
+
+  .a-btn {
+    padding: 1.2cqw 2.6cqw;
+    border-radius: 99cqw;
+    background: linear-gradient(135deg, #19b5a5, #0b5d55);
+    color: #fff;
+    font-size: 1.6cqw;
+    font-weight: 600;
+  }
+
+  .a-art {
+    position: relative;
+    align-self: stretch;
+    border-radius: 3cqw;
+    background:
+      radial-gradient(90% 70% at 90% 100%, #ffc083, transparent 60%),
+      linear-gradient(160deg, #19b5a5, #08272a);
+  }
+
+  .a-orb {
+    position: absolute;
+    inset: 14% 18% 16% 14%;
+    border-radius: 50%;
+    background:
+      radial-gradient(ellipse 28% 16% at 30% 20%, rgb(255 255 255 / 0.65), transparent 70%),
+      radial-gradient(circle at 50% 55%, #e8fff9 0, #7fe9db 28%, #138077 62%, #08272a);
+  }
+
+  .a-card {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0.8cqw;
+    padding: 1cqw 1.6cqw;
+    border-radius: 2cqw;
+    background: rgb(255 255 255 / 0.9);
+    font-size: 1.3cqw;
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  .a-card b {
+    width: 2cqw;
+    height: 2cqw;
+    border-radius: 50%;
+    background: #ff8a2b;
+  }
+
+  .c1 {
+    left: -3cqw;
+    top: 16%;
+  }
+
+  .c2 {
+    right: 2cqw;
+    bottom: 8%;
+  }
+
+  /* ---------- Controls ---------- */
+  .tag {
+    position: absolute;
+    top: 1.6cqw;
+    z-index: 3;
+    padding: 0.6cqw 1.8cqw;
+    border-radius: 99cqw;
+    background: rgb(14 16 36 / 0.86);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: max(0.75rem, 1.5cqw);
+    font-weight: 600;
+  }
+
+  .tag-before {
+    left: 1.6cqw;
+    top: auto;
+    bottom: 5cqw;
+  }
+
+  .tag-after {
+    right: 1.6cqw;
+    bottom: 1.6cqw;
+    top: auto;
+  }
+
+  .handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--ba-pos);
+    z-index: 4;
+    width: 3px;
+    margin-left: -1.5px;
+    background: #fff;
+    box-shadow: 0 0 0 1px rgb(14 16 36 / 0.25);
+  }
+
+  .knob {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 3rem;
+    height: 3rem;
+    margin: -1.5rem 0 0 -1.5rem;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow:
+      0 8px 20px -6px rgb(14 16 36 / 0.5),
+      inset 0 0 0 1px rgb(14 16 36 / 0.12);
+  }
+
+  .knob::before,
+  .knob::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 0.55rem;
+    height: 0.55rem;
+    margin-top: -0.275rem;
+    border: solid #14163f;
+    border-width: 0 0 2.5px 2.5px;
+  }
+
+  .knob::before {
+    left: 0.85rem;
+    transform: rotate(45deg);
+  }
+
+  .knob::after {
+    right: 0.85rem;
+    transform: rotate(-135deg);
+  }
+
+  .frame:has(.range:focus-visible) .knob {
+    outline: 3px solid var(--core-600);
+    outline-offset: 3px;
+  }
+
+  /* The native range input is the real control: transparent, over the whole stage. */
+  .range {
+    position: absolute;
+    inset: clamp(0.5rem, 1.2vw, 0.9rem);
+    z-index: 5;
+    width: calc(100% - 2 * clamp(0.5rem, 1.2vw, 0.9rem));
+    height: calc(100% - 2 * clamp(0.5rem, 1.2vw, 0.9rem));
+    margin: 0;
+    opacity: 0;
+    cursor: ew-resize;
+    touch-action: pan-y;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 3rem;
+    height: 100vh;
+  }
+
+  .range::-moz-range-thumb {
+    width: 3rem;
+    height: 100vh;
+    border: 0;
+  }
+</style>

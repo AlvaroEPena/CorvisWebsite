@@ -1,0 +1,220 @@
+---
+import { site } from '../content/site';
+import Logo from './Logo.astro';
+
+interface Props {
+  /** On the home page anchors are local; elsewhere they point back to "/". */
+  isHome: boolean;
+}
+const { isHome } = Astro.props;
+const base = isHome ? '' : '/';
+const links = site.navigation.map((link) => ({ ...link, href: `${base}${link.href}` }));
+---
+
+<header class="site-header">
+  <nav class="nav glass" aria-label="Primary" data-testid="nav">
+    <a class="brand" href={isHome ? '#main' : '/'} aria-label={`${site.name} home`}>
+      <Logo />
+    </a>
+
+    <ul class="links">
+      {links.map((link) => (
+        <li>
+          <a href={link.href}>{link.label}</a>
+        </li>
+      ))}
+    </ul>
+
+    <a class="btn btn-primary cta" href={`${base}${site.cta.href}`} data-testid="nav-cta">
+      {site.cta.label}
+    </a>
+
+    <button
+      class="toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="nav-menu"
+      aria-label="Open menu"
+      data-nav-toggle
+    >
+      <span class="bars" aria-hidden="true"></span>
+    </button>
+
+    <div class="menu" id="nav-menu" data-nav-menu data-open="false">
+      <ul>
+        {links.map((link) => (
+          <li>
+            <a href={link.href}>{link.label}</a>
+          </li>
+        ))}
+      </ul>
+      <a class="btn btn-primary" href={`${base}${site.cta.href}`}>
+        {site.cta.label}
+      </a>
+    </div>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: 0.75rem var(--gutter) 0;
+    pointer-events: none;
+  }
+
+  .nav {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    max-width: 72rem;
+    min-height: 4rem;
+    margin-inline: auto;
+    padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+    border-radius: var(--radius-pill);
+    pointer-events: auto;
+    /* Fixed bars repaint on every scroll frame: smaller blur, near-opaque fill. */
+    background: rgb(255 255 255 / 0.78);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    backdrop-filter: blur(12px) saturate(140%);
+  }
+
+  .brand {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    text-decoration: none;
+    border-radius: var(--radius-pill);
+  }
+
+  .links {
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 0.25rem;
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 0.95rem;
+    border-radius: var(--radius-pill);
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .links a:hover {
+    background: rgb(59 59 214 / 0.09);
+    color: var(--ink);
+  }
+
+  .cta {
+    display: none;
+    min-height: 2.75rem;
+    padding-inline: 1.3rem;
+    font-size: 0.95rem;
+  }
+
+  .toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid rgb(20 22 63 / 0.16);
+    border-radius: var(--radius-pill);
+    background: #fff;
+    cursor: pointer;
+  }
+
+  .bars,
+  .bars::before {
+    display: block;
+    width: 1.1rem;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--ink);
+    transition: transform 0.25s var(--ease-out);
+  }
+
+  .bars {
+    position: relative;
+    transform: translateY(-3px);
+  }
+
+  .bars::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+  }
+
+  .toggle[aria-expanded='true'] .bars {
+    transform: rotate(45deg);
+  }
+
+  .toggle[aria-expanded='true'] .bars::before {
+    top: 0;
+    transform: rotate(-90deg);
+  }
+
+  .menu {
+    display: none;
+    position: absolute;
+    inset: calc(100% + 0.5rem) 0 auto 0;
+    padding: 1rem;
+    border-radius: var(--radius-card);
+    border: 1px solid rgb(255 255 255 / 0.9);
+    background: rgb(255 255 255 / 0.97);
+    box-shadow: 0 24px 50px -18px rgb(20 22 63 / 0.35);
+    gap: 0.75rem;
+  }
+
+  .menu[data-open='true'] {
+    display: grid;
+  }
+
+  .menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+  }
+
+  .menu ul a {
+    display: flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0 0.75rem;
+    border-radius: 14px;
+    font-size: 1.05rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .menu ul a:hover {
+    background: rgb(59 59 214 / 0.08);
+  }
+
+  @media (min-width: 64rem) {
+    .links {
+      display: flex;
+    }
+    .cta {
+      display: inline-flex;
+    }
+    .toggle,
+    .menu {
+      display: none !important;
+    }
+  }
+</style>

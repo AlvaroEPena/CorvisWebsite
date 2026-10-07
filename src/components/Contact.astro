@@ -1,0 +1,120 @@
+---
+import { site } from '../content/site';
+import ContactForm from './ContactForm.astro';
+import FloatingObject from './FloatingObject.astro';
+
+const nextSteps = [
+  'We reply within one working day.',
+  'A free consult, on video or a call, about 30 minutes.',
+  'A clear proposal with a fixed price. No pressure.',
+];
+---
+
+<section class="contact section" id="contact" aria-labelledby="contact-title">
+  <div class="aura" style="--aura-color:rgb(255 192 131 / .55);top:-6rem;left:-16rem"></div>
+  <div class="aura" style="--aura-color:rgb(124 124 255 / .3);bottom:-12rem;right:-20rem"></div>
+  <div class="container layout">
+    <div class="intro reveal">
+      <p class="eyebrow">Start here</p>
+      <h2 id="contact-title">{site.cta.label}.</h2>
+      <p class="lead">
+        Tell us about your business and the site you want. We will show you how your core vision
+        could look on screen.
+      </p>
+      <ol class="next">
+        {nextSteps.map((step) => (
+          <li>{step}</li>
+        ))}
+      </ol>
+      <p class="direct">
+        Prefer email? <a href={`mailto:${site.email}`}>{site.email}</a>
+      </p>
+      <div class="deco" aria-hidden="true">
+        <FloatingObject
+          kind="bead"
+          tone="amber"
+          style="width:5rem;height:5rem;left:0;bottom:0"
+          delay="-2s"
+        />
+        <FloatingObject
+          kind="capsule"
+          tone="indigo"
+          style="width:2.4rem;height:5.6rem;left:6.5rem;bottom:1rem"
+          tilt="28deg"
+          delay="-4s"
+        />
+      </div>
+    </div>
+    <ContactForm />
+  </div>
+</section>
+
+<style>
+  .layout {
+    display: grid;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  .intro {
+    display: grid;
+    gap: 1.2rem;
+    justify-items: start;
+  }
+
+  .lead {
+    max-width: 30rem;
+    color: var(--ink-soft);
+    font-size: 1.15rem;
+  }
+
+  .next {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .next li {
+    position: relative;
+    padding-left: 1.7rem;
+  }
+
+  .next li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%, #fff, #ff8a2b 60%);
+  }
+
+  .direct a {
+    color: var(--core-600);
+    font-weight: 600;
+  }
+
+  .deco {
+    position: relative;
+    display: none;
+    width: 100%;
+    height: 8rem;
+  }
+
+  @media (min-width: 64rem) {
+    .layout {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 4rem;
+    }
+    .intro {
+      position: sticky;
+      top: 7rem;
+    }
+    .deco {
+      display: block;
+    }
+  }
+</style>

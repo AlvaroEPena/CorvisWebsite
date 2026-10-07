@@ -1,12 +1,32 @@
 ---
+import BeforeAfter from '../components/BeforeAfter.astro';
+import Contact from '../components/Contact.astro';
+import Faq from '../components/Faq.astro';
+import Hero from '../components/Hero.astro';
+import Pricing from '../components/Pricing.astro';
+import Process from '../components/Process.astro';
+import Proof from '../components/Proof.astro';
+import Services from '../components/Services.astro';
+import Testimonials from '../components/Testimonials.astro';
+import Work from '../components/Work.astro';
+import { faq } from '../content/faq';
+import { services } from '../content/services';
+import { site } from '../content/site';
+import Layout from '../layouts/Layout.astro';
+import { faqJsonLd, professionalServiceJsonLd } from '../layouts/seo';
+
+const origin = (Astro.site ?? new URL(site.url)).toString();
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Corvis — The Core Vision</title>
-  </head>
-  <body>
-    <h1>Corvis</h1>
-  </body>
-</html>
+<Layout structuredData={[professionalServiceJsonLd(site, services, origin), faqJsonLd(faq)]}>
+  <Hero />
+  <Proof />
+  <Services />
+  <Work />
+  <BeforeAfter />
+  <Process />
+  <Pricing />
+  <Testimonials />
+  <Faq />
+  <Contact />
+</Layout>

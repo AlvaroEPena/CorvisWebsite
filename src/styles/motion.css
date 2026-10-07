@@ -1,0 +1,64 @@
+/*
+ * Motion layer. Everything here is transform/opacity only and degrades to the final state:
+ *  - scroll-driven reveals run only where `animation-timeline` exists and motion is allowed,
+ *  - the hero entrance is CSS (so the headline, the LCP element, is never delayed),
+ *  - GSAP (scripts/motion.ts) only adds the hero-object entrance and light parallax.
+ * Never put .reveal on an element that carries a backdrop-filter.
+ */
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--tilt, 0deg));
+  }
+  50% {
+    transform: translate3d(0, -14px, 0) rotate(calc(var(--tilt, 0deg) + 2deg));
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-rise {
+    animation: rise-in 0.8s var(--ease-out) both;
+    animation-delay: var(--delay, 0.1s);
+  }
+
+  .float {
+    animation: drift var(--float-duration, 9s) ease-in-out infinite;
+    animation-delay: var(--float-delay, 0s);
+  }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+
+/* Decorative hero objects stay hidden only while GSAP is about to animate them in. */
+:root[data-motion='on']:not([data-motion-ready]) [data-hero-obj] {
+  opacity: 0;
+}

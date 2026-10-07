@@ -1,0 +1,245 @@
+---
+import { formatPrice } from '../content/format';
+import { pricing } from '../content/pricing';
+import { site } from '../content/site';
+---
+
+<section class="pricing" id="pricing" aria-labelledby="pricing-title" data-testid="pricing">
+  <div class="core-bg on-dark">
+    <div class="glow g1"></div>
+    <div class="glow g2"></div>
+    <div class="container inner">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Packages</p>
+        <h2 id="pricing-title">Clear prices before you commit to anything.</h2>
+        <p>
+          Starting points for the most common projects. Your fixed quote follows the free consult.
+        </p>
+      </div>
+
+      <ul class="cards">
+        {pricing.map((pkg) => (
+          <li
+            class:list={['card', pkg.featured ? 'featured' : 'glass-dark']}
+            data-placeholder={pkg.placeholder}
+          >
+            {pkg.featured && <span class="badge">Most chosen</span>}
+            <h3>{pkg.name}</h3>
+            <p class="blurb">{pkg.blurb}</p>
+            <p class="price">
+              <span class="from">Starting at</span>
+              <span class="amount">{formatPrice(pkg.priceFrom)}</span>
+              {pkg.unit && <span class="unit">{pkg.unit}</span>}
+            </p>
+            <ul class="features">
+              {pkg.features.map((feature) => (
+                <li>{feature}</li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+
+      <div class="cta reveal">
+        <p>Not sure which fits? Tell us about the site you have in mind.</p>
+        <a class="btn btn-light" href={site.cta.href}>
+          {site.cta.label}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pricing {
+    padding-inline: clamp(0.5rem, 2vw, 1.5rem);
+  }
+
+  /* The one dark "Core" section: deep indigo with amber and teal light leaking in. */
+  .core-bg {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: clamp(32px, 5vw, 56px);
+    padding-block: var(--section-pad);
+    color: #fff;
+    background: linear-gradient(165deg, #20237a 0%, #14163f 45%, #0a0b24 100%);
+  }
+
+  .glow {
+    position: absolute;
+    z-index: -1;
+    width: 50rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .g1 {
+    right: -18rem;
+    bottom: -22rem;
+    background: radial-gradient(closest-side, rgb(255 138 43 / 0.5), transparent);
+  }
+
+  .g2 {
+    left: -20rem;
+    top: -18rem;
+    background: radial-gradient(closest-side, rgb(25 181 165 / 0.3), transparent);
+  }
+
+  .section-heading p:not(.eyebrow) {
+    color: #c9cbf0;
+  }
+
+  .eyebrow {
+    background: rgb(255 255 255 / 0.1);
+    border-color: rgb(255 255 255 / 0.25);
+    color: var(--vision-300);
+  }
+
+  .cards {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    align-items: stretch;
+  }
+
+  .card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 1.1rem;
+    padding: clamp(1.6rem, 3vw, 2.25rem);
+    border-radius: var(--radius-card);
+  }
+
+  .featured {
+    color: var(--ink);
+    background:
+      radial-gradient(90% 60% at 100% 0%, rgb(255 192 131 / 0.7), transparent 60%),
+      linear-gradient(160deg, #ffffff, #f1efff);
+    border: 1px solid #fff;
+    box-shadow:
+      0 0 0 4px rgb(255 138 43 / 0.35),
+      0 40px 80px -30px rgb(0 0 0 / 0.7);
+  }
+
+  .badge {
+    width: fit-content;
+    padding: 0.3rem 0.85rem;
+    border-radius: var(--radius-pill);
+    background: var(--core-900);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .blurb {
+    color: #c9cbf0;
+    min-height: 3.2em;
+  }
+
+  .featured .blurb {
+    color: var(--ink-soft);
+  }
+
+  .price {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .from {
+    font-size: 0.9rem;
+    color: #c9cbf0;
+  }
+
+  .featured .from {
+    color: var(--ink-soft);
+  }
+
+  .amount {
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 4vw, 3.4rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .unit {
+    font-size: 0.95rem;
+    color: #c9cbf0;
+  }
+
+  .featured .unit {
+    color: var(--ink-soft);
+  }
+
+  .features {
+    display: grid;
+    gap: 0.65rem;
+    margin: 0.5rem 0 0;
+    padding: 1.25rem 0 0;
+    border-top: 1px solid rgb(255 255 255 / 0.16);
+    list-style: none;
+  }
+
+  .featured .features {
+    border-top-color: var(--line);
+  }
+
+  .features li {
+    position: relative;
+    padding-left: 1.6rem;
+    font-size: 0.98rem;
+  }
+
+  .features li::before {
+    content: '';
+    position: absolute;
+    left: 0.15rem;
+    top: 0.5em;
+    width: 0.7rem;
+    height: 0.38rem;
+    border: solid var(--vision-500);
+    border-width: 0 0 2.5px 2.5px;
+    transform: rotate(-45deg);
+  }
+
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem 2rem;
+    margin-top: 3rem;
+  }
+
+  .cta p {
+    color: #e6e7ff;
+    font-size: 1.1rem;
+  }
+
+  .btn-light {
+    color: var(--core-900);
+    background: #fff;
+    border: 2px solid transparent;
+    box-shadow: 0 12px 28px -12px rgb(0 0 0 / 0.6);
+  }
+
+  .btn-light:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 6px rgb(255 138 43 / 0.3);
+  }
+
+  @media (min-width: 64rem) {
+    .cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: center;
+    }
+    /* The featured package stands taller than its neighbours. */
+    .featured {
+      padding-block: clamp(2.4rem, 4vw, 3.2rem);
+    }
+  }
+</style>

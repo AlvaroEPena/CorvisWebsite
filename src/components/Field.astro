@@ -1,0 +1,171 @@
+---
+/** One labelled form control with an optional hint and a slot for its inline error. */
+interface Option {
+  value: string;
+  label: string;
+}
+
+interface Props {
+  name: string;
+  label: string;
+  type?: 'text' | 'email' | 'url' | 'select' | 'textarea';
+  required?: boolean;
+  hint?: string;
+  autocomplete?: string;
+  options?: readonly Option[];
+  placeholder?: string;
+}
+
+const {
+  name,
+  label,
+  type = 'text',
+  required = false,
+  hint,
+  autocomplete,
+  options = [],
+  placeholder,
+} = Astro.props;
+
+const id = `cf-${name}`;
+const hintId = hint ? `${id}-hint` : undefined;
+const errorId = `${id}-error`;
+---
+
+<div class="field">
+  <label for={id}>
+    {label}
+    {required ? (
+      <span class="req" aria-hidden="true">
+        *
+      </span>
+    ) : (
+      <span class="opt">(optional)</span>
+    )}
+  </label>
+
+  {type === 'select' ? (
+    <select
+      id={id}
+      name={name}
+      required={required}
+      aria-describedby={hintId}
+      data-describedby={hintId}
+    >
+      {required && (
+        <option value="" disabled selected>
+          Choose one
+        </option>
+      )}
+      {!required && <option value="">No preference</option>}
+      {options.map((option) => (
+        <option value={option.value}>{option.label}</option>
+      ))}
+    </select>
+  ) : type === 'textarea' ? (
+    <textarea
+      id={id}
+      name={name}
+      rows="5"
+      required={required}
+      placeholder={placeholder}
+      aria-describedby={hintId}
+      data-describedby={hintId}
+    ></textarea>
+  ) : (
+    <input
+      id={id}
+      name={name}
+      type={type}
+      required={required}
+      autocomplete={autocomplete}
+      placeholder={placeholder}
+      inputmode={type === 'url' ? 'url' : undefined}
+      aria-describedby={hintId}
+      data-describedby={hintId}
+    />
+  )}
+
+  {hint && (
+    <p class="hint" id={hintId}>
+      {hint}
+    </p>
+  )}
+  <p class="error" id={errorId} data-error-for={name} hidden></p>
+</div>
+
+<style>
+  .field {
+    display: grid;
+    gap: 0.45rem;
+    align-content: start;
+  }
+
+  label {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .req {
+    margin-left: 0.2rem;
+    color: #b42318;
+  }
+
+  .opt {
+    margin-left: 0.3rem;
+    color: var(--ink-mute);
+    font-weight: 400;
+    font-size: 0.85rem;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.8rem 1rem;
+    border: 1.5px solid #767a99;
+    border-radius: 16px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 8rem;
+  }
+
+  ::placeholder {
+    color: #5d607c;
+    opacity: 1;
+  }
+
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid var(--core-600);
+    outline-offset: 2px;
+    border-color: var(--core-600);
+  }
+
+  [aria-invalid='true'] {
+    border-color: #b42318;
+    box-shadow: 0 0 0 3px rgb(180 35 24 / 0.14);
+  }
+
+  .hint {
+    color: var(--ink-mute);
+    font-size: 0.875rem;
+  }
+
+  .error {
+    color: #b42318;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+</style>

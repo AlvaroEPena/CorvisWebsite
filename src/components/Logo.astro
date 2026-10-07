@@ -1,0 +1,42 @@
+---
+import { site } from '../content/site';
+
+interface Props {
+  /** Visible wordmark next to the mark. */
+  showName?: boolean;
+}
+const { showName = true } = Astro.props;
+---
+
+<span class="logo">
+  <span class="mark" aria-hidden="true"></span>
+  {showName && <span class="name">{site.name}</span>}
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  /* The core orb in miniature: amber heart, indigo shell, one specular highlight. */
+  .mark {
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background:
+      radial-gradient(ellipse 30% 18% at 32% 24%, rgb(255 255 255 / 0.65), transparent 70%),
+      radial-gradient(circle at 50% 52%, #fff1dc 0, #ffc083 16%, #ff8a2b 34%, transparent 62%),
+      linear-gradient(145deg, #7c7cff, #14163f);
+    box-shadow: 0 6px 14px -4px rgb(59 59 214 / 0.55);
+  }
+
+  .name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: -0.04em;
+  }
+</style>
