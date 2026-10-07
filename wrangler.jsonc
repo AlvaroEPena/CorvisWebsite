@@ -1,0 +1,13 @@
+{
+  // Cloudflare Workers static assets + the contact Worker. Deploy only with owner confirmation.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "corvis",
+  "main": "src/worker/index.ts",
+  "compatibility_date": "2026-09-30",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash",
+    "run_worker_first": ["/api/*"],
+  },
+}
