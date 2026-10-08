@@ -22,7 +22,7 @@ import { fileURLToPath } from 'node:url';
 
 import sharp from 'sharp';
 
-const DEFAULT_ALVARO_PHOTO = 'C:/Users/Alvaro/Desktop/Alvaro-5.tif';
+const DEFAULT_ALVARO_PHOTO = 'C:/Users/Alvaro/Desktop/Alvaro-Fixed.jpg';
 const outDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'assets', 'team');
 
 /**
@@ -32,13 +32,15 @@ const outDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'asset
  */
 const CROPS = {
   alvaro: {
+    // The supplied Alvaro-Fixed.jpg is already colour-corrected, so no extra tonal polish.
+    polish: false,
     card: { left: 0.29, top: 0, width: 0.534, height: 1 },
     avatar: { left: 0.33, top: 0.1, width: 0.46, height: 0.69 },
   },
 };
 
-const CARD = { width: 800, height: 1000 }; // 4:5, shown at up to about 272 CSS pixels (3x covers it)
-const AVATAR = { width: 288, height: 288 }; // shown at about 44 CSS pixels, so 3x covers it
+const CARD = { width: 1000, height: 1250 }; // 4:5, shown at about 272 CSS pixels (3x covers it, 4x nearly)
+const AVATAR = { width: 384, height: 384 }; // shown at about 44 CSS pixels, so 4x covers it
 /** A master, not a delivery file: near-lossless, full-resolution colour. */
 const MASTER = { quality: 95, chromaSubsampling: '4:4:4', mozjpeg: true };
 
@@ -80,7 +82,7 @@ function crop(image, info, box) {
   });
 }
 
-async function write(image, size, name) {
+async function write(image, size, name, applyPolish = true) {
   const file = join(outDir, `${id}-${name}.jpg`);
   // An older run saved AVIF files here; they would win over the master, so remove them.
   for (const extension of ['avif', 'webp']) {
@@ -89,7 +91,7 @@ async function write(image, size, name) {
   // sharp strips metadata unless withMetadata() is called; nothing is carried over. A small source is
   // resampled with Lanczos (clean edges) and lightly sharpened, so the site's single AVIF encode
   // starts from the best picture available.
-  const info = await polish(image)
+  const info = await (applyPolish ? polish(image) : image)
     .resize({ ...size, fit: 'cover', position: sharp.strategy.attention, kernel: 'lanczos3' })
     .sharpen({ sigma: 0.6, m1: 0.8, m2: 2 })
     .jpeg(MASTER)
@@ -100,5 +102,6 @@ async function write(image, size, name) {
 await mkdir(outDir, { recursive: true });
 const { info, image } = await open(source);
 const crops = CROPS[id];
-await write(crops ? crop(image(), info, crops.card) : image(), CARD, 'card');
-await write(crops ? crop(image(), info, crops.avatar) : image(), AVATAR, 'avatar');
+const applyPolish = crops?.polish !== false;
+await write(crops ? crop(image(), info, crops.card) : image(), CARD, 'card', applyPolish);
+await write(crops ? crop(image(), info, crops.avatar) : image(), AVATAR, 'avatar', applyPolish);

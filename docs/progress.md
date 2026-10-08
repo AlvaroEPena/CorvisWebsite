@@ -112,3 +112,7 @@
 
 - Grit demo, sandbox card (4th) and Work showcase (3rd, "Concept project"); live-sites timing tests relaxed for slow headless GL (start under 6 s, longest still under 1.5 s).
 - Verified: typecheck/lint/format clean, 260 unit, e2e 571+ passed with timing tests stable over repeated runs, Lighthouse `/` and `/sandbox` 100 on all categories (mobile).
+
+## 2026-10-09 — Headshot from Alvaro-Fixed.jpg
+
+- Switched the source to `C:\Users\Alvaro\Desktop\Alvaro-Fixed.jpg` (2528x1686, already colour-corrected, about 2.5x the pixels of the old TIF). Same crop fractions; tonal polish switched off for it (`polish: false` in `scripts/make-team-photos.mjs`); masters 1000x1250 card and 384x384 avatar; delivered widths 320 to 1000. `/team` mobile LCP 1.7 s, Performance 99 to 100. The previous master is in git history (commit feb5f1f) if needed.
