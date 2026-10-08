@@ -244,7 +244,7 @@ public copy.
 - One file per review: `src/content/reviews/<id>.json` (file name = id). Fields: name, role, company, quote, `featured` (shown on home), optional `siteHref`, `order` (position on `/reviews`), `homeOrder` (position on the home page).
 - Two Sveltia editors over the same folder, so there is exactly one record per review: **All reviews** (full add/edit/delete/reorder + the home tick) and **Home reviews** (filtered to `featured: true`; reorder, edit, add; no tick; Delete disabled). To take a review off the home page, untick it in All reviews.
 - Home rule (`getHomeReviews()` in `src/lib/reviews.ts`): featured reviews ordered by `homeOrder`; featured reviews with no position go after the placed ones in `/reviews` order; at most 6 shown (extra ticked ones only log a build warning).
-- Team photos: `src/assets/team/` (`<id>-card.avif`, `<id>-avatar.avif`, else `<id>-placeholder.svg`, else monogram). Generate with `node scripts/make-team-photos.mjs <id> <photo>`; the original photo is never committed.
+- Team photos: `src/assets/team/` (`<id>-card.jpg`, `<id>-avatar.jpg` high-quality masters, which the build encodes once to AVIF at quality 55; else `<id>-placeholder.svg`, else monogram). Generate with `node scripts/make-team-photos.mjs <id> <photo>`; the original photo is never committed.
 
 ### 16.2 Round 7 delta (2026-10-09)
 

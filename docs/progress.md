@@ -103,3 +103,7 @@
 
 - Red/yellow/green lights on Work previews; before/after now sits in a fake browser window with the split starting under the address bar; Redesign folded into Work in nav and footer; "run by Alvaro" removed from Mod Labs copy; navbar scroll highlight with gliding glass pill.
 - Verified: typecheck/lint/format clean, 258 unit, 562 e2e passed / 0 failed.
+
+## 2026-10-09 — Headshot sharpness fix
+
+- Cause: the portrait was encoded twice (AVIF q58 by `scripts/make-team-photos.mjs`, then again at q42 by astro:assets). Now the script writes JPEG q95 4:4:4 masters (`<id>-card.jpg` 800x1000, `<id>-avatar.jpg` 288x288, Lanczos plus light sharpen) and the site encodes them once (card q55, widths 320/480/640/800; avatar q75). `/team` mobile LCP about 1.8 to 2.0 s (was 1.5 s with the soft image), Performance 97 to 99.

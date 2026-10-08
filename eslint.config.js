@@ -28,6 +28,7 @@ export default [
         AbortController: 'readonly',
         document: 'readonly',
         window: 'readonly',
+        HTMLImageElement: 'readonly',
       },
     },
   },

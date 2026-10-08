@@ -91,12 +91,12 @@ network) and checks the commit each Save would make.
 ## Team photos (not part of the editor)
 
 Photos on `/team` and the avatars under the home reviews live in `src/assets/team/`, found by founder
-id. Alvaro's are `alvaro-card.avif` (portrait) and `alvaro-avatar.avif` (small square), made by
+id. Alvaro's are `alvaro-card.jpg` (portrait) and `alvaro-avatar.jpg` (small square), high-quality JPEG masters that the site build turns into AVIF in a single step, made by
 `node scripts/make-team-photos.mjs` (reads the original from `TEAM_PHOTO_ALVARO`, default
 `C:/Users/Alvaro/Desktop/Alvaro-5.tif`; the original is never copied into the repo).
 
 To add Aaron's photo: run `node scripts/make-team-photos.mjs aaron path/to/his-photo.jpg`. It writes
-`src/assets/team/aaron-card.avif` and `aaron-avatar.avif`, which replace the designed placeholder
+`src/assets/team/aaron-card.jpg` and `aaron-avatar.jpg`, which replace the designed placeholder
 (`aaron-placeholder.svg`) with no other change; the alt text is built from his name and role in
 `src/content/site.ts`. Look at `/team` afterwards; if the crop is off, add a crop for `aaron` in the
 `CROPS` table at the top of the script and run it again.
