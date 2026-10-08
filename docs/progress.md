@@ -74,3 +74,10 @@
 - `/team` "Meet the team" (Alvaro Peña, Founder & Tech Lead; Aaron Peña-Diamond, Co-Founder, business and sales). Nav order: Services, Work, Redesign, Process, Pricing, FAQ, Meet the team, Sandbox. Footer and JSON-LD list both founders.
 - Verified: typecheck/lint/format clean, 196 unit, 438 e2e passed / 0 failed, Lighthouse `/` 99, `/reviews` 100, `/team` 100 (mobile), A11y 100.
 - Reminder: replace the fictional reviews with real client reviews before promoting the site.
+
+## 2026-10-09 — Round 6 (owner): Home reviews editor, Meet the team CTA, team photos: done
+
+- Reviews restructured to one file per review (`src/content/reviews/*.json`) with two editors over the same files (All reviews, Home reviews); verified in the real Sveltia UI with mocked GitHub (reorder commit diffs only `homeOrder`, edit keeps all fields, untick removes from Home list, add creates one file).
+- Home "Meet the team" pill (avatar stack, larger than "More reviews"). /team shows Alvaro's cropped photo and a designed placeholder for Aaron; script `scripts/make-team-photos.mjs` adds his later.
+- Verified: typecheck/lint/format clean, 214 unit, 457 e2e passed / 0 failed, Lighthouse `/` 99, `/team` 100, `/reviews` 100 (mobile), A11y 100.
+- Owner-run checks still pending: real GitHub token Save from /admin (mocked only so far).

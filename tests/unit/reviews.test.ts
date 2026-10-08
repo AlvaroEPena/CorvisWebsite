@@ -1,17 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
-import reviewsFile from '../../src/content/reviews.json';
 import {
   getAllReviews,
-  getFeaturedReviews,
+  getHomeReviews,
   initialsOf,
-  MAX_FEATURED_REVIEWS,
+  MAX_HOME_REVIEWS,
   parseReviews,
+  pickHomeReviews,
+  type Review,
   siteLinkOf,
 } from '../../src/lib/reviews';
 
 const valid = {
-  id: 'a-b',
   name: 'Ana Ruiz',
   role: 'Owner',
   company: 'Ruiz Bakery',
@@ -19,25 +19,26 @@ const valid = {
   featured: false,
 };
 
+const review = (id: string, extra: Partial<Review> = {}): Review => ({ ...valid, id, ...extra });
+const ids = (list: readonly Review[]) => list.map((item) => item.id);
+
 describe('reviews data', () => {
   it('ships 9 to 12 valid reviews with unique kebab-case ids', () => {
     const all = getAllReviews();
     expect(all.length).toBeGreaterThanOrEqual(9);
     expect(all.length).toBeLessThanOrEqual(12);
-    expect(new Set(all.map((review) => review.id)).size).toBe(all.length);
+    expect(new Set(ids(all)).size).toBe(all.length);
   });
 
-  it('features at most six, in list order', () => {
-    const featured = getFeaturedReviews();
-    expect(featured.length).toBeGreaterThan(0);
-    expect(featured.length).toBeLessThanOrEqual(MAX_FEATURED_REVIEWS);
-    const order = getAllReviews().map((review) => review.id);
-    const positions = featured.map((review) => order.indexOf(review.id));
-    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+  it('shows between one and six reviews on the home page, all ticked', () => {
+    const home = getHomeReviews();
+    expect(home.length).toBeGreaterThan(0);
+    expect(home.length).toBeLessThanOrEqual(MAX_HOME_REVIEWS);
+    expect(home.every((item) => item.featured)).toBe(true);
   });
 
   it('uses no star ratings, plain hyphens and none of the banned words', () => {
-    const copy = JSON.stringify(reviewsFile);
+    const copy = JSON.stringify(getAllReviews());
     expect(copy).not.toMatch(/[★☆]|stars?\b|rating/i);
     expect(copy).not.toMatch(/[–—]/);
     expect(copy).not.toMatch(/template|framework|\bAI\b/i);
@@ -45,34 +46,84 @@ describe('reviews data', () => {
 });
 
 describe('parseReviews', () => {
-  it('rejects duplicate ids', () => {
-    expect(() => parseReviews({ reviews: [valid, valid] })).toThrow(/Duplicate/);
+  const files = (record: unknown, path = '../content/reviews/ana-ruiz.json') => ({
+    [path]: record,
   });
-  it('rejects more than six featured reviews', () => {
-    const many = Array.from({ length: 7 }, (_, index) => ({
-      ...valid,
-      id: `r-${index}`,
-      featured: true,
-    }));
-    expect(() => parseReviews({ reviews: many })).toThrow(/At most 6/);
+
+  it('takes the id from the file name and sorts by the Reviews page order', () => {
+    const parsed = parseReviews({
+      '../content/reviews/b-two.json': { ...valid, order: 2 },
+      '../content/reviews/a-one.json': { ...valid, order: 1 },
+      '../content/reviews/c-new.json': valid,
+    });
+    expect(ids(parsed)).toEqual(['a-one', 'b-two', 'c-new']);
   });
-  it('rejects empty fields, short or long quotes and bad ids', () => {
-    expect(() => parseReviews({ reviews: [{ ...valid, name: ' ' }] })).toThrow();
-    expect(() => parseReviews({ reviews: [{ ...valid, quote: 'Too short' }] })).toThrow();
-    expect(() => parseReviews({ reviews: [{ ...valid, quote: 'x'.repeat(400) }] })).toThrow();
-    expect(() => parseReviews({ reviews: [{ ...valid, id: 'Not Kebab' }] })).toThrow();
+  it('rejects empty fields, short or long quotes and bad file names, naming the file', () => {
+    expect(() => parseReviews(files({ ...valid, name: ' ' }))).toThrow(/ana-ruiz\.json/);
+    expect(() => parseReviews(files({ ...valid, quote: 'Too short' }))).toThrow();
+    expect(() => parseReviews(files({ ...valid, quote: 'x'.repeat(400) }))).toThrow();
+    expect(() => parseReviews(files(valid, '../content/reviews/Not Kebab.json'))).toThrow(
+      /hyphens/,
+    );
   });
-  it('accepts a missing, empty or null siteHref', () => {
+  it('rejects a bad position number and an empty folder', () => {
+    expect(() => parseReviews(files({ ...valid, order: 0 }))).toThrow();
+    expect(() => parseReviews(files({ ...valid, homeOrder: 1.5 }))).toThrow();
+    expect(() => parseReviews({})).toThrow(/at least one/);
+  });
+  it('accepts a missing, empty or null siteHref and missing positions', () => {
     for (const siteHref of [undefined, '', null]) {
-      const [review] = parseReviews({ reviews: [{ ...valid, siteHref }] });
-      expect(review && siteLinkOf(review)).toBeUndefined();
+      const [parsed] = parseReviews(files({ ...valid, siteHref }));
+      expect(parsed && siteLinkOf(parsed)).toBeUndefined();
     }
+  });
+});
+
+describe('home order rule', () => {
+  it('shows exactly the ticked reviews, in home order', () => {
+    const list = [
+      review('a', { featured: true, homeOrder: 2 }),
+      review('b'),
+      review('c', { featured: true, homeOrder: 1 }),
+    ];
+    expect(ids(pickHomeReviews(list))).toEqual(['c', 'a']);
+  });
+  it('puts newly ticked reviews (no home position) after the placed ones, in Reviews page order', () => {
+    const list = [
+      review('a', { featured: true }),
+      review('b', { featured: true, homeOrder: 5 }),
+      review('c', { featured: true }),
+      review('d', { featured: true, homeOrder: 1 }),
+    ];
+    expect(ids(pickHomeReviews(list))).toEqual(['d', 'b', 'a', 'c']);
+  });
+  it('ignores the home position of a review that is not ticked', () => {
+    const list = [review('a', { homeOrder: 1 }), review('b', { featured: true, homeOrder: 2 })];
+    expect(ids(pickHomeReviews(list))).toEqual(['b']);
+  });
+  it('breaks ties by Reviews page order', () => {
+    const list = [
+      review('a', { featured: true, homeOrder: 1 }),
+      review('b', { featured: true, homeOrder: 1 }),
+    ];
+    expect(ids(pickHomeReviews(list))).toEqual(['a', 'b']);
+  });
+  it('shows at most six, keeping the first six in home order', () => {
+    const list = Array.from({ length: 8 }, (_, index) =>
+      review(`r-${index}`, { featured: true, homeOrder: 8 - index }),
+    );
+    const home = pickHomeReviews(list);
+    expect(home).toHaveLength(MAX_HOME_REVIEWS);
+    expect(ids(home)).toEqual(['r-7', 'r-6', 'r-5', 'r-4', 'r-3', 'r-2']);
+  });
+  it('is empty when nothing is ticked', () => {
+    expect(pickHomeReviews([review('a')])).toEqual([]);
   });
 });
 
 describe('helpers', () => {
   it('returns the site link only when one is set', () => {
-    expect(siteLinkOf({ ...valid, siteHref: ' /sandbox ' })).toBe('/sandbox');
+    expect(siteLinkOf({ siteHref: ' /sandbox ' })).toBe('/sandbox');
   });
   it('builds initials without titles', () => {
     expect(initialsOf('Dr. Lena Brandt')).toBe('LB');

@@ -1,0 +1,87 @@
+---
+import { Image } from 'astro:assets';
+
+import type { TeamImages } from '../lib/team-photos';
+
+/**
+ * Overlapping round avatars of the founders. Purely decorative: the link or sentence next to it says
+ * who they are, so every image has an empty alt.
+ */
+interface Props {
+  people: readonly { id: string; images: TeamImages | undefined; monogram: string }[];
+}
+const { people } = Astro.props;
+---
+
+<span class="stack" aria-hidden="true">
+  {people.map(({ id, images, monogram }) => (
+    <span class="avatar" data-avatar={id}>
+      {images?.isPlaceholder ? (
+        <img
+          src={images.avatar.src}
+          alt=""
+          width={80}
+          height={80}
+          loading="lazy"
+          decoding="async"
+          class="img"
+        />
+      ) : images ? (
+        <Image
+          src={images.avatar}
+          alt=""
+          width={80}
+          height={80}
+          format="avif"
+          quality={42}
+          widths={[80, 160]}
+          sizes="2.75rem"
+          loading="lazy"
+          class="img"
+        />
+      ) : (
+        <span class="initials">{monogram}</span>
+      )}
+    </span>
+  ))}
+</span>
+
+<style>
+  .stack {
+    display: inline-flex;
+    flex: none;
+  }
+
+  .avatar {
+    position: relative;
+    display: block;
+    width: 2.75rem;
+    height: 2.75rem;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    background: linear-gradient(145deg, rgb(228 228 255), rgb(255 236 214));
+    box-shadow: 0 6px 14px -6px rgb(20 22 63 / 0.5);
+  }
+
+  .avatar + .avatar {
+    margin-left: -0.7rem;
+  }
+
+  .img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+  }
+
+  .initials {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    color: var(--core-900);
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+</style>

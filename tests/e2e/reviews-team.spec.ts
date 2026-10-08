@@ -1,19 +1,38 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 
 import { expect, test } from '@playwright/test';
 
-// Read as a file: the test runner's ESM loader cannot import JSON without an import attribute.
+// Read as files: the test runner cannot use the site's import.meta.glob loader.
 interface ReviewRecord {
   id: string;
   name: string;
   quote: string;
   featured: boolean;
   siteHref?: string;
+  order?: number;
+  homeOrder?: number;
 }
-const reviews = (
-  JSON.parse(readFileSync('src/content/reviews.json', 'utf8')) as { reviews: ReviewRecord[] }
-).reviews;
-const featured = reviews.filter((review) => review.featured);
+const DIR = 'src/content/reviews';
+const rank = (value: number | undefined) => value ?? Number.POSITIVE_INFINITY;
+/** Independent oracle for the ordering rule: sort by position, ties and missing keep file order. */
+const sortedBy = (list: ReviewRecord[], key: 'order' | 'homeOrder') =>
+  list
+    .map((review, index) => ({ review, index }))
+    .sort((a, b) => rank(a.review[key]) - rank(b.review[key]) || a.index - b.index)
+    .map(({ review }) => review);
+const reviews = sortedBy(
+  readdirSync(DIR)
+    .sort()
+    .map((file) => ({
+      id: file.replace(/\.json$/, ''),
+      ...(JSON.parse(readFileSync(`${DIR}/${file}`, 'utf8')) as Omit<ReviewRecord, 'id'>),
+    })),
+  'order',
+);
+const featured = sortedBy(
+  reviews.filter((review) => review.featured),
+  'homeOrder',
+).slice(0, 6);
 const NAV_LABELS = [
   'Services',
   'Work',
@@ -43,6 +62,46 @@ test.describe('home testimonials', () => {
     await expect(button).toHaveAttribute('href', '/reviews');
     await button.click();
     await expect(page).toHaveURL(/\/reviews$/);
+  });
+
+  test('has a "Meet the team" call to action to /team, more prominent than "More reviews"', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const section = page.getByTestId('testimonials');
+    const team = section.getByRole('link', { name: /^Meet the team/ });
+    await expect(team).toHaveAttribute('href', '/team');
+    await expect(team).toContainText('Two founders, one point of contact');
+    // The avatars are decorative: the link's name is its text.
+    await expect(team.locator('img')).toHaveCount(2);
+    for (const image of await team.locator('img').all()) {
+      await expect(image).toHaveAttribute('alt', '');
+    }
+    const [teamBox, moreBox] = await Promise.all([
+      team.boundingBox(),
+      section.getByTestId('more-reviews').boundingBox(),
+    ]);
+    expect(teamBox && moreBox).toBeTruthy();
+    expect((teamBox?.width ?? 0) * (teamBox?.height ?? 0)).toBeGreaterThan(
+      (moreBox?.width ?? 0) * (moreBox?.height ?? 0) * 1.4,
+    );
+    await team.click();
+    await expect(page).toHaveURL(/\/team$/);
+  });
+
+  test('stacks the two buttons on phones and puts them side by side on desktop', async ({
+    page,
+    isMobile,
+  }) => {
+    await page.goto('/');
+    const section = page.getByTestId('testimonials');
+    const [teamBox, moreBox] = await Promise.all([
+      section.getByTestId('meet-the-team').boundingBox(),
+      section.getByTestId('more-reviews').boundingBox(),
+    ]);
+    if (isMobile)
+      expect(moreBox?.y ?? 0).toBeGreaterThan((teamBox?.y ?? 0) + (teamBox?.height ?? 0));
+    else expect(Math.abs((moreBox?.y ?? 0) - (teamBox?.y ?? 0))).toBeLessThan(40);
   });
 
   test('never emits review or rating structured data', async ({ page }) => {
@@ -162,6 +221,33 @@ test.describe('/team and founders', () => {
     await expect(
       page.locator('main').getByRole('link', { name: 'Book a free consult' }),
     ).toHaveAttribute('href', '/#contact');
+  });
+
+  test('shows Alvaro photo with alt text and a decorative placeholder for Aaron, both 4:5', async ({
+    page,
+  }) => {
+    await page.goto('/team');
+    const photos = page.getByTestId('team-photo').locator('img');
+    await expect(photos).toHaveCount(2);
+    for (const image of await photos.all()) await image.scrollIntoViewIfNeeded();
+    for (const image of await photos.all()) {
+      await expect
+        .poll(() =>
+          image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0),
+        )
+        .toBe(true);
+      const width = Number(await image.getAttribute('width'));
+      const height = Number(await image.getAttribute('height'));
+      expect(width / height).toBeCloseTo(0.8, 2);
+    }
+    const [alvaro, aaron] = [photos.nth(0), photos.nth(1)];
+    await expect(alvaro).toHaveAttribute('alt', 'Alvaro Peña, Founder and Tech Lead');
+    await expect(alvaro).toHaveAttribute('src', /alvaro-card.*\.avif/);
+    await expect(aaron).toHaveAttribute('alt', '');
+    await expect(aaron).toHaveAttribute('aria-hidden', 'true');
+    // Real photo sits above the fold: eager. Placeholder further down: lazy.
+    await expect(alvaro).toHaveAttribute('loading', 'eager');
+    await expect(aaron).toHaveAttribute('loading', 'lazy');
   });
 
   test('footer names both founders and JSON-LD lists them as founders', async ({ page }) => {

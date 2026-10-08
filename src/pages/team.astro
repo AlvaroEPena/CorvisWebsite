@@ -1,18 +1,16 @@
 ---
-import { Image } from 'astro:assets';
-
 import FloatingObject from '../components/FloatingObject.astro';
 import Monogram from '../components/Monogram.astro';
+import TeamPhoto from '../components/TeamPhoto.astro';
 import { site } from '../content/site';
-import { teamPage, teamProfiles } from '../content/team';
+import { photoAltOf, teamPage, teamProfiles } from '../content/team';
 import Layout from '../layouts/Layout.astro';
-import { teamPhoto } from '../lib/team-photos';
+import { teamImages } from '../lib/team-photos';
 
 const members = site.team.map((member) => {
   const profile = teamProfiles.find((candidate) => candidate.id === member.id);
   if (!profile) throw new Error(`Missing team profile for ${member.id}`);
-  const photo = profile.photo ? teamPhoto(profile.photo.file) : undefined;
-  return { ...member, ...profile, photoImage: photo };
+  return { ...member, ...profile, images: teamImages(member.id), photoAlt: photoAltOf(member) };
 });
 ---
 
@@ -43,15 +41,9 @@ const members = site.team.map((member) => {
       <ul class="people" aria-label={teamPage.teamLabel}>
         {members.map((member, index) => (
           <li class="person panel reveal" data-testid="team-member">
-            <div class="avatar">
-              {member.photoImage && member.photo ? (
-                <Image
-                  src={member.photoImage}
-                  alt={member.photo.alt}
-                  width={192}
-                  height={192}
-                  class="photo"
-                />
+            <div class="portrait">
+              {member.images ? (
+                <TeamPhoto images={member.images} alt={member.photoAlt} priority={index === 0} />
               ) : (
                 <Monogram
                   initials={member.monogram}
@@ -146,18 +138,8 @@ const members = site.team.map((member) => {
     padding: clamp(1.75rem, 3.4vw, 2.75rem);
   }
 
-  .avatar {
+  .portrait {
     margin-bottom: 0.75rem;
-  }
-
-  .photo {
-    display: block;
-    width: 6rem;
-    height: 6rem;
-    border-radius: 28px;
-    object-fit: cover;
-    border: 1px solid rgb(255 255 255 / 0.85);
-    box-shadow: 0 8px 16px -8px rgb(59 59 214 / 0.4);
   }
 
   .person h2 {

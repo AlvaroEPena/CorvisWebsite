@@ -1,6 +1,12 @@
 import type { CmsConfig } from '@sveltia/cms';
 
-import { REVIEWS_FILE, reviewsFileFields } from './reviews-fields';
+import {
+  ALL_REVIEWS_HINT,
+  allReviewFields,
+  HOME_REVIEWS_HINT,
+  homeReviewFields,
+  REVIEWS_FOLDER,
+} from './reviews-fields';
 
 const SITE_URL = 'https://thecorvis.com';
 
@@ -12,6 +18,17 @@ const SITE_URL = 'https://thecorvis.com';
  * (see docs/admin-setup.md). Sveltia's config validation rejects `undefined` values, so optional
  * keys are only added when set.
  */
+/** Both editors read and write the same one-file-per-review folder. */
+const reviewFolder = {
+  folder: REVIEWS_FOLDER,
+  format: 'json',
+  extension: 'json',
+  identifier_field: 'company',
+  summary: '{{name}} - {{company}}',
+  // The preview pane repeats the form; one column is simpler to use.
+  editor: { preview: false },
+} as const;
+
 export const config: CmsConfig = {
   load_config_file: false,
   backend: {
@@ -31,16 +48,26 @@ export const config: CmsConfig = {
   collections: [
     {
       name: 'reviews',
-      label: 'Reviews',
+      label: 'All reviews',
+      label_singular: 'review',
+      description: ALL_REVIEWS_HINT,
       icon: 'format_quote',
-      files: [
-        {
-          name: 'reviews',
-          label: 'Client reviews',
-          file: REVIEWS_FILE,
-          fields: reviewsFileFields,
-        },
-      ],
+      ...reviewFolder,
+      reorder: { key: 'order' },
+      fields: allReviewFields,
+    },
+    {
+      name: 'home-reviews',
+      label: 'Home reviews',
+      label_singular: 'review',
+      description: HOME_REVIEWS_HINT,
+      icon: 'home',
+      ...reviewFolder,
+      filter: { field: 'featured', value: true },
+      reorder: { key: 'homeOrder' },
+      // Deleting a review removes it everywhere, so that only happens in "All reviews".
+      delete: false,
+      fields: homeReviewFields,
     },
   ],
 };

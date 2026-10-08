@@ -1,15 +1,10 @@
 import { site } from './site';
 
 /**
- * Copy for /team. Easy to edit: change the words here, add a `photo` (a file in src/assets/team, AVIF
- * or WebP) to replace the initials monogram. Names and roles come from site.ts.
+ * Copy for /team. Easy to edit: change the words here. Names and roles come from site.ts.
+ * Photos are not set here: drop `<id>-card.avif` and `<id>-avatar.avif` into src/assets/team (made
+ * with scripts/make-team-photos.mjs) and they replace the designed placeholder automatically.
  */
-export interface TeamPhoto {
-  /** File name inside src/assets/team, with extension. */
-  file: string;
-  alt: string;
-}
-
 export interface TeamProfile {
   id: (typeof site.team)[number]['id'];
   /** Letters on the monogram avatar (both founders share initials, so first names are used). */
@@ -17,9 +12,18 @@ export interface TeamProfile {
   /** One line: what this person does for a client. */
   summary: string;
   bio: readonly string[];
-  /** Optional photo; the monogram shows until one is added. */
-  photo?: TeamPhoto;
 }
+
+/** Alt text for a real photo, from the facts in site.ts: "Alvaro Peña, Founder and Tech Lead". */
+export const photoAltOf = (member: { name: string; role: string }): string =>
+  `${member.name}, ${member.role.replace(' & ', ' and ')}`;
+
+/** The "Meet the team" call to action under the home page reviews. */
+export const teamTeaser = {
+  label: 'Meet the team',
+  text: 'Two founders, one point of contact',
+  href: '/team',
+} as const;
 
 export const teamPage = {
   title: 'Meet the team | Corvis',

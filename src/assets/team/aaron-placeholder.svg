@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+  <defs>
+    <linearGradient id="wash" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#dcdcff" />
+      <stop offset="0.55" stop-color="#eeeaff" />
+      <stop offset="1" stop-color="#ffe3c7" />
+    </linearGradient>
+    <radialGradient id="indigo" cx="0.18" cy="0.12" r="0.65">
+      <stop offset="0" stop-color="#7c7cff" stop-opacity="0.55" />
+      <stop offset="1" stop-color="#7c7cff" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="amber" cx="0.9" cy="0.95" r="0.7">
+      <stop offset="0" stop-color="#ffb066" stop-opacity="0.75" />
+      <stop offset="1" stop-color="#ffb066" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="figure" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.92" />
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.42" />
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95" />
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.2" />
+    </linearGradient>
+    <clipPath id="frame"><rect width="800" height="1000" /></clipPath>
+  </defs>
+  <g clip-path="url(#frame)">
+    <rect width="800" height="1000" fill="url(#wash)" />
+    <rect width="800" height="1000" fill="url(#indigo)" />
+    <rect width="800" height="1000" fill="url(#amber)" />
+    <!-- Soft glass arc behind the figure -->
+    <circle cx="400" cy="400" r="270" fill="#ffffff" fill-opacity="0.26" />
+    <circle cx="400" cy="400" r="270" fill="none" stroke="url(#rim)" stroke-width="3" />
+    <!-- Head and shoulders, abstract: no features -->
+    <circle cx="400" cy="372" r="118" fill="url(#figure)" />
+    <path
+      d="M120 1000 C120 800 238 676 400 676 C562 676 680 800 680 1000 Z"
+      fill="url(#figure)"
+    />
+    <circle cx="400" cy="372" r="118" fill="none" stroke="url(#rim)" stroke-width="3" />
+    <path
+      d="M120 1000 C120 800 238 676 400 676 C562 676 680 800 680 1000"
+      fill="none"
+      stroke="url(#rim)"
+      stroke-width="3"
+    />
+  </g>
+</svg>

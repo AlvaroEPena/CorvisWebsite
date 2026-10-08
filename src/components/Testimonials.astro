@@ -1,8 +1,17 @@
 ---
-import { getFeaturedReviews, initialsOf } from '../lib/reviews';
+import { site } from '../content/site';
+import { teamProfiles, teamTeaser } from '../content/team';
+import { getHomeReviews, initialsOf } from '../lib/reviews';
+import { teamImages } from '../lib/team-photos';
+import AvatarStack from './AvatarStack.astro';
 import Monogram from './Monogram.astro';
 
-const reviews = getFeaturedReviews();
+const reviews = getHomeReviews();
+const founders = site.team.map(({ id }) => ({
+  id,
+  images: teamImages(id),
+  monogram: teamProfiles.find((profile) => profile.id === id)?.monogram ?? '',
+}));
 ---
 
 <section
@@ -37,6 +46,27 @@ const reviews = getFeaturedReviews();
     </div>
 
     <div class="more reveal">
+      <a
+        class="btn btn-primary btn-shine team-cta"
+        href={teamTeaser.href}
+        data-magnetic
+        data-testid="meet-the-team"
+      >
+        <AvatarStack people={founders} />
+        <span class="team-text">
+          <strong>{teamTeaser.label}</strong>
+          <span>{teamTeaser.text}</span>
+        </span>
+        <svg class="btn-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path
+            d="M4 10h11m-4-5 5 5-5 5"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></path>
+        </svg>
+      </a>
       <a class="btn btn-glass btn-shine" href="/reviews" data-magnetic data-testid="more-reviews">
         More reviews
         <svg class="btn-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -101,10 +131,56 @@ const reviews = getFeaturedReviews();
     font-size: 0.9rem;
   }
 
+  /* Two calls to action: the team banner is the main one, "More reviews" the quieter pill. */
   .more {
     display: flex;
-    justify-content: center;
-    margin-top: clamp(1.75rem, 3vw, 2.5rem);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.9rem;
+    max-width: 28rem;
+    margin: clamp(1.75rem, 3vw, 2.5rem) auto 0;
+  }
+
+  .team-cta {
+    justify-content: flex-start;
+    gap: 0.9rem;
+    min-height: 4.5rem;
+    padding: 0.7rem 1.4rem 0.7rem 0.8rem;
+    white-space: normal;
+    text-align: left;
+  }
+
+  .team-text {
+    display: grid;
+    flex: 1;
+    gap: 0.15rem;
+    line-height: 1.25;
+  }
+
+  .team-text strong {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    letter-spacing: -0.02em;
+  }
+
+  .team-text span {
+    color: rgb(255 255 255 / 0.82);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  @media (min-width: 40rem) {
+    .more {
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 1.1rem;
+      max-width: none;
+    }
+
+    .team-cta {
+      padding-right: 1.8rem;
+    }
   }
 
   /* Rows of 7+5 and 5+7 columns, so one to six reviews all sit in a balanced grid. */

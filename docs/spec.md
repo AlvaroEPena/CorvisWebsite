@@ -238,3 +238,10 @@ public copy.
   noindex, no-store, own CSP (global CSP detached), never framed.
 - **Team:** Alvaro Peña = Founder & Tech Lead; Aaron Peña-Diamond = Co-Founder, business and sales, the person clients talk
   to. New page `/team` ("Meet the team"), nav item right after FAQ (then Sandbox). Footer, JSON-LD founders and copy updated.
+
+### 16.1 Delivered layout (supersedes the data shape above)
+
+- One file per review: `src/content/reviews/<id>.json` (file name = id). Fields: name, role, company, quote, `featured` (shown on home), optional `siteHref`, `order` (position on `/reviews`), `homeOrder` (position on the home page).
+- Two Sveltia editors over the same folder, so there is exactly one record per review: **All reviews** (full add/edit/delete/reorder + the home tick) and **Home reviews** (filtered to `featured: true`; reorder, edit, add; no tick; Delete disabled). To take a review off the home page, untick it in All reviews.
+- Home rule (`getHomeReviews()` in `src/lib/reviews.ts`): featured reviews ordered by `homeOrder`; featured reviews with no position go after the placed ones in `/reviews` order; at most 6 shown (extra ticked ones only log a build warning).
+- Team photos: `src/assets/team/` (`<id>-card.avif`, `<id>-avatar.avif`, else `<id>-placeholder.svg`, else monogram). Generate with `node scripts/make-team-photos.mjs <id> <photo>`; the original photo is never committed.

@@ -1,25 +1,66 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+
+import type { Field } from '@sveltia/cms';
 import { describe, expect, it } from 'vitest';
 
 import { config } from '../../src/admin/config';
-import { REVIEWS_FILE, reviewFields, reviewsFileFields } from '../../src/admin/reviews-fields';
-import { reviewSchema } from '../../src/lib/reviews';
+import {
+  allReviewFields,
+  homeReviewFields,
+  REVIEW_KEYS,
+  REVIEWS_FOLDER,
+} from '../../src/admin/reviews-fields';
+import { getAllReviews } from '../../src/lib/reviews';
 import { parseHeaderRules } from './helpers/headers';
 
-const fileText = readFileSync(REVIEWS_FILE, 'utf8');
-const fileData = JSON.parse(fileText) as { reviews: Record<string, unknown>[] };
+type Entry = Record<string, unknown>;
 
-/** What Sveltia writes for one entry: fields in config order, empty optional ones omitted. */
-function cmsOutput(entry: Record<string, unknown>): Record<string, unknown> {
-  const out: Record<string, unknown> = {};
-  for (const field of reviewFields) {
-    const value = entry[field.name];
-    const isOptional = 'required' in field && field.required === false;
+const records = readdirSync(REVIEWS_FOLDER).map((name) => {
+  const text = readFileSync(`${REVIEWS_FOLDER}/${name}`, 'utf8');
+  return { name, text, data: JSON.parse(text) as Entry };
+});
+
+interface FolderCollection {
+  name: string;
+  label: string;
+  folder: string;
+  format: string;
+  extension: string;
+  fields: Field[];
+  filter?: { field: string; value: unknown };
+  reorder?: { key: string };
+  delete?: boolean;
+}
+const collections = (config.collections ?? []) as unknown as FolderCollection[];
+const collectionNamed = (name: string) => {
+  const found = collections.find((collection) => collection.name === name);
+  if (!found) throw new Error(`No collection "${name}"`);
+  return found;
+};
+const namesOf = (fields: Field[]) => fields.map((field) => field.name);
+
+/**
+ * What Sveltia writes for one entry: the collection's reorder key first (checked in the real editor,
+ * see tests/e2e/admin-reviews.spec.ts), then the other fields in config order, empty optional ones
+ * omitted.
+ */
+function cmsOutput(collection: FolderCollection, entry: Entry): Entry {
+  const key = collection.reorder?.key;
+  const names = [
+    ...(key ? [key] : []),
+    ...namesOf(collection.fields).filter((name) => name !== key),
+  ];
+  const out: Entry = {};
+  for (const name of names) {
+    const field = collection.fields.find((candidate) => candidate.name === name);
+    const value = entry[name];
+    const isOptional = field && 'required' in field && field.required === false;
     if (value === undefined || value === null || (isOptional && value === '')) continue;
-    out[field.name] = value;
+    out[name] = value;
   }
   return out;
 }
+const asFile = (entry: Entry) => `${JSON.stringify(entry, null, 2)}\n`;
 
 describe('admin config', () => {
   it('uses the GitHub backend on the Corvis repo, main, without an OAuth proxy', () => {
@@ -29,32 +70,67 @@ describe('admin config', () => {
     expect(config.load_config_file).toBe(false);
   });
 
-  it('has one Reviews file collection editing reviews.json', () => {
-    expect(config.collections).toHaveLength(1);
-    const [collection] = config.collections ?? [];
-    expect(collection).toMatchObject({ name: 'reviews', label: 'Reviews' });
-    const files = (collection as { files: { file: string; fields: unknown[] }[] }).files;
-    expect(files).toHaveLength(1);
-    expect(files[0]?.file).toBe('src/content/reviews.json');
-    expect(files[0]?.fields).toBe(reviewsFileFields);
+  it('has "All reviews" then "Home reviews", both reading the same folder', () => {
+    expect(collections.map((collection) => collection.label)).toEqual([
+      'All reviews',
+      'Home reviews',
+    ]);
+    for (const collection of collections) {
+      expect(collection).toMatchObject({
+        folder: REVIEWS_FOLDER,
+        format: 'json',
+        extension: 'json',
+      });
+    }
   });
 
-  it('edits a sortable list named "reviews" with the agreed fields', () => {
-    const [list] = reviewsFileFields;
-    expect(list).toMatchObject({ name: 'reviews', widget: 'list' });
-    expect(reviewFields.map((field) => field.name)).toEqual([
-      'id',
+  it('keeps one record per review: both editors share the fields and differ only where intended', () => {
+    const all = collectionNamed('reviews');
+    const home = collectionNamed('home-reviews');
+    expect(namesOf(home.fields)).toEqual(namesOf(all.fields));
+    expect(namesOf(all.fields)).toEqual([
       'name',
       'role',
       'company',
       'quote',
       'featured',
       'siteHref',
+      'order',
+      'homeOrder',
     ]);
-    const byName = Object.fromEntries(reviewFields.map((field) => [field.name, field]));
-    expect(byName.featured).toMatchObject({ label: 'Show on the home page', widget: 'boolean' });
-    expect(byName.siteHref).toMatchObject({ required: false });
-    expect(byName.id).toMatchObject({ widget: 'uuid', prefix: 'review-' });
+    expect(namesOf(all.fields)).toEqual(REVIEW_KEYS);
+    for (const field of all.fields.filter((candidate) => candidate.name !== 'featured')) {
+      expect(home.fields.find((candidate) => candidate.name === field.name)).toEqual(field);
+    }
+  });
+
+  it('shows the home tick box only in All reviews; Home reviews lists the ticked ones', () => {
+    const featuredIn = (fields: Field[]) => fields.find((field) => field.name === 'featured');
+    expect(featuredIn(allReviewFields)).toMatchObject({
+      label: 'Show on the home page',
+      widget: 'boolean',
+    });
+    expect(featuredIn(homeReviewFields)).toMatchObject({ widget: 'hidden', default: true });
+    expect(collectionNamed('home-reviews').filter).toEqual({ field: 'featured', value: true });
+    expect(collectionNamed('reviews').filter).toBeUndefined();
+  });
+
+  it('drags write a different number in each editor; both numbers are hidden in both', () => {
+    expect(collectionNamed('reviews').reorder).toEqual({ key: 'order' });
+    expect(collectionNamed('home-reviews').reorder).toEqual({ key: 'homeOrder' });
+    for (const fields of [allReviewFields, homeReviewFields]) {
+      for (const name of ['order', 'homeOrder']) {
+        expect(fields.find((field) => field.name === name)).toMatchObject({
+          widget: 'hidden',
+          required: false,
+        });
+      }
+    }
+  });
+
+  it('cannot delete from Home reviews (that would delete the review everywhere)', () => {
+    expect(collectionNamed('home-reviews').delete).toBe(false);
+    expect(collectionNamed('reviews').delete).toBeUndefined();
   });
 
   it('omits empty optional fields so a save never adds empty keys', () => {
@@ -63,26 +139,32 @@ describe('admin config', () => {
 });
 
 describe('round trip through the field definitions', () => {
-  it('gives every key in the file a field, so Sveltia accepts the file', () => {
-    const fieldNames = new Set(reviewFields.map((field) => field.name));
-    for (const entry of fileData.reviews) {
-      for (const key of Object.keys(entry)) expect(fieldNames.has(key), key).toBe(true);
+  it('gives every key in every file a field, so Sveltia accepts the files', () => {
+    for (const { name, data } of records) {
+      for (const key of Object.keys(data)) expect(REVIEW_KEYS, `${name}: ${key}`).toContain(key);
     }
   });
 
-  it('writes the current file back byte for byte (clean diff, no key changes)', () => {
-    const output = { reviews: fileData.reviews.map(cmsOutput) };
-    expect(`${JSON.stringify(output, null, 2)}\n`).toBe(fileText);
+  it('All reviews writes every file back byte for byte (clean diff)', () => {
+    for (const { name, text, data } of records) {
+      expect(asFile(cmsOutput(collectionNamed('reviews'), data)), name).toBe(text);
+    }
   });
 
-  it('writes valid reviews for every entry', () => {
-    for (const entry of fileData.reviews) {
-      expect(reviewSchema.safeParse(cmsOutput(entry)).success).toBe(true);
+  it('Home reviews writes the same values, losing nothing (only the key order differs)', () => {
+    for (const { name, data } of records) {
+      expect(cmsOutput(collectionNamed('home-reviews'), data), name).toEqual(data);
     }
+  });
+
+  it('every file is a valid review', () => {
+    expect(getAllReviews()).toHaveLength(records.length);
   });
 
   it('drops an emptied siteHref instead of writing an empty string', () => {
-    expect(cmsOutput({ ...fileData.reviews[0], siteHref: '' })).not.toHaveProperty('siteHref');
+    const [first] = records;
+    const out = cmsOutput(collectionNamed('reviews'), { ...first?.data, siteHref: '' });
+    expect(out).not.toHaveProperty('siteHref');
   });
 });
 

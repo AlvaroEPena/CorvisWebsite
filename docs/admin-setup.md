@@ -1,6 +1,6 @@
 # Reviews admin (`/admin`)
 
-A static page (Sveltia CMS) that edits `src/content/reviews.json` through the GitHub API. Every **Save**
+A static page (Sveltia CMS) that edits the review files in `src/content/reviews/` through the GitHub API. Every **Save**
 is a commit on `main` of `AlvaroEPena/CorvisWebsite`; Cloudflare Workers Builds then rebuilds and
 redeploys the site. There is no separate sign-in Worker: the single editor signs in with a GitHub token.
 
@@ -8,14 +8,34 @@ Nothing here is switched on until the owner does the steps below.
 
 ## What it edits
 
-One collection, **Reviews**, with one file, **Client reviews**: a sortable list. Per review: name, role,
-business name, quote, "Show on the home page", and an optional link to their new site (leave it empty
-to show a disabled "View their new site" button). New reviews get a unique id automatically. Drag to
-reorder: list order is the order on `/reviews`, and the home page shows the ticked ones in that order
-(at most six).
+Each review is ONE small file in `src/content/reviews/` (the file name is the review's id). Two editors
+show those same files, so a review exists once and an edit in one shows in the other:
 
-The config lives in `src/admin/config.ts` and `src/admin/reviews-fields.ts`. A unit test round-trips
-the real `reviews.json` through those field definitions, so a save produces a clean diff.
+- **All reviews**: every review. Edit name, role, business name, quote, the optional link to their new
+  site (empty = disabled "View their new site" button), add, delete, and the **Show on the home page**
+  tick. **Reorder** (drag, or the up/down buttons) sets the order on `/reviews`.
+- **Home reviews**: only the reviews ticked "Show on the home page". **Reorder** sets their order on the
+  home page. You can edit any text here too (same record), and add a review (it is ticked for the home
+  page automatically). There is no tick box here and **Delete is switched off**: deleting removes the
+  review everywhere, so that is done in All reviews. To take a review off the home page, untick it in
+  All reviews; it disappears from Home reviews.
+
+Rules the site follows: the home page shows exactly the ticked reviews, in the Home reviews order; a
+review ticked later (no home position yet) goes after the placed ones until you open Reorder in Home
+reviews once and press Done; at most six show on the home page (the first six in that order).
+
+How it works: Reorder saves a number in each file (`order` for the Reviews page, `homeOrder` for the
+home page). A drag in one editor never changes the other editor's numbers. Saving from a different
+editor may move those two keys around inside a file, which is harmless.
+
+What Sveltia cannot do (checked against 0.227.2): a filtered view cannot hide its own Delete button (it
+is shown greyed out), and a list that only contains the ticked reviews cannot be built on its own, so
+the Home list comes from the tick in All reviews instead of a second list that could disagree.
+
+The config lives in `src/admin/config.ts` and `src/admin/reviews-fields.ts`. Unit tests round-trip the
+real review files through those field definitions (byte for byte for All reviews, value for value for
+Home reviews), and `tests/e2e/admin-reviews.spec.ts` drives the real editor against a mocked GitHub (no
+network) and checks the commit each Save would make.
 
 ## Owner steps
 
@@ -45,3 +65,16 @@ the real `reviews.json` through those field definitions, so a save produces a cl
   GitHub page if it leaks.
 - Sveltia CMS sign-in options were checked in the package itself: without `base_url` it shows "Sign In
   Using Access Token" and "Work with Local Repository".
+
+## Team photos (not part of the editor)
+
+Photos on `/team` and the avatars under the home reviews live in `src/assets/team/`, found by founder
+id. Alvaro's are `alvaro-card.avif` (portrait) and `alvaro-avatar.avif` (small square), made by
+`node scripts/make-team-photos.mjs` (reads the original from `TEAM_PHOTO_ALVARO`, default
+`C:/Users/Alvaro/Desktop/Alvaro-5.tif`; the original is never copied into the repo).
+
+To add Aaron's photo: run `node scripts/make-team-photos.mjs aaron path/to/his-photo.jpg`. It writes
+`src/assets/team/aaron-card.avif` and `aaron-avatar.avif`, which replace the designed placeholder
+(`aaron-placeholder.svg`) with no other change; the alt text is built from his name and role in
+`src/content/site.ts`. Look at `/team` afterwards; if the crop is off, add a crop for `aaron` in the
+`CROPS` table at the top of the script and run it again.

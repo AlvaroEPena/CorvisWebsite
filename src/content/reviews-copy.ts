@@ -1,4 +1,4 @@
-/** Copy for /reviews. The reviews themselves live in reviews.json (edited in /admin). */
+/** Copy for /reviews. The reviews themselves live in src/content/reviews/ (edited in /admin). */
 export const reviewsPage = {
   title: 'Client reviews | Corvis',
   description:

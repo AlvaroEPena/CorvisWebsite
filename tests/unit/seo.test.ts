@@ -9,13 +9,15 @@ import { redesignSample } from '../../src/content/redesign-demo';
 import { sandboxProjects } from '../../src/content/sandbox';
 import { services } from '../../src/content/services';
 import { site } from '../../src/content/site';
-import reviewsFile from '../../src/content/reviews.json';
 import {
   absoluteUrl,
   canonicalPath,
   faqJsonLd,
   professionalServiceJsonLd,
 } from '../../src/layouts/seo';
+import { getAllReviews } from '../../src/lib/reviews';
+
+const reviewsFile = getAllReviews();
 
 const ORIGIN = 'https://corvis.example/';
 
