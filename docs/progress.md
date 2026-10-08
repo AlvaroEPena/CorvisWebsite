@@ -33,4 +33,8 @@
 ## 2026-10-08 — Phase 7 review done
 - Reviewer: no Critical; verdict no-ship until High fixed. Fixed: visible "Sample feedback" label on placeholder testimonials; `npm run release:check` (blocks deploy on placeholder site URL/email or missing Turnstile site key); robots.txt now generated from site URL; `website` restricted to http(s); neutral form success copy; JSON-LD `<` escaped; spec §6 error codes updated; `npm run check` green.
 - Deferred (Medium/Low, listed to owner): CSP `unsafe-inline` for scripts (use hashes later), checkout has no bot check beyond origin+rate limit (add WAF rule), webhook dedupe is per-isolate (KV later), PandaDoc auto-send must stay off until owner approves, deposit amounts hard-coded separately from pricing, `/thanks` copy not verified against session, HSTS preload only once domain is final, verify Stripe API version string before live.
-- Next: Phase 8 handoff (README, screenshots).
+- Next: Done. See README.
+
+## 2026-10-08 — Phase 8 handoff: DONE
+- README written; screenshots reviewed (desktop + mobile hero, services, pricing, slider).
+- Owner to-do: real domain/email/prices/testimonials/projects, Resend/Turnstile/Stripe/PandaDoc accounts, deploy (explicit confirmation).
