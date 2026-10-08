@@ -32,7 +32,7 @@ const year = new Date().getFullYear();
       </div>
       <nav aria-label="Footer">
         <ul>
-          {site.navigation.map((link) => (
+          {site.footerNavigation.map((link) => (
             <li>
               <a href={resolveHref(link.href, isHome)}>{link.label}</a>
             </li>

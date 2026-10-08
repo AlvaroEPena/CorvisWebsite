@@ -49,8 +49,15 @@
 - Claims the owner must be able to deliver: 14-day launch, up to 10 service/location pages, instant email alerts per client, hosting/security/backups with rollback, done-for-you copywriting.
 
 ## 2026-10-09 — Round 3 (owner): new logo, sandbox, Refined Celebrations: done
+
 - New logo (owner PDF converted to vector, glass tile) everywhere; favicon set and OG regenerated.
 - `/sandbox` test-drive page with project picker, Before/After toggle (only for projects with a before), device sizes, reload, fullscreen, deep links.
 - Real before/after pool-builder demo (sanitized, working) and Refined Celebrations (real info, no before) embedded as same-origin demos.
 - Work section now shows Refined Celebrations. One explore button under the before/after slider.
 - Verified: typecheck 0 errors, lint and format clean, 168 unit tests, 330 e2e passed / 0 failed, Lighthouse `/` mobile 99, `/sandbox` mobile 100, A11y 100; all 667 demo assets return 200 under wrangler dev; headers verified with curl.
+
+## 2026-10-09 — Round 4 (owner feedback): done
+
+- Fixed inner-page navigation inside the Refined Celebrations demo on the dev server (dev-only rewrite in `scripts/vite-demos-routing.mjs`, wired in `astro.config.mjs`; production was already correct). Pool demos rebuilt with file-style extensionless links.
+- "Live build" label is now "Built from scratch"; Sandbox is last in the navbar; new detailed glass hero logo (`HeroMark.astro`); hero now visible at first paint (removed opacity gate and GSAP entrance); proof numbers are static (count-up removed).
+- Verified: typecheck/lint/format clean, 173 unit tests, 364 e2e passed / 0 failed, Lighthouse mobile `/` 100 and `/sandbox` 100, A11y 100.

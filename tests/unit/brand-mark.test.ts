@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   classedMark,
   MARK_LIGHT_PALETTE,
+  markGeometry,
   MARK_SOURCE_PALETTE,
   paintMark,
   parseMark,
@@ -48,5 +49,17 @@ describe('brand mark', () => {
 
   it('rejects input that is not an SVG', () => {
     expect(() => parseMark('<div></div>')).toThrow();
+  });
+});
+
+describe('markGeometry', () => {
+  it('extracts the ring, chevron and dot in the 0-100 drawing space', () => {
+    const geometry = markGeometry(parseMark(source).body);
+    expect(geometry.ring.width).toBe(11);
+    expect(geometry.ring.d.startsWith('M70.93 23.21')).toBe(true);
+    expect(geometry.chevron).toEqual({ d: 'M57 33L37 50L57 67', width: 10.6 });
+    expect(geometry.dot.cx).toBeCloseTo(64, 1);
+    expect(geometry.dot.cy).toBeCloseTo(50, 1);
+    expect(geometry.dot.r).toBeCloseTo(6.5, 1);
   });
 });

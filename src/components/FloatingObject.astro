@@ -12,26 +12,11 @@ interface Props {
   parallax?: number;
   tilt?: string;
   delay?: string;
-  entrance?: boolean;
 }
-const {
-  kind,
-  tone = 'amber',
-  style,
-  parallax,
-  tilt = '0deg',
-  delay = '0s',
-  entrance = false,
-} = Astro.props;
+const { kind, tone = 'amber', style, parallax, tilt = '0deg', delay = '0s' } = Astro.props;
 ---
 
-<span
-  class="object"
-  style={style}
-  data-parallax={parallax}
-  data-hero-obj={entrance ? '' : undefined}
-  aria-hidden="true"
->
+<span class="object" style={style} data-parallax={parallax} aria-hidden="true">
   <span class={`body float ${kind} ${tone}`} style={`--tilt:${tilt};--float-delay:${delay}`}>
     {kind === 'spark' && (
       <svg viewBox="0 0 40 40" focusable="false">

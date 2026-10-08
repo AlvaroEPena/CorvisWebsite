@@ -1,6 +1,7 @@
 ---
 import { site } from '../content/site';
 import FloatingObject from './FloatingObject.astro';
+import HeroMark from './HeroMark.astro';
 ---
 
 <section class="hero section" id="hero" aria-labelledby="hero-title">
@@ -21,10 +22,10 @@ import FloatingObject from './FloatingObject.astro';
         <br />
         <span class="vision">Vision.</span>
       </h1>
-      <p class="lead hero-rise" style="--delay:.12s">
+      <p class="lead hero-rise" style="--delay:.04s">
         {site.hero.lead}
       </p>
-      <div class="actions hero-rise" style="--delay:.22s">
+      <div class="actions hero-rise" style="--delay:.08s">
         <a
           class="btn btn-primary btn-shine"
           href={site.cta.href}
@@ -48,17 +49,16 @@ import FloatingObject from './FloatingObject.astro';
       </div>
     </div>
 
-    <div class="stage-wrap" aria-hidden="true">
+    <div class="stage-wrap">
       <div class="stage">
-        <div class="core" data-hero-obj data-parallax="6">
-          <span class="core-orb float" style="--float-duration:11s"></span>
+        <div class="core" data-parallax="6">
+          <HeroMark />
         </div>
       </div>
 
       <FloatingObject
         kind="capsule"
         tone="amber"
-        entrance
         parallax={-14}
         tilt="-26deg"
         delay="-2s"
@@ -67,7 +67,6 @@ import FloatingObject from './FloatingObject.astro';
       <FloatingObject
         kind="capsule"
         tone="teal"
-        entrance
         parallax={10}
         tilt="32deg"
         delay="-5s"
@@ -76,7 +75,6 @@ import FloatingObject from './FloatingObject.astro';
       <FloatingObject
         kind="bead"
         tone="pearl"
-        entrance
         parallax={-8}
         delay="-1s"
         style="width:4.2rem;height:4.2rem;right:12%;top:-1.6rem"
@@ -84,7 +82,6 @@ import FloatingObject from './FloatingObject.astro';
       <FloatingObject
         kind="bead"
         tone="indigo"
-        entrance
         parallax={14}
         delay="-6s"
         style="width:2.2rem;height:2.2rem;left:22%;bottom:-.8rem"
@@ -92,20 +89,19 @@ import FloatingObject from './FloatingObject.astro';
       <FloatingObject
         kind="spark"
         tone="amber"
-        entrance
         parallax={-6}
         delay="-3s"
         style="width:3.2rem;height:3.2rem;left:8%;bottom:34%"
       />
 
-      <div class="card card-core glass">
+      <div class="card card-core glass" aria-hidden="true">
         <span class="chip core-chip"></span>
         <div>
           <p class="card-title">Core</p>
           <p class="card-text">The one idea that makes you different.</p>
         </div>
       </div>
-      <div class="card card-vision glass">
+      <div class="card card-vision glass" aria-hidden="true">
         <span class="chip vision-chip"></span>
         <div>
           <p class="card-title">Vision</p>
@@ -215,39 +211,9 @@ import FloatingObject from './FloatingObject.astro';
 
   .core {
     position: absolute;
-    inset: 15% 12% 13% 14%;
+    inset: 9% 7% 8% 8%;
     display: grid;
     place-items: center;
-  }
-
-  /* The glowing core: amber heart inside a glassy indigo sphere with a specular highlight. */
-  .core-orb {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background:
-      radial-gradient(ellipse 26% 15% at 30% 20%, rgb(255 255 255 / 0.7), transparent 72%),
-      radial-gradient(
-        circle at 50% 54%,
-        #fff3e0 0,
-        #ffc083 13%,
-        #ff8a2b 27%,
-        rgb(255 138 43 / 0) 54%
-      ),
-      radial-gradient(circle at 42% 38%, #6d6dff 0, #2f31b8 52%, #14163f 100%);
-    box-shadow:
-      inset 0 0 0 1px rgb(255 255 255 / 0.28),
-      inset -16px -24px 50px rgb(8 9 40 / 0.55),
-      0 0 90px 10px rgb(255 138 43 / 0.38);
-  }
-
-  .core-orb::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(200deg, transparent 55%, rgb(255 192 131 / 0.35));
   }
 
   .card {
@@ -303,6 +269,21 @@ import FloatingObject from './FloatingObject.astro';
     color: var(--ink-soft);
     font-size: 0.85rem;
     line-height: 1.35;
+  }
+
+  /* Phones: compact chips (title only) so the cards never cover the logo. */
+  @media (max-width: 40rem) {
+    .card {
+      width: auto;
+      padding: 0.6rem 1rem 0.6rem 0.7rem;
+    }
+    .card-text {
+      display: none;
+    }
+    .chip {
+      width: 2rem;
+      height: 2rem;
+    }
   }
 
   @media (min-width: 64rem) {

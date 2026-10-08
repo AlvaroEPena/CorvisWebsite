@@ -13,7 +13,7 @@ test.describe('J7 reduced motion and fallbacks', () => {
     await expect(page.locator('html')).not.toHaveAttribute('data-motion', 'on');
 
     const hidden = await page.evaluate(() =>
-      [...document.querySelectorAll<HTMLElement>('.reveal, .hero-rise, [data-hero-obj]')]
+      [...document.querySelectorAll<HTMLElement>('.reveal, .hero-rise')]
         .filter((el) => Number(getComputedStyle(el).opacity) < 1)
         .map((el) => el.className),
     );

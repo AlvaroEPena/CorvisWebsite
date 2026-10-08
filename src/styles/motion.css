@@ -2,7 +2,7 @@
  * Motion layer. Everything here is transform/opacity only and degrades to the final state:
  *  - scroll-driven reveals run only where `animation-timeline` exists and motion is allowed,
  *  - the hero entrance is CSS (so the headline, the LCP element, is never delayed),
- *  - GSAP (scripts/motion.ts) only adds the hero-object entrance and light parallax.
+ *  - GSAP (scripts/motion.ts) only adds light parallax; nothing in the hero waits for it.
  * Never put .reveal on an element that carries a backdrop-filter.
  */
 
@@ -19,8 +19,8 @@
 
 @keyframes rise-in {
   from {
-    opacity: 0;
-    transform: translateY(18px);
+    opacity: 0.01;
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -40,8 +40,8 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .hero-rise {
-    animation: rise-in 0.8s var(--ease-out) both;
-    animation-delay: var(--delay, 0.1s);
+    animation: rise-in 0.35s var(--ease-out) both;
+    animation-delay: var(--delay, 0s);
   }
 
   .float {
@@ -56,11 +56,6 @@
       animation-range: entry 0% entry 40%;
     }
   }
-}
-
-/* Decorative hero objects stay hidden only while GSAP is about to animate them in. */
-:root[data-motion='on']:not([data-motion-ready]) [data-hero-obj] {
-  opacity: 0;
 }
 
 /*
@@ -109,27 +104,12 @@
   display: none;
 }
 
-@property --count {
-  syntax: '<integer>';
-  inherits: false;
-  initial-value: 0;
-}
-
 @keyframes progress-grow {
   from {
     transform: scaleX(0);
   }
   to {
     transform: scaleX(1);
-  }
-}
-
-@keyframes count-up {
-  from {
-    --count: 0;
-  }
-  to {
-    --count: var(--to);
   }
 }
 
@@ -147,23 +127,6 @@
       pointer-events: none;
       animation: progress-grow linear both;
       animation-timeline: scroll(root block);
-    }
-  }
-
-  @supports (animation-timeline: view()) {
-    /* Proof-strip counters: the number counts up as the strip scrolls into view. The real text
-       stays in the DOM (and reads normally); the animated glyphs are presentation only. */
-    .count {
-      font-size: 0;
-      animation: count-up linear both;
-      animation-timeline: view();
-      animation-range: entry 5% entry 90%;
-      counter-reset: count var(--count);
-    }
-
-    .count::before {
-      content: counter(count) / '';
-      font-size: var(--count-size);
     }
   }
 }

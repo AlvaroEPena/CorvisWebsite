@@ -61,7 +61,9 @@ describe('describeSelection', () => {
       'Showing Saltwater Row, the new website.',
     );
   });
-  it('calls a fresh design the live build', () => {
-    expect(describeSelection('Refined', 'after', false)).toBe('Showing Refined, live build.');
+  it('calls a fresh design a brand-new website built from scratch', () => {
+    expect(describeSelection('Refined', 'after', false)).toBe(
+      'Showing Refined, a brand-new website built from scratch.',
+    );
   });
 });

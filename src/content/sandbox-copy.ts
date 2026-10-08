@@ -15,7 +15,7 @@ export const sandboxPage = {
   lead: 'Everything below is the real build running live, not a screenshot. Click through it, resize it to a phone, flip between the old and new site. Sample projects have their details changed.',
   pickerLabel: 'Projects',
   versionLabel: 'Version',
-  liveLabel: 'Live build',
+  liveLabel: 'Built from scratch',
   deviceLabel: 'Device width',
   devices: [
     { id: 'desktop', label: 'Desktop', width: '100%' },

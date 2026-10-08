@@ -135,11 +135,11 @@ test.describe('sandbox project picker and versions', () => {
     await expect(studio(page).locator('[data-status]')).toHaveText(/new website/);
   });
 
-  test('a fresh design shows "Live build" and no Before/After toggle', async ({ page }) => {
+  test('a fresh design shows "Built from scratch" and no Before/After toggle', async ({ page }) => {
     await openSandbox(page, '/sandbox#refined-celebrations/after');
     await expect(page.getByRole('group', { name: 'Version' })).toBeHidden();
     await expect(page.getByRole('button', { name: 'Before' })).toBeHidden();
-    await expect(page.getByText('Live build', { exact: true })).toBeVisible();
+    await expect(page.getByText('Built from scratch', { exact: true })).toBeVisible();
   });
 
   test('deep links pick the project and version, and bad ones fall back', async ({ page }) => {

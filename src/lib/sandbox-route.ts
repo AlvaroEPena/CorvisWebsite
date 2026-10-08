@@ -41,6 +41,6 @@ export function describeSelection(
   version: SandboxVersionKey,
   hasBefore: boolean,
 ): string {
-  if (!hasBefore) return `Showing ${projectName}, live build.`;
+  if (!hasBefore) return `Showing ${projectName}, a brand-new website built from scratch.`;
   return `Showing ${projectName}, ${version === 'before' ? 'the old website' : 'the new website'}.`;
 }

@@ -2,6 +2,7 @@
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, fontProviders } from 'astro/config';
+import { demosRouting } from './scripts/vite-demos-routing.mjs';
 
 // Static output, deployed to Cloudflare Workers static assets (see wrangler.jsonc).
 // The contact endpoint is a separate Worker (src/worker) served on /api/*.
@@ -10,7 +11,7 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'never',
   build: { format: 'file', inlineStylesheets: 'always' },
-  integrations: [sitemap({ filter: (page) => !page.endsWith('/thanks') })],
+  integrations: [sitemap({ filter: (page) => !page.endsWith('/thanks') }), demosRouting()],
   image: { layout: 'constrained' },
   vite: { plugins: [tailwindcss()] },
   // Self-hosted at build time by the Fonts API (no third-party request at runtime).

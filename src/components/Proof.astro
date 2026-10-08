@@ -10,9 +10,7 @@ import { proofChips, proofStats } from '../content/proof';
           <div class="stat">
             <dt>{stat.label}</dt>
             <dd>
-              <span class="count" style={`--to:${stat.value}`}>
-                {stat.value}
-              </span>
+              {stat.value}
               {stat.suffix}
             </dd>
           </div>
@@ -53,7 +51,6 @@ import { proofChips, proofStats } from '../content/proof';
   }
 
   dd {
-    --count-size: clamp(2.4rem, 5vw, 3.6rem);
     margin: 0;
     font-family: var(--font-display);
     font-size: clamp(2.4rem, 5vw, 3.6rem);

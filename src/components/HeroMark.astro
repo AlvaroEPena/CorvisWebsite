@@ -1,0 +1,461 @@
+---
+/**
+ * The hero feature: the Corvis mark as large, glossy frosted glass, drawn from the mark's real
+ * geometry (src/assets/brand/corvis-mark.svg via markGeometry), separate from the small nav logo.
+ *
+ * Visible at first paint: everything below is plain SVG with its final look as the base style. CSS
+ * adds a short intro (ring draws, chevron slides, dot pops) and gentle idle motion; scripts/hero-mark.ts
+ * only adds the pointer tilt and pausing. Animations touch transform, opacity and stroke-dashoffset
+ * only (never filter or blur), and are removed for reduced motion and Save-Data.
+ * No backdrop-filter here: the "glass" is gradients and opacity, so the blur budget is untouched.
+ */
+import markSource from '../assets/brand/corvis-mark.svg?raw';
+import { markGeometry, parseMark } from '../lib/brand-mark';
+
+const { ring, chevron, dot } = markGeometry(parseMark(markSource).body);
+// The mark is off-center in its own box (the dot sits in the C's opening); shift it onto the disc.
+const CENTERING_SHIFT = 8;
+---
+
+<div class="hero-mark" data-hero-mark role="img" aria-label="Corvis logo">
+  <span class="hm-glow" aria-hidden="true"></span>
+  <div class="hm-tilt">
+    <div class="hm-float">
+      <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+        <defs>
+          <radialGradient id="hm-disc" cx="38%" cy="30%" r="80%">
+            <stop offset="0" stop-color="#fff" stop-opacity="0.34"></stop>
+            <stop offset="0.55" stop-color="#c9c9ff" stop-opacity="0.12"></stop>
+            <stop offset="1" stop-color="#fff" stop-opacity="0.04"></stop>
+          </radialGradient>
+          <linearGradient id="hm-disc-rim" x1="0.1" y1="0" x2="0.9" y2="1">
+            <stop offset="0" stop-color="#fff" stop-opacity="0.85"></stop>
+            <stop offset="0.5" stop-color="#fff" stop-opacity="0.12"></stop>
+            <stop offset="1" stop-color="#ffc083" stop-opacity="0.55"></stop>
+          </linearGradient>
+          <radialGradient id="hm-disc-spec" cx="50%" cy="50%" r="50%">
+            <stop offset="0" stop-color="#fff" stop-opacity="0.5"></stop>
+            <stop offset="1" stop-color="#fff" stop-opacity="0"></stop>
+          </radialGradient>
+          <linearGradient
+            id="hm-ring"
+            gradientUnits="userSpaceOnUse"
+            x1="14"
+            y1="12"
+            x2="72"
+            y2="90"
+          >
+            <stop offset="0" stop-color="#c4c4ff"></stop>
+            <stop offset="0.45" stop-color="#5a5af0"></stop>
+            <stop offset="1" stop-color="#2a2cb0"></stop>
+          </linearGradient>
+          <linearGradient
+            id="hm-chevron"
+            gradientUnits="userSpaceOnUse"
+            x1="36"
+            y1="30"
+            x2="58"
+            y2="70"
+          >
+            <stop offset="0" stop-color="#3a3e7c"></stop>
+            <stop offset="0.35" stop-color="#14163f"></stop>
+            <stop offset="1" stop-color="#05061a"></stop>
+          </linearGradient>
+          <radialGradient id="hm-bead" cx="36%" cy="30%" r="75%">
+            <stop offset="0" stop-color="#fff3e0"></stop>
+            <stop offset="0.3" stop-color="#ffc083"></stop>
+            <stop offset="0.65" stop-color="#ff8a2b"></stop>
+            <stop offset="1" stop-color="#c2410a"></stop>
+          </radialGradient>
+          <radialGradient id="hm-halo" cx="50%" cy="50%" r="50%">
+            <stop offset="0.25" stop-color="#ff8a2b" stop-opacity="0.65"></stop>
+            <stop offset="1" stop-color="#ff8a2b" stop-opacity="0"></stop>
+          </radialGradient>
+          <linearGradient id="hm-sweep" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#fff" stop-opacity="0"></stop>
+            <stop offset="0.5" stop-color="#fff" stop-opacity="0.85"></stop>
+            <stop offset="1" stop-color="#fff" stop-opacity="0"></stop>
+          </linearGradient>
+          <mask id="hm-sweep-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+            <g transform={`translate(${CENTERING_SHIFT} 0)`} fill="none" stroke="#fff">
+              <path d={ring.d} stroke-width={ring.width}></path>
+              <path d={chevron.d} stroke-width={chevron.width}></path>
+            </g>
+          </mask>
+        </defs>
+
+        <ellipse
+          class="hm-floor"
+          cx="50"
+          cy="97"
+          rx="30"
+          ry="2.6"
+          fill="#0a0b2e"
+          opacity="0.28"
+        ></ellipse>
+
+        <!-- Frosted glass disc: translucent fill, light rim, crescent highlight. -->
+        <g class="hm-disc">
+          <circle cx="50" cy="50" r="47" fill="url(#hm-disc)"></circle>
+          <circle
+            cx="50"
+            cy="50"
+            r="40"
+            fill="none"
+            stroke="#fff"
+            stroke-opacity="0.1"
+            stroke-width="0.6"
+          ></circle>
+          <circle
+            cx="50"
+            cy="50"
+            r="47"
+            fill="none"
+            stroke="url(#hm-disc-rim)"
+            stroke-width="0.7"
+            vector-effect="non-scaling-stroke"
+          ></circle>
+          <ellipse
+            cx="34"
+            cy="19"
+            rx="24"
+            ry="9"
+            fill="url(#hm-disc-spec)"
+            transform="rotate(-24 34 19)"
+          ></ellipse>
+        </g>
+
+        <g class="hm-parallax">
+          <g transform={`translate(${CENTERING_SHIFT} 0)`} fill="none">
+            <!-- The C: a glass tube with a lit core, a specular line and an amber bounce light. -->
+            <g class="hm-ring" stroke-linecap="round">
+              <path
+                d={ring.d}
+                pathLength="1"
+                class="hm-draw"
+                stroke="#0a0b2e"
+                stroke-opacity="0.35"
+                stroke-width={ring.width + 2}
+                transform="translate(1.4 2.4)"
+              ></path>
+              <path
+                d={ring.d}
+                pathLength="1"
+                class="hm-draw"
+                stroke="url(#hm-ring)"
+                stroke-width={ring.width}
+              ></path>
+              <path
+                d={ring.d}
+                pathLength="1"
+                class="hm-draw"
+                stroke="#b9b9ff"
+                stroke-opacity="0.42"
+                stroke-width={ring.width * 0.42}
+              ></path>
+              <path
+                d={ring.d}
+                pathLength="1"
+                class="hm-fade"
+                stroke="#fff"
+                stroke-opacity="0.85"
+                stroke-width="1.5"
+                stroke-dasharray="0.32 1"
+                stroke-dashoffset="-0.12"
+                transform="translate(-0.4 -2.3)"
+              ></path>
+              <path
+                d={ring.d}
+                pathLength="1"
+                class="hm-fade"
+                stroke="#ffc083"
+                stroke-opacity="0.6"
+                stroke-width="1"
+                stroke-dasharray="0.26 1"
+                stroke-dashoffset="-0.6"
+                transform="translate(0.8 2.2)"
+              ></path>
+            </g>
+
+            <!-- The chevron: polished dark glass. -->
+            <g class="hm-chevron-slide">
+              <path
+                d={chevron.d}
+                stroke="#0a0b2e"
+                stroke-opacity="0.35"
+                stroke-width={chevron.width}
+                transform="translate(1.4 2.4)"
+              ></path>
+              <path d={chevron.d} stroke="url(#hm-chevron)" stroke-width={chevron.width}></path>
+              <path
+                d={chevron.d}
+                stroke="#fff"
+                stroke-opacity="0.38"
+                stroke-width="1.3"
+                transform="translate(-0.2 -3)"
+              ></path>
+            </g>
+
+            <!-- Light sweep across the ring and chevron only (masked), every few seconds. -->
+            <g mask="url(#hm-sweep-mask)">
+              <g transform="rotate(18 50 50)">
+                <rect
+                  class="hm-sweep"
+                  x="-30"
+                  y="-20"
+                  width="26"
+                  height="140"
+                  fill="url(#hm-sweep)"
+                ></rect>
+              </g>
+            </g>
+
+            <!-- The dot: a glowing glass bead with a breathing halo. -->
+            <g class="hm-dot">
+              <circle
+                class="hm-halo"
+                cx={dot.cx}
+                cy={dot.cy}
+                r={dot.r * 2.6}
+                fill="url(#hm-halo)"
+              ></circle>
+              <g class="hm-dot-pop">
+                <g class="hm-dot-pulse">
+                  <circle cx={dot.cx} cy={dot.cy} r={dot.r} fill="url(#hm-bead)"></circle>
+                  <circle
+                    cx={dot.cx}
+                    cy={dot.cy}
+                    r={dot.r - 0.3}
+                    fill="none"
+                    stroke="#fff"
+                    stroke-opacity="0.55"
+                    stroke-width="0.6"
+                  ></circle>
+                  <ellipse
+                    cx={dot.cx - dot.r * 0.34}
+                    cy={dot.cy - dot.r * 0.42}
+                    rx={dot.r * 0.36}
+                    ry={dot.r * 0.22}
+                    fill="#fff"
+                    opacity="0.85"
+                    transform={`rotate(-30 ${dot.cx - dot.r * 0.34} ${dot.cy - dot.r * 0.42})`}
+                  ></ellipse>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script>
+  import '../scripts/hero-mark';
+</script>
+
+<style>
+  .hero-mark {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    --rx: 0deg;
+    --ry: 0deg;
+    --px: 0;
+    --py: 0;
+  }
+
+  /* Soft colored glow behind the glass: gradients only, opacity-animated. */
+  .hm-glow {
+    position: absolute;
+    inset: -6%;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 36% 32%, rgb(124 124 255 / 0.55), transparent 58%),
+      radial-gradient(circle at 72% 74%, rgb(255 138 43 / 0.42), transparent 52%);
+    pointer-events: none;
+  }
+
+  .hm-tilt {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+    transform-style: preserve-3d;
+  }
+
+  .hm-float,
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Everything in the SVG scales about its own center. */
+  svg :is(.hm-dot-pop, .hm-dot-pulse, .hm-halo, .hm-chevron-slide, .hm-floor) {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  /* Pointer parallax: the art drifts a little more than the disc, which gives depth. */
+  .hm-parallax {
+    transform: translate(calc(var(--px) * 1.6px), calc(var(--py) * 1.6px));
+  }
+
+  .hm-disc {
+    transform: translate(calc(var(--px) * -0.8px), calc(var(--py) * -0.8px));
+  }
+
+  /* Base (final) state: ring fully drawn. */
+  .hm-draw {
+    stroke-dasharray: 1 1.01;
+    stroke-dashoffset: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(:root:not([data-save-data])) .hero-mark {
+      /* Intro: the ring draws (it starts partly drawn, so something is visible at first paint). */
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    :global(:root:not([data-save-data])) .hm-draw {
+      animation: hm-draw 0.6s var(--ease-out) backwards;
+    }
+
+    :global(:root:not([data-save-data])) .hm-fade {
+      animation: hm-fade 0.4s ease-out 0.35s backwards;
+    }
+
+    :global(:root:not([data-save-data])) .hm-chevron-slide {
+      animation: hm-slide 0.4s var(--ease-out) 0.15s backwards;
+    }
+
+    :global(:root:not([data-save-data])) .hm-dot-pop {
+      animation: hm-pop 0.5s var(--ease-spring) 0.3s backwards;
+    }
+
+    /* Idle: slow float, a light sweep, the bead pulsing, the halo and glow breathing. */
+    :global(:root:not([data-save-data])) .hm-float {
+      animation: hm-float 8s ease-in-out infinite;
+    }
+
+    :global(:root:not([data-save-data])) .hm-floor {
+      animation: hm-floor 8s ease-in-out infinite;
+    }
+
+    :global(:root:not([data-save-data])) .hm-sweep {
+      animation: hm-sweep 6.5s ease-in-out 1.4s infinite;
+    }
+
+    :global(:root:not([data-save-data])) .hm-dot-pulse {
+      animation: hm-pulse 3.2s ease-in-out infinite alternate;
+    }
+
+    :global(:root:not([data-save-data])) .hm-halo {
+      animation: hm-breathe 4.5s ease-in-out infinite alternate;
+    }
+
+    :global(:root:not([data-save-data])) .hm-glow {
+      animation: hm-glow 6s ease-in-out infinite alternate;
+    }
+
+    /* Touch screens have no pointer to follow: a very gentle sway instead. */
+    @media (pointer: coarse) {
+      :global(:root:not([data-save-data])) .hm-tilt {
+        animation: hm-sway 10s ease-in-out infinite;
+      }
+    }
+
+    /* Paused by scripts/hero-mark.ts while off-screen or in a hidden tab. */
+    .hero-mark[data-paused]
+      :is(.hm-float, .hm-floor, .hm-sweep, .hm-dot-pulse, .hm-halo, .hm-glow, .hm-tilt) {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes hm-draw {
+    from {
+      stroke-dashoffset: 0.88;
+    }
+  }
+
+  @keyframes hm-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes hm-slide {
+    from {
+      opacity: 0.2;
+      transform: translateX(-9px);
+    }
+  }
+
+  @keyframes hm-pop {
+    from {
+      opacity: 0.2;
+      transform: scale(0.2);
+    }
+  }
+
+  @keyframes hm-float {
+    50% {
+      transform: translateY(-2.5%);
+    }
+  }
+
+  @keyframes hm-floor {
+    50% {
+      opacity: 0.6;
+      transform: scaleX(0.88);
+    }
+  }
+
+  @keyframes hm-sweep {
+    0%,
+    55% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(170px);
+    }
+  }
+
+  @keyframes hm-pulse {
+    to {
+      transform: scale(1.1);
+    }
+  }
+
+  @keyframes hm-breathe {
+    from {
+      opacity: 0.7;
+      transform: scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1.12);
+    }
+  }
+
+  @keyframes hm-glow {
+    from {
+      opacity: 0.75;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes hm-sway {
+    0%,
+    100% {
+      transform: perspective(900px) rotateY(-4deg) rotateX(2deg);
+    }
+    50% {
+      transform: perspective(900px) rotateY(4deg) rotateX(-2deg);
+    }
+  }
+</style>

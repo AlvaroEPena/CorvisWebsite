@@ -18,6 +18,16 @@ export const site = {
     { label: 'Services', href: '#services' },
     { label: 'Work', href: '#work' },
     { label: 'Redesign', href: '#redesign' },
+    { label: 'Process', href: '#process' },
+    { label: 'Pricing', href: '#pricing' },
+    { label: 'FAQ', href: '#faq' },
+    { label: 'Sandbox', href: '/sandbox' },
+  ],
+  /** Footer keeps the Sandbox link next to the work it shows, ahead of Process. */
+  footerNavigation: [
+    { label: 'Services', href: '#services' },
+    { label: 'Work', href: '#work' },
+    { label: 'Redesign', href: '#redesign' },
     { label: 'Sandbox', href: '/sandbox' },
     { label: 'Process', href: '#process' },
     { label: 'Pricing', href: '#pricing' },

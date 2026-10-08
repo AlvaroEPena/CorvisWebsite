@@ -1,4 +1,4 @@
-/** Commitments we build to (targets, not client results). Numbers are animated by CSS counters. */
+/** Commitments we build to (targets, not client results). Rendered statically: the numbers never animate. */
 export const proofStats = [
   { value: 14, suffix: '', label: 'Days from kickoff to a live site' },
   { value: 10, suffix: '', label: 'Local search pages in The Market Leader' },

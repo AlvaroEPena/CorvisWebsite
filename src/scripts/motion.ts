@@ -1,14 +1,13 @@
 /**
- * Lazy GSAP layer: hero-object entrance and light parallax only. Loaded after first paint, and
+ * Lazy GSAP layer: light parallax only (the hero is fully visible without it). Loaded after first paint, and
  * every tween lives inside matchMedia so reduced-motion users get the static layout.
- * Motion has a job here: the entrance directs attention to the hero composition, the parallax
- * gives the floating objects depth against the panel.
+ * Motion has a job here: the parallax gives the floating objects depth against the panel.
  */
 const root = document.documentElement;
 
 async function startMotion(): Promise<void> {
-  // Pages without hero objects or parallax (sandbox, 404...) never need GSAP's weight.
-  if (!document.querySelector('[data-hero-obj], [data-parallax]')) {
+  // Pages without parallax (sandbox, 404...) never need GSAP's weight.
+  if (!document.querySelector('[data-parallax]')) {
     root.setAttribute('data-motion-ready', '');
     return;
   }
@@ -19,15 +18,6 @@ async function startMotion(): Promise<void> {
   gsap.registerPlugin(ScrollTrigger);
 
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
-    gsap.from('[data-hero-obj]', {
-      opacity: 0,
-      y: 36,
-      scale: 0.9,
-      duration: 1.1,
-      stagger: 0.1,
-      ease: 'power3.out',
-    });
-
     gsap.utils.toArray<HTMLElement>('[data-parallax]').forEach((element) => {
       const depth = Number(element.dataset.parallax) || 10;
       gsap.to(element, {
