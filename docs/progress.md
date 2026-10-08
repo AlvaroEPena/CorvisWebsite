@@ -98,3 +98,8 @@
 
 - Cause of choppiness: integer scroll quantization (per-frame step SD 0.53 px to 0.005 px after fix), plus hidden scroll bar, no hover pause, time-based holds/ramps, same-size Work previews, "Preview Loading" placeholder with cross-fade.
 - Verified: typecheck/lint/format clean, 253 unit, 550 e2e passed / 0 failed, Lighthouse `/` and `/sandbox` mobile 100/100/100/100.
+
+## 2026-10-09 — Round 10 (owner): browser frame on slider, traffic lights, nav merge, nav highlight: done
+
+- Red/yellow/green lights on Work previews; before/after now sits in a fake browser window with the split starting under the address bar; Redesign folded into Work in nav and footer; "run by Alvaro" removed from Mod Labs copy; navbar scroll highlight with gliding glass pill.
+- Verified: typecheck/lint/format clean, 258 unit, 562 e2e passed / 0 failed.

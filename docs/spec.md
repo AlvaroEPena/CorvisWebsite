@@ -268,3 +268,8 @@ public copy.
 - Demo contract: `?preview=1` (water one tier lighter) and the `corvis-preview` postMessage `{type, paused}` (same-origin, parent only) to stop and resume the water loop; no page parking.
 - Slider wipe: overflow-hidden window whose width changes (no clip-path). Work previews share one column width and a 16:10 aspect.
 - Removed: OldSiteMock, NewSiteMock, SitePreview, redesign-demo.ts, the CSS `browse` keyframes. `data-js` on `<html>` supports the no-script placeholder text.
+
+### 16.5 Navbar section highlight (2026-10-09)
+
+- `src/scripts/nav-spy.ts` (+ pure `nav-spy-math.ts`): on the home page the navbar link of the section being read gets `aria-current="location"` and a glass pill glides behind it (`.links::before`, transform and width only, positioned with `--ind-x`/`--ind-w` measured against the list; no pill under reduced motion transitions). Reading line is 34% from the top; the redesign demo counts as Work; sections without a link (hero, testimonials, contact) show no highlight; a nav click goes straight to its target for 1.1 s. On other pages the pill rests under the current page's link.
+- Redesign removed from the navbar and footer (it is part of Work). Navbar: Services, Work, Process, Pricing, FAQ, Meet the team, Sandbox, Reviews.
