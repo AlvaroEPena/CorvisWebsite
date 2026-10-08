@@ -4,5 +4,6 @@
   "role": "Director",
   "company": "Pinecone Early Learning",
   "quote": "Parents can find our hours, tours and tuition in seconds. Launch day was calm because every approval was already done.",
-  "featured": false
+  "featured": false,
+  "showOnReviewsPage": true
 }

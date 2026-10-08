@@ -4,5 +4,6 @@
   "role": "Managing Partner",
   "company": "Lindqvist & Moore Accounting",
   "quote": "Clear packages, a clear price and a proposal I could sign the same day. The new site explains what we do better than I ever could.",
-  "featured": false
+  "featured": false,
+  "showOnReviewsPage": true
 }

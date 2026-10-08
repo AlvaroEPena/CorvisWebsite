@@ -11,6 +11,7 @@ interface ReviewRecord {
   siteHref?: string;
   order?: number;
   homeOrder?: number;
+  showOnReviewsPage?: boolean;
 }
 const DIR = 'src/content/reviews';
 const rank = (value: number | undefined) => value ?? Number.POSITIVE_INFINITY;
@@ -20,7 +21,7 @@ const sortedBy = (list: ReviewRecord[], key: 'order' | 'homeOrder') =>
     .map((review, index) => ({ review, index }))
     .sort((a, b) => rank(a.review[key]) - rank(b.review[key]) || a.index - b.index)
     .map(({ review }) => review);
-const reviews = sortedBy(
+const allReviews = sortedBy(
   readdirSync(DIR)
     .sort()
     .map((file) => ({
@@ -29,8 +30,10 @@ const reviews = sortedBy(
     })),
   'order',
 );
+/** /reviews lists the ones with "Show on the reviews page" (a missing key counts as shown). */
+const reviews = allReviews.filter((review) => review.showOnReviewsPage !== false);
 const featured = sortedBy(
-  reviews.filter((review) => review.featured),
+  allReviews.filter((review) => review.featured),
   'homeOrder',
 ).slice(0, 6);
 const NAV_LABELS = [
@@ -42,6 +45,7 @@ const NAV_LABELS = [
   'FAQ',
   'Meet the team',
   'Sandbox',
+  'Reviews',
 ];
 
 test.describe('home testimonials', () => {
@@ -71,7 +75,7 @@ test.describe('home testimonials', () => {
     const section = page.getByTestId('testimonials');
     const team = section.getByRole('link', { name: /^Meet the team/ });
     await expect(team).toHaveAttribute('href', '/team');
-    await expect(team).toContainText('Two founders, one point of contact');
+    await expect(team).toContainText('Meet Alvaro and Aaron');
     // The avatars are decorative: the link's name is its text.
     await expect(team.locator('img')).toHaveCount(2);
     for (const image of await team.locator('img').all()) {
@@ -132,7 +136,9 @@ test.describe('/reviews', () => {
     await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/reviews$/);
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', /.+/);
-    await expect(page.getByTestId('reviews-count')).toHaveText(`${reviews.length} reviews`);
+    await expect(page.getByTestId('reviews-count')).toHaveText(
+      `${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'}`,
+    );
 
     const cards = page.getByTestId('review-card');
     await expect(cards).toHaveCount(reviews.length);
@@ -198,10 +204,17 @@ test.describe('/reviews', () => {
     expect(await columnsAt(390)).toBe('1');
   });
 
-  test('is linked from the footer but not from the main navbar', async ({ page }) => {
+  test('is linked from the footer and the navbar, and highlighted there when open', async ({
+    page,
+    isMobile,
+  }) => {
     await page.goto('/');
     await expect(page.locator('body > footer a[href="/reviews"]')).toHaveCount(1);
-    await expect(page.locator('body > header a[href="/reviews"]')).toHaveCount(0);
+    await expect(page.locator('body > header a[href="/reviews"]').first()).toBeAttached();
+    await page.goto('/reviews');
+    if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
+    const active = page.locator('body > header a[aria-current="page"]').filter({ visible: true });
+    await expect(active.first()).toHaveText('Reviews');
   });
 });
 
@@ -209,6 +222,9 @@ test.describe('/team and founders', () => {
   test('shows both founders with their roles and the working steps', async ({ page }) => {
     await page.goto('/team');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Meet the team.');
+    await expect(
+      page.getByRole('heading', { level: 1 }).locator('xpath=following-sibling::p[1]'),
+    ).toHaveText('Two founders, one clear way of working. You talk to Aaron. Alvaro builds it.');
     const members = page.getByTestId('team-member');
     await expect(members).toHaveCount(2);
     await expect(members.nth(0)).toContainText('Alvaro Peña');
@@ -265,7 +281,7 @@ test.describe('/team and founders', () => {
     await expect(page.getByTestId('proof')).toContainText('Aaron');
   });
 
-  test('the navbar lists Meet the team right after FAQ, then Sandbox, on one line', async ({
+  test('the navbar lists Meet the team right after FAQ, then Sandbox and Reviews, on one line', async ({
     page,
     isMobile,
   }) => {
@@ -278,9 +294,12 @@ test.describe('/team and founders', () => {
     expect(await page.locator('header .links a').allInnerTexts()).toEqual(NAV_LABELS);
   });
 
-  test('the navbar never wraps or overflows at 1024px and 1280px', async ({ page, isMobile }) => {
+  test('the navbar never wraps, clips the CTA or overflows from 1120px to 1440px', async ({
+    page,
+    isMobile,
+  }) => {
     test.skip(isMobile, 'Desktop link row.');
-    for (const width of [1024, 1280]) {
+    for (const width of [1120, 1200, 1280, 1440]) {
       await page.setViewportSize({ width, height: 800 });
       await page.goto('/team');
       const nav = page.getByTestId('nav');
@@ -289,11 +308,20 @@ test.describe('/team and founders', () => {
       const overflow = await nav.evaluate((node) => node.scrollWidth - node.clientWidth);
       expect(overflow, `nav overflow at ${width}`).toBeLessThanOrEqual(0);
       const cta = await page.getByTestId('nav-cta').boundingBox();
+      expect(
+        (cta?.x ?? 0) + (cta?.width ?? 0),
+        `CTA inside the bar at ${width}`,
+      ).toBeLessThanOrEqual((box?.x ?? 0) + (box?.width ?? 0));
       expect((cta?.x ?? 0) + (cta?.width ?? 0)).toBeLessThanOrEqual(width);
       for (const link of await page.locator('header .links a').all()) {
         const linkBox = await link.boundingBox();
         expect(linkBox?.height ?? 0).toBeLessThanOrEqual(48);
       }
+      const lastLink = await page.locator('header .links a').last().boundingBox();
+      expect(
+        (lastLink?.x ?? 0) + (lastLink?.width ?? 0),
+        `last link clears the CTA at ${width}`,
+      ).toBeLessThanOrEqual(cta?.x ?? 0);
     }
   });
 });

@@ -4,5 +4,6 @@
   "role": "Principal Attorney",
   "company": "Halvorsen Family Law",
   "quote": "I was wary of marketing language. The copy is plain, calm and accurate, and the consult page brings in people who are ready to talk.",
-  "featured": false
+  "featured": false,
+  "showOnReviewsPage": true
 }

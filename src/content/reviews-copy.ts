@@ -5,6 +5,8 @@ export const reviewsPage = {
     'What business owners say about working with Corvis: fast launches, copy written for them, local search pages and hosting that just works.',
   heading: 'What clients say.',
   lead: 'Owners of small local businesses, in their own words, on launching with Corvis and what changed after.',
+  countLabel: (count: number) => `${count} ${count === 1 ? 'review' : 'reviews'}`,
+  empty: 'New reviews are on their way. In the meantime, book a free consult and ask us anything.',
   viewSite: 'View their new site',
   comingSoon: 'Coming soon',
   homeLink: { label: 'Back to the reviews on the home page', href: '/#testimonials' },

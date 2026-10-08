@@ -6,7 +6,9 @@ import { describe, expect, it } from 'vitest';
 import { config } from '../../src/admin/config';
 import {
   allReviewFields,
+  HOME_MEMBERSHIP_WIDGET,
   homeReviewFields,
+  removalMessage,
   REVIEW_KEYS,
   REVIEWS_FOLDER,
 } from '../../src/admin/reviews-fields';
@@ -94,11 +96,13 @@ describe('admin config', () => {
       'company',
       'quote',
       'featured',
+      'showOnReviewsPage',
       'siteHref',
       'order',
       'homeOrder',
     ]);
     expect(namesOf(all.fields)).toEqual(REVIEW_KEYS);
+    // Only `featured` differs: a tick box in All reviews, a confirm-gated button in Home reviews.
     for (const field of all.fields.filter((candidate) => candidate.name !== 'featured')) {
       expect(home.fields.find((candidate) => candidate.name === field.name)).toEqual(field);
     }
@@ -110,9 +114,29 @@ describe('admin config', () => {
       label: 'Show on the home page',
       widget: 'boolean',
     });
-    expect(featuredIn(homeReviewFields)).toMatchObject({ widget: 'hidden', default: true });
+    expect(featuredIn(homeReviewFields)).toMatchObject({
+      widget: HOME_MEMBERSHIP_WIDGET,
+      default: true,
+    });
     expect(collectionNamed('home-reviews').filter).toEqual({ field: 'featured', value: true });
     expect(collectionNamed('reviews').filter).toBeUndefined();
+  });
+
+  it('shows "Show on the reviews page" in both editors, as the same field on the same record', () => {
+    const find = (fields: Field[]) => fields.find((field) => field.name === 'showOnReviewsPage');
+    expect(find(allReviewFields)).toMatchObject({
+      label: 'Show on the reviews page',
+      widget: 'boolean',
+      default: true,
+    });
+    expect(find(homeReviewFields)).toEqual(find(allReviewFields));
+  });
+
+  it('asks before removing a review from the home screen', () => {
+    expect(removalMessage('Marisol Okafor')).toBe(
+      'Remove Marisol Okafor from the home screen? It stays in All reviews.',
+    );
+    expect(removalMessage('')).toContain('this review');
   });
 
   it('drags write a different number in each editor; both numbers are hidden in both', () => {

@@ -48,7 +48,9 @@ const currentPath = Astro.url.pathname.replace(/\.html$/, '');
       <ul>
         {links.map((link) => (
           <li>
-            <a href={link.href}>{link.label}</a>
+            <a href={link.href} aria-current={link.href === currentPath ? 'page' : undefined}>
+              {link.label}
+            </a>
           </li>
         ))}
       </ul>
@@ -211,11 +213,17 @@ const currentPath = Astro.url.pathname.replace(/\.html$/, '');
     text-decoration: none;
   }
 
+  .menu ul a[aria-current='page'] {
+    color: var(--core-600);
+    background: rgb(59 59 214 / 0.08);
+  }
+
   .menu ul a:hover {
     background: rgb(59 59 214 / 0.08);
   }
 
-  @media (min-width: 64rem) {
+  /* Nine links plus the button fit from 70rem (1120px); below that the menu button is used. */
+  @media (min-width: 70rem) {
     .links {
       display: flex;
     }
@@ -228,7 +236,7 @@ const currentPath = Astro.url.pathname.replace(/\.html$/, '');
     }
   }
 
-  /* Eight links plus the button need the tighter spacing above until there is room (1280px). */
+  /* The tighter spacing above is used until there is room for the roomy one (1280px). */
   @media (min-width: 80rem) {
     .links a {
       padding: 0 0.85rem;

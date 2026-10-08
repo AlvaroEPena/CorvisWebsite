@@ -24,6 +24,8 @@ export const reviewSchema = z.object({
   quote: z.string().trim().min(QUOTE_MIN_LENGTH).max(QUOTE_MAX_LENGTH),
   /** Shown on the home page (the first MAX_HOME_REVIEWS, in home order). */
   featured: z.boolean(),
+  /** Listed on /reviews. Independent of `featured`; a review without the key counts as shown. */
+  showOnReviewsPage: z.boolean().default(true),
   /** Link to the client's new site. Empty or missing means the button is disabled. */
   siteHref: z.string().trim().nullish(),
   order: position,
@@ -92,8 +94,14 @@ if (reviews.filter((review) => review.featured).length > MAX_HOME_REVIEWS) {
   );
 }
 
-/** Every review, in the order the "All reviews" editor arranged them. */
+/** Every review, in the order the "All reviews" editor arranged them (hidden ones included). */
 export const getAllReviews = (): readonly Review[] => reviews;
+
+/** The reviews listed on /reviews: the ones with "Show on the reviews page", in that order. */
+export const pickReviewsPageReviews = (list: readonly Review[]): Review[] =>
+  list.filter((review) => review.showOnReviewsPage);
+
+export const getReviewsPageReviews = (): Review[] => pickReviewsPageReviews(reviews);
 
 /** The reviews on the home page, in the order the "Home reviews" editor arranged them. */
 export const getHomeReviews = (list: readonly Review[] = reviews): Review[] =>

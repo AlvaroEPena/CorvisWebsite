@@ -2,9 +2,9 @@ import { expect, test } from '@playwright/test';
 
 import { expectNoHorizontalScroll, PAGES, revealEverything } from './support';
 
-const WIDTHS = [320, 390, 768, 1024, 1440] as const;
-/** Navigation switches from the menu button to the link row at 64rem (Nav.astro). */
-const DESKTOP_NAV_MIN_WIDTH = 1024;
+const WIDTHS = [320, 390, 768, 1024, 1100, 1120, 1280, 1440] as const;
+/** Navigation switches from the menu button to the link row at 70rem (Nav.astro). */
+const DESKTOP_NAV_MIN_WIDTH = 1120;
 
 // Viewport is set per test, so one project is enough; the other two would repeat the work.
 test.describe('J6 responsive layout', () => {

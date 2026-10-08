@@ -27,6 +27,7 @@ export const site = {
     { label: 'FAQ', href: '#faq' },
     { label: 'Meet the team', href: '/team' },
     { label: 'Sandbox', href: '/sandbox' },
+    { label: 'Reviews', href: '/reviews' },
   ],
   /** Footer keeps the Sandbox link next to the work it shows, ahead of Process. */
   footerNavigation: [

@@ -21,7 +21,7 @@ export const photoAltOf = (member: { name: string; role: string }): string =>
 /** The "Meet the team" call to action under the home page reviews. */
 export const teamTeaser = {
   label: 'Meet the team',
-  text: 'Two founders, one point of contact',
+  text: 'Meet Alvaro and Aaron',
   href: '/team',
 } as const;
 

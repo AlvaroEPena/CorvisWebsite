@@ -42,6 +42,15 @@ const rows = (page: Page) => page.getByRole('row').filter({ hasText: ' - ' });
 
 const home = (page: Page) => page.getByText('Home reviews', { exact: true }).first();
 
+/** Keys whose value differs between a seeded record and the text a Save wrote. */
+function changedKeys(id: string, text: string | null | undefined): string[] {
+  const before = JSON.parse(seededRepo().get(`${DIR}/${id}.json`) ?? '{}') as Record_;
+  const after = JSON.parse(text ?? '{}') as Record_;
+  return [...new Set([...Object.keys(before), ...Object.keys(after)])].filter(
+    (key) => JSON.stringify(before[key]) !== JSON.stringify(after[key]),
+  );
+}
+
 async function shot(page: Page, name: string) {
   if (!SHOTS) return;
   mkdirSync(SHOTS, { recursive: true });
@@ -118,7 +127,7 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
 
     await page.getByText('Marisol Okafor - Ridgeline Lawn & Garden').click();
     await expect(page.getByRole('textbox', { name: 'Role' })).toBeVisible();
-    await expect(page.getByText('Show on the home page')).toHaveCount(0);
+    await expect(page.getByRole('switch', { name: /Show on the home page/ })).toHaveCount(0);
     await page.getByRole('textbox', { name: 'Role' }).fill('Owner and founder');
     await shot(page, 'admin-home-edit');
     await page.getByRole('button', { name: 'Save' }).first().click();
@@ -178,5 +187,102 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
       featured: true,
     });
     expect(record).not.toHaveProperty('siteHref');
+  });
+
+  test('Home reviews shows the remove button, not the home tick box; All reviews shows the tick box', async ({
+    page,
+  }) => {
+    await openEditor(page);
+    await page.getByText('Marisol Okafor - Ridgeline Lawn & Garden').click();
+    await expect(page.getByRole('switch', { name: /Show on the home page/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Remove from home screen' })).toHaveCount(0);
+    await expect(page.getByRole('switch', { name: /Show on the reviews page/ })).toBeVisible();
+    await shot(page, 'admin-all-edit');
+    await page.goBack();
+
+    await home(page).click();
+    await page.getByText('Marisol Okafor - Ridgeline Lawn & Garden').click();
+    await expect(page.getByRole('button', { name: 'Remove from home screen' })).toBeVisible();
+    await expect(page.getByText('This review is on the home screen.')).toBeVisible();
+    await expect(page.getByRole('switch', { name: /Show on the home page/ })).toHaveCount(0);
+    await expect(page.getByRole('switch', { name: /Show on the reviews page/ })).toBeVisible();
+    await shot(page, 'admin-home-edit-remove-button');
+  });
+
+  test('removing from the home screen asks first; cancel changes nothing', async ({ page }) => {
+    const mock = await openEditor(page);
+    await home(page).click();
+    await page.getByText('Marisol Okafor - Ridgeline Lawn & Garden').click();
+
+    const messages: string[] = [];
+    page.once('dialog', (dialog) => {
+      messages.push(dialog.message());
+      void dialog.dismiss();
+    });
+    await page.getByRole('button', { name: 'Remove from home screen' }).click();
+    expect(messages).toEqual([
+      'Remove Marisol Okafor from the home screen? It stays in All reviews.',
+    ]);
+    await expect(page.getByText('This review is on the home screen.')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Save' }).first()).toBeDisabled();
+    expect(mock.commits).toHaveLength(0);
+  });
+
+  test('confirming removes it from the home screen: one field changes, it leaves Home reviews', async ({
+    page,
+  }) => {
+    const mock = await openEditor(page);
+    await home(page).click();
+    await page.getByText('Marisol Okafor - Ridgeline Lawn & Garden').click();
+
+    page.once('dialog', (dialog) => void dialog.accept());
+    await page.getByRole('button', { name: 'Remove from home screen' }).click();
+    await expect(
+      page.getByText('This review will leave the home screen when you press Save.'),
+    ).toBeVisible();
+    await shot(page, 'admin-home-removal-pending');
+    await page.getByRole('button', { name: 'Save' }).first().click();
+    await expect.poll(() => mock.commits.length).toBe(1);
+
+    expect(mock.commits[0]).toHaveLength(1);
+    const [change] = mock.commits[0] ?? [];
+    expect(change?.path).toBe(`${DIR}/ridgeline-landscape.json`);
+    expect(changedKeys('ridgeline-landscape', change?.text)).toEqual(['featured']);
+    expect(JSON.parse(change?.text ?? '{}')).toMatchObject({ featured: false });
+
+    await expect(rows(page)).toHaveCount(3);
+    await expect(page.getByText('Marisol Okafor')).toHaveCount(0);
+    await shot(page, 'admin-home-after-removal');
+    await page.getByText('All reviews', { exact: true }).first().click();
+    await page.getByText('Marisol Okafor - Ridgeline Lawn & Garden').click();
+    await expect(page.getByRole('switch', { name: /Show on the home page/ })).not.toBeChecked();
+  });
+
+  test('"Show on the reviews page" changes the same record, one field, from either editor', async ({
+    page,
+  }) => {
+    const mock = await openEditor(page);
+    const toggleAndSave = async (label: string) => {
+      await page.getByText(label).click();
+      await page.getByRole('switch', { name: /Show on the reviews page/ }).click();
+      await page.getByRole('button', { name: 'Save' }).first().click();
+    };
+
+    await toggleAndSave('Calvin Dubois - Bluewater Pool Builders'); // All reviews
+    await expect.poll(() => mock.commits.length).toBe(1);
+    expect(changedKeys('bluewater-pools', mock.commits[0]?.[0]?.text)).toEqual([
+      'showOnReviewsPage',
+    ]);
+    expect(JSON.parse(mock.commits[0]?.[0]?.text ?? '{}')).toMatchObject({
+      showOnReviewsPage: false,
+    });
+
+    await home(page).click();
+    await toggleAndSave('Tomas Reyes - The Copper Kettle Cafe'); // Home reviews
+    await expect.poll(() => mock.commits.length).toBe(2);
+    expect(mock.commits[1]).toHaveLength(1);
+    expect(changedKeys('copper-kettle', mock.commits[1]?.[0]?.text)).toEqual(['showOnReviewsPage']);
+    // Hidden from the Reviews page, still on the home screen.
+    await expect(rows(page)).toHaveCount(4);
   });
 });

@@ -3,9 +3,9 @@ import FloatingObject from '../components/FloatingObject.astro';
 import ReviewCard from '../components/ReviewCard.astro';
 import { reviewsPage } from '../content/reviews-copy';
 import Layout from '../layouts/Layout.astro';
-import { getAllReviews } from '../lib/reviews';
+import { getReviewsPageReviews } from '../lib/reviews';
 
-const reviews = getAllReviews();
+const reviews = getReviewsPageReviews();
 ---
 
 <Layout title={reviewsPage.title} description={reviewsPage.description}>
@@ -18,7 +18,7 @@ const reviews = getAllReviews();
         <h1 id="reviews-title">{reviewsPage.heading}</h1>
         <p>{reviewsPage.lead}</p>
         <p class="count" data-testid="reviews-count">
-          {reviews.length} reviews
+          {reviewsPage.countLabel(reviews.length)}
         </p>
         <FloatingObject
           kind="bead"
@@ -41,11 +41,17 @@ const reviews = getAllReviews();
         />
       </header>
 
-      <div class="wall">
-        {reviews.map((review, index) => (
-          <ReviewCard review={review} index={index} />
-        ))}
-      </div>
+      {reviews.length > 0 ? (
+        <div class="wall">
+          {reviews.map((review, index) => (
+            <ReviewCard review={review} index={index} />
+          ))}
+        </div>
+      ) : (
+        <p class="empty" data-testid="reviews-empty">
+          {reviewsPage.empty}
+        </p>
+      )}
 
       <p class="back">
         <a href={reviewsPage.homeLink.href}>{reviewsPage.homeLink.label}</a>
@@ -115,6 +121,12 @@ const reviews = getAllReviews();
   .wall {
     columns: 1;
     column-gap: 1.25rem;
+  }
+
+  .empty {
+    max-width: 34rem;
+    color: var(--ink-soft);
+    font-size: 1.125rem;
   }
 
   .back {

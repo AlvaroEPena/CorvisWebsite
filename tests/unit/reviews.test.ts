@@ -7,6 +7,7 @@ import {
   MAX_HOME_REVIEWS,
   parseReviews,
   pickHomeReviews,
+  pickReviewsPageReviews,
   type Review,
   siteLinkOf,
 } from '../../src/lib/reviews';
@@ -19,7 +20,12 @@ const valid = {
   featured: false,
 };
 
-const review = (id: string, extra: Partial<Review> = {}): Review => ({ ...valid, id, ...extra });
+const review = (id: string, extra: Partial<Review> = {}): Review => ({
+  ...valid,
+  showOnReviewsPage: true,
+  id,
+  ...extra,
+});
 const ids = (list: readonly Review[]) => list.map((item) => item.id);
 
 describe('reviews data', () => {
@@ -118,6 +124,31 @@ describe('home order rule', () => {
   });
   it('is empty when nothing is ticked', () => {
     expect(pickHomeReviews([review('a')])).toEqual([]);
+  });
+});
+
+describe('Reviews page rule', () => {
+  it('lists only reviews with "Show on the reviews page", keeping the Reviews page order', () => {
+    const list = [review('a'), review('b', { showOnReviewsPage: false }), review('c')];
+    expect(ids(pickReviewsPageReviews(list))).toEqual(['a', 'c']);
+  });
+  it('is independent of the home page tick, both ways', () => {
+    const list = [
+      review('on-home-only', { featured: true, showOnReviewsPage: false, homeOrder: 1 }),
+      review('on-page-only', { featured: false, showOnReviewsPage: true }),
+    ];
+    expect(ids(pickHomeReviews(list))).toEqual(['on-home-only']);
+    expect(ids(pickReviewsPageReviews(list))).toEqual(['on-page-only']);
+  });
+  it('treats a file without the key as shown, and rejects a non-boolean', () => {
+    const [parsed] = parseReviews({ '../content/reviews/ana-ruiz.json': valid });
+    expect(parsed?.showOnReviewsPage).toBe(true);
+    expect(() =>
+      parseReviews({ '../content/reviews/ana-ruiz.json': { ...valid, showOnReviewsPage: 'no' } }),
+    ).toThrow();
+  });
+  it('ships every review file with the key set to true', () => {
+    expect(getAllReviews().every((item) => item.showOnReviewsPage)).toBe(true);
   });
 });
 

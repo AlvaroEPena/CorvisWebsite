@@ -5,5 +5,6 @@
   "company": "Ridgeline Lawn & Garden",
   "quote": "I never wrote a word, yet the site sounds like me on a job walk. It was live in under two weeks and the quote requests started that month.",
   "featured": true,
+  "showOnReviewsPage": true,
   "homeOrder": 1
 }

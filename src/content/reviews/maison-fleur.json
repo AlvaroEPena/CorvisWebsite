@@ -4,5 +4,6 @@
   "role": "Salon Owner",
   "company": "Maison Fleur Hair Studio",
   "quote": "Online booking, a gallery that loads instantly and copy that sounds like my salon. My clients keep mentioning how easy it is to use.",
-  "featured": false
+  "featured": false,
+  "showOnReviewsPage": true
 }

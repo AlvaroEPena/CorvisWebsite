@@ -81,3 +81,9 @@
 - Home "Meet the team" pill (avatar stack, larger than "More reviews"). /team shows Alvaro's cropped photo and a designed placeholder for Aaron; script `scripts/make-team-photos.mjs` adds his later.
 - Verified: typecheck/lint/format clean, 214 unit, 457 e2e passed / 0 failed, Lighthouse `/` 99, `/team` 100, `/reviews` 100 (mobile), A11y 100.
 - Owner-run checks still pending: real GitHub token Save from /admin (mocked only so far).
+
+## 2026-10-09 — Round 7 (owner): sync, remove-from-home button, reviews-page toggle, nav: done
+
+- `showOnReviewsPage` toggle in both editors; confirm-gated "Remove from home screen" (custom field) in Home reviews; Reviews link added to navbar after Sandbox (burger below 1120px).
+- Verified in the mocked-GitHub editor harness: confirm/cancel, single-field commits. Verified: typecheck/lint/format clean, 220 unit, 489 e2e passed / 0 failed, Lighthouse `/` 100, `/reviews` 100 (mobile).
+- Still to do by owner: real token Save from the live /admin; empty-state copy for /reviews to confirm.

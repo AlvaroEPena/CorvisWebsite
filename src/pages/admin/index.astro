@@ -17,7 +17,9 @@
     <script>
       import { init } from '@sveltia/cms';
       import { config } from '../../admin/config';
+      import { registerHomeMembershipWidget } from '../../admin/home-membership-widget';
 
+      registerHomeMembershipWidget();
       init({ config });
     </script>
   </body>

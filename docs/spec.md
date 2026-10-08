@@ -245,3 +245,10 @@ public copy.
 - Two Sveltia editors over the same folder, so there is exactly one record per review: **All reviews** (full add/edit/delete/reorder + the home tick) and **Home reviews** (filtered to `featured: true`; reorder, edit, add; no tick; Delete disabled). To take a review off the home page, untick it in All reviews.
 - Home rule (`getHomeReviews()` in `src/lib/reviews.ts`): featured reviews ordered by `homeOrder`; featured reviews with no position go after the placed ones in `/reviews` order; at most 6 shown (extra ticked ones only log a build warning).
 - Team photos: `src/assets/team/` (`<id>-card.avif`, `<id>-avatar.avif`, else `<id>-placeholder.svg`, else monogram). Generate with `node scripts/make-team-photos.mjs <id> <photo>`; the original photo is never committed.
+
+### 16.2 Round 7 delta (2026-10-09)
+
+- Review record gains `showOnReviewsPage` (boolean, default true): `/reviews` lists only reviews with it true (independent of `featured`); toggle available in both editors.
+- Home reviews editor: `featured` is rendered by a custom `home-membership` Sveltia field (`src/admin/home-membership-widget.ts`): a red "Remove from home screen" button with a native confirm dialog, then "will leave the home screen when you press Save" + Undo. The home tick box exists only in All reviews. `homeOrder` is not cleared on removal (ignored while unfeatured; the review returns to its old slot if re-ticked).
+- Navbar (9 items): Services, Work, Redesign, Process, Pricing, FAQ, Meet the team, Sandbox, Reviews; burger menu below 70rem (1120px). Footer keeps Reviews.
+- Team pill subtext: "Meet Alvaro and Aaron". `/team` subtitle: "Two founders, one clear way of working. You talk to Aaron. Alvaro builds it."

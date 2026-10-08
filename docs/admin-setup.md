@@ -8,17 +8,37 @@ Nothing here is switched on until the owner does the steps below.
 
 ## What it edits
 
-Each review is ONE small file in `src/content/reviews/` (the file name is the review's id). Two editors
-show those same files, so a review exists once and an edit in one shows in the other:
+**No duplicates, always in sync.** Each review is ONE small file in `src/content/reviews/` (the file
+name is the review's id). "All reviews" and "Home reviews" are two views of those same files, so a
+review exists exactly once: anything changed in one editor is the same change in the other, and there is
+nothing to keep in step.
 
 - **All reviews**: every review. Edit name, role, business name, quote, the optional link to their new
-  site (empty = disabled "View their new site" button), add, delete, and the **Show on the home page**
-  tick. **Reorder** (drag, or the up/down buttons) sets the order on `/reviews`.
+  site (empty = disabled "View their new site" button), add and delete reviews, and use the two tick
+  boxes below. **Reorder** (drag, or the up/down buttons) sets the order on `/reviews`.
 - **Home reviews**: only the reviews ticked "Show on the home page". **Reorder** sets their order on the
-  home page. You can edit any text here too (same record), and add a review (it is ticked for the home
-  page automatically). There is no tick box here and **Delete is switched off**: deleting removes the
-  review everywhere, so that is done in All reviews. To take a review off the home page, untick it in
-  All reviews; it disappears from Home reviews.
+  home page. You can edit any text here too, add a review (it starts on the home screen), and use
+  "Show on the reviews page". Delete is switched off here (deleting removes a review everywhere, so do
+  that in All reviews).
+
+Two switches decide where a review appears; they are independent:
+
+| Switch                                         | Where you see it | Effect                                                                          |
+| ---------------------------------------------- | ---------------- | ------------------------------------------------------------------------------- |
+| Show on the home page (`featured`)             | All reviews only | On the home page, in the Home reviews order                                     |
+| Show on the reviews page (`showOnReviewsPage`) | Both editors     | Listed on `/reviews` (and counted in its "N reviews"), in the All reviews order |
+
+A review can be on the home page but hidden from `/reviews`, and the other way round. New reviews start
+ticked for the Reviews page.
+
+**Remove from home screen (Home reviews).** Open a review in Home reviews: instead of the tick box it
+shows "This review is on the home screen." and a **Remove from home screen** button. Pressing it asks
+"Remove <name> from the home screen? It stays in All reviews." Cancel changes nothing. OK marks the
+review for removal ("will leave the home screen when you press Save"; **Undo** is available); press
+**Save** to make it final. That clears the same "Show on the home page" tick you see in All reviews, so
+the two stay in step, and the review leaves the Home reviews list after saving. To put it back, tick
+"Show on the home page" in All reviews. Its old home position is remembered in the file and is used
+again if it is ticked later (Reorder in Home reviews to change it).
 
 Rules the site follows: the home page shows exactly the ticked reviews, in the Home reviews order; a
 review ticked later (no home position yet) goes after the placed ones until you open Reorder in Home
@@ -26,10 +46,12 @@ reviews once and press Done; at most six show on the home page (the first six in
 
 How it works: Reorder saves a number in each file (`order` for the Reviews page, `homeOrder` for the
 home page). A drag in one editor never changes the other editor's numbers. Saving from a different
-editor may move those two keys around inside a file, which is harmless.
+editor may move those two keys around inside a file, which is harmless. The Remove button is a small
+custom field type (`src/admin/home-membership-widget.ts`); a custom field can only change its own value,
+which is why the old `homeOrder` number is left in the file instead of being cleared.
 
 What Sveltia cannot do (checked against 0.227.2): a filtered view cannot hide its own Delete button (it
-is shown greyed out), and a list that only contains the ticked reviews cannot be built on its own, so
+is shown greyed out), the confirmation is the browser's own dialog (plain, but reliable and accessible), and a list that only contains the ticked reviews cannot be built on its own, so
 the Home list comes from the tick in All reviews instead of a second list that could disagree.
 
 The config lives in `src/admin/config.ts` and `src/admin/reviews-fields.ts`. Unit tests round-trip the

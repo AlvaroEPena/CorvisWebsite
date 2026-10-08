@@ -23,6 +23,7 @@ const LINK_LABELS = [
   'FAQ',
   'Meet the team',
   'Sandbox',
+  'Reviews',
 ];
 
 /** Product of opacity along the ancestor chain: 1 means fully visible. */
@@ -37,13 +38,13 @@ function effectiveOpacity(page: Page, selector: string): Promise<number> {
 }
 
 test.describe('navigation order', () => {
-  test('desktop navbar ends with Sandbox, after FAQ', async ({ page, isMobile }) => {
+  test('desktop navbar ends with Reviews, after Sandbox', async ({ page, isMobile }) => {
     test.skip(isMobile, 'The link row only exists on desktop; the mobile menu is checked below.');
     await page.goto('/');
     expect(await page.locator('header .links a').allInnerTexts()).toEqual(LINK_LABELS);
   });
 
-  test('mobile menu ends with Sandbox, after FAQ', async ({ page, isMobile }) => {
+  test('mobile menu ends with Reviews, after Sandbox', async ({ page, isMobile }) => {
     test.skip(!isMobile, 'The menu only exists below the desktop breakpoint.');
     await page.goto('/');
     await page.getByRole('button', { name: 'Open menu' }).click();

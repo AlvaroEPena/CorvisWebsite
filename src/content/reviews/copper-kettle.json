@@ -5,5 +5,6 @@
   "company": "The Copper Kettle Cafe",
   "quote": "Menu, hours and catering on one fast page that works on a phone in line at the counter. Hosting is simply handled, which is all I wanted.",
   "featured": true,
+  "showOnReviewsPage": true,
   "homeOrder": 3
 }
