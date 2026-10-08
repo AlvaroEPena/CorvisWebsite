@@ -7,6 +7,7 @@ import {
   firstInvalidField,
   normalizeWebsite,
   parseContactResponse,
+  splitSubmitErrors,
 } from '../../src/scripts/contact-form';
 
 const EMAIL = 'hello@corvis.example';
@@ -108,5 +109,20 @@ describe('parseContactResponse', () => {
     expect(parseContactResponse({ ok: true }, 500)).toBeNull();
     expect(parseContactResponse('nope', 200)).toBeNull();
     expect(parseContactResponse(null, 404)).toBeNull();
+  });
+});
+
+describe('splitSubmitErrors', () => {
+  it('lets field errors win over the too-fast notice', () => {
+    const split = splitSubmitErrors({ name: 'Please enter your name', elapsedMs: 'too small' });
+    expect(split.fieldErrors).toEqual({ name: 'Please enter your name' });
+    expect(split.isTooFast).toBe(false);
+  });
+  it('flags too fast only when nothing else is invalid', () => {
+    expect(splitSubmitErrors({ elapsedMs: 'too small' })).toEqual({
+      fieldErrors: {},
+      isTooFast: true,
+    });
+    expect(splitSubmitErrors({}).isTooFast).toBe(false);
   });
 });

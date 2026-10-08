@@ -20,7 +20,7 @@ async function startCheckout(button: HTMLButtonElement): Promise<void> {
   const label = button.textContent ?? '';
   showError('');
   button.disabled = true;
-  button.textContent = 'Opening secure checkout...';
+  button.textContent = 'Opening secure checkout…';
   try {
     const { url, init } = buildCheckoutRequest(packageId);
     const reply = await fetch(url, init);

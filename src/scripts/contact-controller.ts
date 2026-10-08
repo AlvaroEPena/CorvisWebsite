@@ -5,6 +5,7 @@ import {
   fieldErrorsFromIssues,
   firstInvalidField,
   parseContactResponse,
+  splitSubmitErrors,
   type FieldErrors,
 } from './contact-form';
 import { mountTurnstile, type TurnstileHandle } from './turnstile';
@@ -85,7 +86,7 @@ export function initContactForm(form: HTMLFormElement, startedAt: number): void 
     isSending = value;
     submit.disabled = value;
     submit.dataset.loading = String(value);
-    submit.textContent = value ? 'Sending...' : submitLabel;
+    submit.textContent = value ? 'Sending…' : submitLabel;
   }
 
   function fail(response: ContactResponse | null): void {
@@ -137,10 +138,9 @@ export function initContactForm(form: HTMLFormElement, startedAt: number): void 
     }
 
     const errors = fieldErrorsFromIssues(result.error.issues);
-    // elapsedMs has no field of its own: it means "submitted too fast", shown as a general notice.
-    const { elapsedMs, ...fieldErrors } = errors;
+    const { fieldErrors, isTooFast } = splitSubmitErrors(errors);
     showErrors(fieldErrors);
-    if (elapsedMs) fail({ ok: false, error: 'too_fast' });
+    if (isTooFast) fail({ ok: false, error: 'too_fast' });
   });
 }
 

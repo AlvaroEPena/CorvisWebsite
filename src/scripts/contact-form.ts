@@ -38,6 +38,19 @@ export function fieldErrorsFromIssues(issues: readonly IssueLike[]): FieldErrors
   return errors;
 }
 
+/**
+ * Splits validation errors into per-field errors and the "submitted too fast" flag.
+ * Field errors win: the too-fast notice applies only when the form is otherwise valid.
+ */
+export function splitSubmitErrors(errors: FieldErrors): {
+  fieldErrors: FieldErrors;
+  isTooFast: boolean;
+} {
+  const { elapsedMs, ...fieldErrors } = errors;
+  const hasFieldErrors = Object.keys(fieldErrors).length > 0;
+  return { fieldErrors, isTooFast: Boolean(elapsedMs) && !hasFieldErrors };
+}
+
 export function firstInvalidField(errors: FieldErrors): string | undefined {
   return FIELD_ORDER.find((field) => errors[field]);
 }

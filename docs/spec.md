@@ -46,7 +46,7 @@ and tech/value chips, no fake client logos) · `#services` · `#work` (portfolio
 J1. Visitor lands → reads hero + slogan → clicks "Book a free consult" → scrolls to `#contact`.
 J2. Visitor fills the form validly → submit → sees success state; Worker sends email (mocked in tests).
 J3. Visitor submits an invalid form → inline accessible errors; nothing sent.
-J4. Visitor drags / keyboard-arrows the before/after slider → reveal changes (`aria-valuenow`).
+J4. Visitor drags / keyboard-arrows the before/after slider → reveal changes (native range input value exposed to the accessibility tree).
 J5. Visitor opens FAQ items (keyboard operable) and nav anchors scroll to sections.
 J6. Mobile viewport: nav collapses to menu, no horizontal scroll, form usable.
 J7. Reduced-motion and no-backdrop-filter fallbacks render readable solid panels.
