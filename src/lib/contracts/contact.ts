@@ -11,7 +11,10 @@ export const contactInputSchema = z.object({
   name: z.string().trim().min(2, 'Please enter your name').max(80),
   email: z.email('Please enter a valid email').max(160),
   company: z.string().trim().max(120).optional(),
-  website: z.url('Please enter a full URL, e.g. https://example.com').max(200).optional(),
+  website: z
+    .url({ protocol: /^https?$/, error: 'Please enter a full URL, e.g. https://example.com' })
+    .max(200)
+    .optional(),
   service: z.enum(SERVICES),
   budget: z.enum(BUDGETS).optional(),
   message: z.string().trim().min(10, 'Tell us a little more (10+ characters)').max(2000),

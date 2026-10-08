@@ -19,6 +19,9 @@ const initials = (name: string) =>
   <div class="container">
     <div class="section-heading reveal">
       <h2 id="testimonials-title">What working with us feels like.</h2>
+      <p class="sample-note" data-testid="testimonials-sample-note">
+        Sample feedback shown as a preview. Real client quotes replace these at launch.
+      </p>
     </div>
 
     <div class="layout">
@@ -48,6 +51,13 @@ const initials = (name: string) =>
 </section>
 
 <style>
+  .sample-note {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--ink-soft, rgb(14 16 36 / 0.7));
+    font-style: italic;
+  }
+
   .layout {
     display: grid;
     gap: 1.25rem;

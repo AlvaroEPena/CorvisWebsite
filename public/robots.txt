@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://corvis.example/sitemap-index.xml

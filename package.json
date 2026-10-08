@@ -20,7 +20,8 @@
     "test:e2e": "playwright test",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm run test",
     "dev:worker": "npm run build && wrangler dev",
-    "deploy": "npm run build && wrangler deploy"
+    "release:check": "node scripts/check-release-env.mjs",
+    "deploy": "npm run release:check && npm run build && wrangler deploy"
   },
   "allowScripts": {
     "esbuild": true

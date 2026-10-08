@@ -78,7 +78,7 @@ const isHome = canonicalPath(Astro.url.pathname) === '/';
       })();
     </script>
     {structuredData.map((data) => (
-      <script type="application/ld+json" set:html={JSON.stringify(data)} />
+      <script type="application/ld+json" set:html={JSON.stringify(data).replace(/</g, '\u003c')} />
     ))}
   </head>
   <body>

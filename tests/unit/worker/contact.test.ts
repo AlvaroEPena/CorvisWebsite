@@ -399,7 +399,7 @@ describe('HTML escaping of hostile input', () => {
         validPayload({
           name: `<script>alert(1)</script>`,
           company: hostile,
-          website: 'javascript://%0Aalert(1)',
+          website: 'https://example.com/?q="><img src=x onerror=alert(1)>',
           message: `${hostile}\n<b>bold</b>`,
         }),
       ),

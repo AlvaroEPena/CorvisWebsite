@@ -59,9 +59,9 @@ No database. Typed content modules in `src/content/`: `site.ts` (name, slogan, e
 
 ## 6. API / server contract
 
-| Route          | Method      | Input          | Output         | Errors                                                                                                            |
-| -------------- | ----------- | -------------- | -------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `/api/contact` | POST (JSON) | `ContactInput` | `{ ok: true }` | 400 `{ok:false, errors}` validation; 403 Turnstile fail; 429 too fast/rate; 500 `{ok:false, error:"send_failed"}` |
+| Route          | Method      | Input          | Output         | Errors                                                                                                                                                                                                                    |
+| -------------- | ----------- | -------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/api/contact` | POST (JSON) | `ContactInput` | `{ ok: true }` | 400 `{ok:false, errors}` validation; 403 Turnstile fail; 429 too fast/rate; 502 `send_failed` (Resend/upstream failure), 500 `send_failed` (bad server config), 413/400 body problems as `validation` with `errors._form` |
 
 `ContactInput` (Zod, `src/lib/contracts/contact.ts`, orchestrator-owned): `name` (2–80),
 `email` (valid), `company` (optional ≤120), `website` (optional URL), `service`

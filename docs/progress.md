@@ -24,7 +24,13 @@
 - Next: Phase 6 QA (qa-tester), Phase 7 review.
 
 ## 2026-10-08 — Phase 6 QA done
+
 - qa-tester added e2e/a11y/responsive/SEO/motion suites (tests/e2e). Found: form errors wiped on fast submit, contrast in before/after mock, mobile LCP 2.4 s. All fixed.
 - LCP fix: static font weights (display 700; body 400+600) instead of variable files + inlined stylesheets.
 - Results: `npm run check` 134 unit tests pass; e2e 182 passed / 70 skipped by project gating / 0 failed; Lighthouse mobile Perf 100, A11y 100, LCP 1.5 s, CLS 0.
 - Next: Phase 7 code review.
+
+## 2026-10-08 — Phase 7 review done
+- Reviewer: no Critical; verdict no-ship until High fixed. Fixed: visible "Sample feedback" label on placeholder testimonials; `npm run release:check` (blocks deploy on placeholder site URL/email or missing Turnstile site key); robots.txt now generated from site URL; `website` restricted to http(s); neutral form success copy; JSON-LD `<` escaped; spec §6 error codes updated; `npm run check` green.
+- Deferred (Medium/Low, listed to owner): CSP `unsafe-inline` for scripts (use hashes later), checkout has no bot check beyond origin+rate limit (add WAF rule), webhook dedupe is per-isolate (KV later), PandaDoc auto-send must stay off until owner approves, deposit amounts hard-coded separately from pricing, `/thanks` copy not verified against session, HSTS preload only once domain is final, verify Stripe API version string before live.
+- Next: Phase 8 handoff (README, screenshots).
