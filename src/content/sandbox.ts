@@ -54,6 +54,18 @@ export const sandboxProjects: readonly SandboxProject[] = [
       },
     },
   },
+  {
+    id: 'mod-labs',
+    name: 'Mod Labs',
+    category: 'New website design',
+    summary:
+      'Console modding and electronics repair in Seattle: clear prices, a deep photo gallery and quote and booking forms, rebuilt from the ground up.',
+    displayUrl: 'modlabs.store',
+    sample: false,
+    versions: {
+      after: { src: '/demos/mod-labs/', title: 'Mod Labs: the website' },
+    },
+  },
 ];
 
 export const getSandboxProject = (id: string): SandboxProject | undefined =>

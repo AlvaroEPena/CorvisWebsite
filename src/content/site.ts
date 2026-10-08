@@ -2,10 +2,13 @@
 export const site = {
   name: 'Corvis',
   slogan: 'The Core Vision',
+  /** Other names people search for; sent to Google as the site's alternate names. */
+  alternateNames: ['The Corvis', 'Corvis Web Design', 'thecorvis'],
   url: 'https://thecorvis.com',
-  title: 'Corvis | The Core Vision - Done-For-You Digital Real Estate',
+  /** Home page <title>: the studio's name and what it is, under 60 characters. */
+  title: 'Corvis | Web Design Studio for Local Businesses',
   description:
-    'Corvis is your done-for-you digital growth partner. We write, build, launch and manage a fast, branded website for local businesses in 14 days. Book a free consult.',
+    'Corvis is a web design studio for local businesses. We write, build, launch and manage a fast, branded website in 14 days. Book a free consult.',
   email: 'aaron@thecorvis.com',
   phone: '+1 801-784-0475',
   /** E.164 form for tel: links and structured data. */

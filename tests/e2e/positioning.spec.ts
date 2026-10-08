@@ -40,13 +40,21 @@ test.describe('public copy rules', () => {
 });
 
 test.describe('portfolio', () => {
-  test('shows Refined Celebrations as a new design with no sandbox button', async ({ page }) => {
+  test('shows Refined Celebrations and Mod Labs as new designs with no sandbox button', async ({
+    page,
+  }) => {
     await page.goto('/#work');
     const work = page.getByTestId('work');
-    await expect(work.getByTestId('project-showcase')).toHaveCount(1);
+    await expect(work.getByTestId('project-showcase')).toHaveCount(2);
     await expect(work).toContainText('Refined Celebrations & Co.');
     await expect(work).toContainText('Indianapolis');
-    await expect(work.getByTestId('project-origin')).toContainText('built from scratch');
+    await expect(work).toContainText('Mod Labs');
+    await expect(work).toContainText('Console modding, done right.');
+    await expect(work).toContainText('Seattle');
+    const origins = work.getByTestId('project-origin');
+    await expect(origins).toHaveCount(2);
+    for (const origin of await origins.all())
+      await expect(origin).toContainText('built from scratch');
     await expect(work).not.toContainText(/saltwater|sample project/i);
     // The only way into the sandbox from the home page body is the button under the slider.
     await expect(work.locator('a[href*="sandbox"], button')).toHaveCount(0);
@@ -73,7 +81,10 @@ test.describe('portfolio', () => {
 });
 
 test.describe('motion fallbacks', () => {
-  test('scroll-through mocks animate normally and stop under reduced motion', async ({ page }) => {
+  test('poster mocks animate normally and stop under reduced motion', async ({ page }) => {
+    // This checks the CSS poster animation, which runs when no live demo replaces it (here: missing
+    // demos). The live pages have their own tests in live-sites.spec.ts.
+    await page.route('**/demos/**', (route) => route.fulfill({ status: 404, body: 'missing' }));
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
     const animationOf = (selector: string) =>

@@ -252,3 +252,11 @@ public copy.
 - Home reviews editor: `featured` is rendered by a custom `home-membership` Sveltia field (`src/admin/home-membership-widget.ts`): a red "Remove from home screen" button with a native confirm dialog, then "will leave the home screen when you press Save" + Undo. The home tick box exists only in All reviews. `homeOrder` is not cleared on removal (ignored while unfeatured; the review returns to its old slot if re-ticked).
 - Navbar (9 items): Services, Work, Redesign, Process, Pricing, FAQ, Meet the team, Sandbox, Reviews; burger menu below 70rem (1120px). Footer keeps Reviews.
 - Team pill subtext: "Meet Alvaro and Aaron". `/team` subtitle: "Two founders, one clear way of working. You talk to Aaron. Alvaro builds it."
+
+### 16.3 Rounds 8 to 9 delta (2026-10-09)
+
+- Home before/after and the Work previews run the REAL demo builds in decorative iframes (`LiveSiteStage`, `src/scripts/live-browse.ts`; CSS mocks remain as posters). Scroll is JS-driven with the same curves as the CSS tunings (`progress()` in `live-browse-math.ts`). Mounted only when near the viewport; never under Save-Data; the water loop is parked when the host is off screen. Scroll-through starts when the frame is fully visible (`in-view.ts`, 96px top-bar allowance).
+- Sandbox registry has 3 projects: saltwater-row (before + after), refined-celebrations and mod-labs (single "Built from scratch" views). Demos: `public/demos/{saltwater-row,saltwater-row-before,refined-celebrations,mod-labs}`; rebuild with `scripts/build-demo-refined.mjs`, `scripts/build-demo-modlabs.mjs` and `npm run build:corvis` in `sites/saltwater-row*`. Mod Labs demo: forms neutralized, videos dropped, gallery trimmed (first 8 per project), about 15 MB.
+- Work lists Refined Celebrations and Mod Labs (real info, owner's sites). Poster photos: `src/assets/portfolio/{refined,modlabs}` (`scripts/optimize-refined.mjs`, `scripts/optimize-modlabs.mjs`).
+- Search: home title "Corvis | Web Design Studio for Local Businesses"; `WebSite` entity with alternate names; logo ImageObject; `serializeJsonLd` escaping fixed; optional `PUBLIC_GOOGLE_SITE_VERIFICATION` / `PUBLIC_BING_SITE_VERIFICATION`; `docs/seo-checklist.md`; e2e sweep `tests/e2e/seo.spec.ts`.
+- Sandbox picker: 1/2/3 columns by breakpoint.

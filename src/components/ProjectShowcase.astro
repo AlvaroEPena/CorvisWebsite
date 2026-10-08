@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import type { WorkProject } from '../content/projects';
+import LiveSiteStage from './LiveSiteStage.astro';
 import SitePreview from './mocks/SitePreview.astro';
 import { portfolioImage } from './mocks/portfolio-images';
 
@@ -21,18 +22,26 @@ const isReversed = index % 2 === 1;
   data-sandbox-id={project.sandboxId}
   aria-labelledby={`project-${project.id}`}
 >
-  <div class="window browse-host" aria-hidden="true">
+  <div
+    class="window browse-host"
+    aria-hidden="true"
+    data-live-host
+    data-browse-duration="26"
+    data-browse-tuning="browse"
+  >
     <div class="chrome">
       <span class="dot"></span>
       <span class="dot"></span>
       <span class="dot"></span>
       <span class="address">{project.preview.domain}</span>
     </div>
-    <div class="browse viewport" data-testid="project-browse">
-      <div class="browse-track">
-        <SitePreview project={project} />
+    <LiveSiteStage projectId={project.sandboxId} version="after">
+      <div class="browse viewport" data-testid="project-browse">
+        <div class="browse-track">
+          <SitePreview project={project} />
+        </div>
       </div>
-    </div>
+    </LiveSiteStage>
   </div>
 
   <div class="summary">

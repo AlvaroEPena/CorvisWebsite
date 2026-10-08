@@ -5,7 +5,7 @@ import Footer from '../components/Footer.astro';
 import Nav from '../components/Nav.astro';
 import { site } from '../content/site';
 import '../styles/global.css';
-import { absoluteUrl, canonicalPath } from './seo';
+import { absoluteUrl, canonicalPath, serializeJsonLd, verificationTags } from './seo';
 
 interface Props {
   title?: string;
@@ -29,6 +29,11 @@ const origin = (Astro.site ?? new URL(site.url)).toString();
 const canonical = absoluteUrl(canonicalPath(Astro.url.pathname), origin);
 const ogImage = absoluteUrl(image, origin);
 const isHome = canonicalPath(Astro.url.pathname) === '/';
+// Optional search engine ownership tags, set at build time (see docs/seo-checklist.md).
+const verification = verificationTags({
+  google: import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION,
+  bing: import.meta.env.PUBLIC_BING_SITE_VERIFICATION,
+});
 ---
 
 <!doctype html>
@@ -41,6 +46,9 @@ const isHome = canonicalPath(Astro.url.pathname) === '/';
     <meta name="theme-color" content="#f5f3ef" />
     {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
+    {verification.map((tag) => (
+      <meta name={tag.name} content={tag.content} />
+    ))}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
@@ -81,7 +89,7 @@ const isHome = canonicalPath(Astro.url.pathname) === '/';
       })();
     </script>
     {structuredData.map((data) => (
-      <script type="application/ld+json" set:html={JSON.stringify(data).replace(/</g, '\u003c')} />
+      <script type="application/ld+json" set:html={serializeJsonLd(data)} />
     ))}
   </head>
   <body>

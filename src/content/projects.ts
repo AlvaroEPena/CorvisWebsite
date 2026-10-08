@@ -6,7 +6,9 @@
  *
  * DATA NOTE: Refined Celebrations & Co. is a site we designed and built from scratch. The owner
  * confirmed we may show it with its real name, copy and photographs (photos live in
- * src/assets/portfolio/refined/, re-encoded by scripts/optimize-refined.mjs).
+ * src/assets/portfolio/refined/, re-encoded by scripts/optimize-refined.mjs). Mod Labs is the
+ * owner's own site, so its real name, prices and bench photos may be shown too (photos in
+ * src/assets/portfolio/modlabs/, re-encoded by scripts/optimize-modlabs.mjs).
  */
 export interface WorkPhoto {
   /** File name (without extension) inside the project's folder in src/assets/portfolio. */
@@ -156,6 +158,96 @@ export const projects: readonly WorkProject[] = [
         "Every great event starts with a conversation. Whether you're planning a wedding, a corporate gathering, or a milestone celebration, we'd love to hear your vision.",
       ctaLabel: 'Get In Touch',
       theme: { ink: '#1a1714', paper: '#faf8f4', accent: '#c9a96e', accentSoft: '#f7f0e3' },
+    },
+  },
+  {
+    id: 'mod-labs',
+    sandboxId: 'mod-labs',
+    name: 'Mod Labs',
+    category: 'New website design',
+    label: 'Live project',
+    folder: 'modlabs',
+    summary:
+      'A console modding and electronics repair shop in Seattle, run by Alvaro. The site had to make a fiddly, technical service feel clear and trustworthy: what each job costs, what is included, and how to get one booked.',
+    built: [
+      'A home page that leads with clear prices for the most common mods',
+      'Quote and booking forms for local drop-off and mail-in jobs',
+      'A builds page for one-off commissions, the GWii portable Wii and the Wii Miicro Deluxe',
+      'A photo gallery of real jobs, sorted by console',
+    ],
+    whyItWorks: [
+      'Real prices up front, from $100, so nobody has to ask before they know if it fits.',
+      'Bench photos of real jobs build trust faster than any promise.',
+      'Short forms and quick turnaround make the next step easy, even on a phone.',
+    ],
+    originNote: 'A brand-new design, built from scratch.',
+    photos: [
+      {
+        file: 'gwii-handheld-zelda',
+        alt: 'A purple portable handheld Wii with GameCube-style buttons, showing a Zelda game on its screen',
+      },
+      {
+        file: 'wii-miicro-deluxe',
+        alt: 'A compact silver-and-pink Wii Miicro build with four GameCube controller ports, on a blue repair mat',
+      },
+      {
+        file: 'halo-xbox-360',
+        alt: 'A clear-shell Xbox 360 glowing with custom purple and blue RGB lighting',
+      },
+      {
+        file: 'switch-oled-kamikaze',
+        alt: 'A red clear-shell Nintendo Switch OLED standing on its dock after a modchip install',
+      },
+      {
+        file: 'xbox-360-matrix-install',
+        alt: 'A modchip wired onto an Xbox 360 motherboard during an install',
+      },
+      {
+        file: 'gwii-handheld-hero',
+        alt: 'A purple portable handheld Wii running a Zelda game',
+      },
+    ],
+    preview: {
+      domain: 'modlabs.store',
+      brand: 'Mod Labs',
+      nav: ['Services', 'Builds', 'Gallery', 'FAQ', 'Book'],
+      eyebrow: 'Seattle, WA',
+      headline: 'Console modding, done right.',
+      subline: 'Console modding & electronics repair',
+      primaryCta: 'Get a quote',
+      secondaryCta: 'Book a mod',
+      heroPhoto: 'gwii-handheld-hero',
+      strip: ['Xbox 360 RGH', 'Switch modchips', 'Custom builds', 'Repairs'],
+      aboutTitle: 'Precision work under the microscope.',
+      aboutText:
+        'Mod Labs is run by Alvaro in Seattle. Drop your console off locally for a fast turnaround, often the same or next day, or mail it in and we will work out shipping together.',
+      aboutPhoto: 'wii-miicro-deluxe',
+      servicesTitle: 'Straightforward prices.',
+      services: [
+        {
+          title: 'Xbox 360 RGH - $100',
+          text: 'Modchip where needed, a deep clean with fresh thermal paste, and full software setup.',
+        },
+        {
+          title: 'Switch OLED (Kamikaze) - $160',
+          text: 'A modchip install using a direct point that will not come undone.',
+        },
+        {
+          title: 'Switch V1 / V2 - $120',
+          text: 'Precision install under the microscope, then a clean reassembly.',
+        },
+        {
+          title: 'Switch Lite - $140',
+          text: 'The same careful install for the compact model.',
+        },
+      ],
+      galleryTitle: 'Real jobs from the bench.',
+      galleryPhotos: ['halo-xbox-360', 'switch-oled-kamikaze', 'xbox-360-matrix-install'],
+      ctaTitle: 'Ready to mod your console?',
+      ctaText:
+        'Ask for a quote or book a slot. Electronics repair and custom shells with RGB are priced by quote.',
+      ctaLabel: 'Get a quote',
+      theme: { ink: '#070815', paper: '#eef1ff', accent: '#00d4f0', accentSoft: '#dfe6ff' },
     },
   },
 ];

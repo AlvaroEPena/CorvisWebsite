@@ -14,6 +14,9 @@ import {
   canonicalPath,
   faqJsonLd,
   professionalServiceJsonLd,
+  serializeJsonLd,
+  verificationTags,
+  websiteJsonLd,
 } from '../../src/layouts/seo';
 import { getAllReviews } from '../../src/lib/reviews';
 
@@ -48,6 +51,86 @@ describe('professionalServiceJsonLd', () => {
   });
   it('never emits ratings or reviews (placeholder testimonials)', () => {
     expect(JSON.stringify(data)).not.toMatch(/aggregateRating|ratingValue|review/i);
+  });
+  it('gives the logo as an image object and leaves out the price range', () => {
+    expect(data.logo).toEqual({
+      '@type': 'ImageObject',
+      url: 'https://corvis.example/logo-512.png',
+      width: 512,
+      height: 512,
+    });
+    expect(data).not.toHaveProperty('priceRange');
+  });
+  it('only lists profile pages that are set in site.ts as sameAs', () => {
+    expect(data).not.toHaveProperty('sameAs');
+    const withProfile = professionalServiceJsonLd(
+      { ...site, socials: { github: 'https://github.com/AlvaroEPena', empty: '' } },
+      services,
+      ORIGIN,
+    );
+    expect(withProfile.sameAs).toEqual(['https://github.com/AlvaroEPena']);
+  });
+});
+
+describe('websiteJsonLd', () => {
+  const data = websiteJsonLd(site, ORIGIN);
+  it('names the site and its alternate names for Google', () => {
+    expect(data).toMatchObject({
+      '@type': 'WebSite',
+      name: 'Corvis',
+      alternateName: ['The Corvis', 'Corvis Web Design', 'thecorvis'],
+      url: ORIGIN,
+    });
+  });
+  it('points at the business entity as its publisher, with no ratings', () => {
+    expect(data.publisher).toEqual({ '@id': `${ORIGIN}#business` });
+    expect(JSON.stringify(data)).not.toMatch(/aggregateRating|ratingValue|review/i);
+  });
+});
+
+describe('home page title and description', () => {
+  it('names the studio in under 60 characters', () => {
+    expect(site.title).toBe('Corvis | Web Design Studio for Local Businesses');
+    expect(site.title.length).toBeLessThanOrEqual(60);
+  });
+  it('is 70 to 160 characters and mentions web design and local businesses', () => {
+    expect(site.description.length).toBeGreaterThanOrEqual(70);
+    expect(site.description.length).toBeLessThanOrEqual(160);
+    expect(site.description).toMatch(/web design/i);
+    expect(site.description).toMatch(/local businesses/i);
+    expect(`${site.title} ${site.description}`).not.toMatch(/template|framework|\bAI\b/i);
+  });
+});
+
+describe('structured data output', () => {
+  const blocks = [
+    websiteJsonLd(site, ORIGIN),
+    professionalServiceJsonLd(site, services, ORIGIN),
+    faqJsonLd(faq),
+  ];
+  it('is well-formed JSON that round-trips', () => {
+    for (const block of blocks) expect(JSON.parse(serializeJsonLd(block))).toEqual(block);
+  });
+  it('can never close the script tag or start a comment', () => {
+    const hostile = serializeJsonLd({ text: '</script><script>alert(1)</script> <!-- & \u2028' });
+    expect(hostile).not.toMatch(/[<>&\u2028\u2029]/);
+    expect(JSON.parse(hostile)).toEqual({
+      text: '</script><script>alert(1)</script> <!-- & \u2028',
+    });
+  });
+});
+
+describe('verificationTags', () => {
+  it('emits nothing when unset, empty or blank', () => {
+    expect(verificationTags({})).toEqual([]);
+    expect(verificationTags({ google: '', bing: '   ' })).toEqual([]);
+  });
+  it('emits one tag per configured value, trimmed', () => {
+    expect(verificationTags({ google: ' abc123 ', bing: 'XYZ' })).toEqual([
+      { name: 'google-site-verification', content: 'abc123' },
+      { name: 'msvalidate.01', content: 'XYZ' },
+    ]);
+    expect(verificationTags({ bing: 'XYZ' })).toEqual([{ name: 'msvalidate.01', content: 'XYZ' }]);
   });
 });
 

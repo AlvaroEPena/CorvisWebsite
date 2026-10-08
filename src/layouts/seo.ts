@@ -14,6 +14,7 @@ export function absoluteUrl(path: string, origin: string): string {
 
 interface BusinessFacts {
   name: string;
+  alternateNames?: readonly string[];
   description: string;
   email: string;
   phoneE164: string;
@@ -43,7 +44,12 @@ export function professionalServiceJsonLd(
       jobTitle: member.role,
     })),
     image: absoluteUrl('/og.png', origin),
-    logo: absoluteUrl('/logo-512.png', origin),
+    logo: {
+      '@type': 'ImageObject',
+      url: absoluteUrl('/logo-512.png', origin),
+      width: 512,
+      height: 512,
+    },
     areaServed: 'Worldwide',
     ...(sameAs.length > 0 ? { sameAs } : {}),
     hasOfferCatalog: {
@@ -55,6 +61,51 @@ export function professionalServiceJsonLd(
       })),
     },
   };
+}
+
+/**
+ * The site's own name for Google (the "site name" shown above results). `publisher` points at the
+ * business entity, so the two are understood as one organisation. Add profile pages (LinkedIn,
+ * GitHub, Google Business Profile) to `socials` in src/content/site.ts; they flow into `sameAs`.
+ */
+export function websiteJsonLd(business: BusinessFacts, origin: string): JsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${origin}#website`,
+    name: business.name,
+    ...(business.alternateNames?.length ? { alternateName: [...business.alternateNames] } : {}),
+    url: origin,
+    inLanguage: 'en',
+    publisher: { '@id': `${origin}#business` },
+  };
+}
+
+/** JSON for a <script type="application/ld+json">: `<`, `>` and `&` escaped so it can never close the tag. */
+export function serializeJsonLd(data: JsonLd): string {
+  return JSON.stringify(data)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+}
+
+export interface VerificationEnv {
+  google?: string;
+  bing?: string;
+}
+
+/**
+ * Search engine site-verification <meta> tags, only for values that are set. Astro escapes the
+ * attribute values when they are rendered.
+ */
+export function verificationTags(env: VerificationEnv): { name: string; content: string }[] {
+  const tags = [
+    { name: 'google-site-verification', content: env.google?.trim() ?? '' },
+    { name: 'msvalidate.01', content: env.bing?.trim() ?? '' },
+  ];
+  return tags.filter((tag) => tag.content !== '');
 }
 
 export function faqJsonLd(entries: readonly FaqEntry[]): JsonLd {

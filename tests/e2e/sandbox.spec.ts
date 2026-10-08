@@ -5,6 +5,7 @@ import { demoExists, expectNoHorizontalScroll, revealEverything } from './suppor
 const SALTWATER_AFTER = '/demos/saltwater-row/';
 const SALTWATER_BEFORE = '/demos/saltwater-row-before/';
 const REFINED = '/demos/refined-celebrations/';
+const MOD_LABS = '/demos/mod-labs/';
 
 /** Answers the demo URLs with a tiny page so these tests never depend on the demo builds. */
 async function stubDemos(page: Page): Promise<void> {
@@ -109,6 +110,44 @@ test.describe('sandbox project picker and versions', () => {
     await expect(studio(page).locator('[data-status]')).toContainText('Refined Celebrations');
   });
 
+  test('lists three projects in a clean grid on every screen size', async ({ page }) => {
+    for (const width of [390, 768, 1024, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await openSandbox(page, '/sandbox');
+      await expect(page.locator('[data-picker] [role="tab"]')).toHaveCount(3);
+      const boxes = await page
+        .locator('[data-picker] [role="tab"]')
+        .evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect()));
+      for (const box of boxes) {
+        expect(box.right, `card inside the page at ${width}`).toBeLessThanOrEqual(width);
+      }
+      const rows = new Set(boxes.map((box) => Math.round(box.top)));
+      const expectedRows = width < 640 ? 3 : width < 1024 ? 2 : 1;
+      expect(rows.size, `rows at ${width}`).toBe(expectedRows);
+      if (width >= 640 && width < 1024) {
+        // The odd third card spans the full row instead of sitting alone on the left.
+        expect(boxes[2]?.width ?? 0).toBeGreaterThan((boxes[0]?.width ?? 0) * 1.8);
+      }
+      await expectNoHorizontalScroll(page);
+    }
+  });
+
+  test('deep link #mod-labs/after selects Mod Labs, with no Before/After toggle', async ({
+    page,
+  }) => {
+    await openSandbox(page, '/sandbox#mod-labs/after');
+    await expect(tab(page, 'mod-labs')).toHaveAttribute('aria-selected', 'true');
+    await expect(studio(page).locator('[data-address]')).toHaveText('modlabs.store');
+    await expect(activeFrame(page)).toHaveAttribute('src', new RegExp(MOD_LABS));
+    await expect(page.getByRole('button', { name: 'Before' })).toBeHidden();
+    await expect(page.getByRole('button', { name: 'After' })).toBeHidden();
+    await expect(studio(page).locator('[data-live-label]')).toHaveText('Built from scratch');
+    // A deep link to a version that does not exist falls back to the one that does.
+    await openSandbox(page, '/sandbox#mod-labs/before');
+    await expect(tab(page, 'mod-labs')).toHaveAttribute('aria-selected', 'true');
+    await expect(activeFrame(page)).toHaveAttribute('src', new RegExp(MOD_LABS));
+  });
+
   test('Before/After toggle exists for saltwater-row and swaps the active frame', async ({
     page,
   }) => {
@@ -184,7 +223,7 @@ test.describe('sandbox project picker and versions', () => {
     await page.keyboard.press('ArrowLeft');
     await expect(tab(page, 'saltwater-row')).toHaveAttribute('aria-selected', 'true');
     await page.keyboard.press('End');
-    await expect(tab(page, 'refined-celebrations')).toHaveAttribute('aria-selected', 'true');
+    await expect(tab(page, 'mod-labs')).toHaveAttribute('aria-selected', 'true');
     await page.keyboard.press('Home');
     await expect(tab(page, 'saltwater-row')).toHaveAttribute('aria-selected', 'true');
 
@@ -345,7 +384,10 @@ test.describe('sandbox frame', () => {
     await page.waitForTimeout(800);
 
     // A demo that has not been copied into public/demos yet answers 404, which the browser logs.
-    const missingDemos = !demoExists('saltwater-row') || !demoExists('refined-celebrations');
+    const missingDemos =
+      !demoExists('saltwater-row') ||
+      !demoExists('refined-celebrations') ||
+      !demoExists('mod-labs');
     const unexpected = problems.filter(
       (text) => !(missingDemos && /Failed to load resource.*404/.test(text)),
     );
@@ -354,7 +396,7 @@ test.describe('sandbox frame', () => {
 });
 
 test.describe('sandbox demo builds', () => {
-  for (const id of ['saltwater-row', 'saltwater-row-before', 'refined-celebrations']) {
+  for (const id of ['saltwater-row', 'saltwater-row-before', 'refined-celebrations', 'mod-labs']) {
     test(`${id} exists in public/demos`, () => {
       test.skip(!demoExists(id), `public/demos/${id}/index.html has not been copied in yet.`);
       expect(demoExists(id)).toBe(true);
@@ -382,5 +424,45 @@ test.describe('sandbox demo builds', () => {
     await page.getByRole('button', { name: 'Before' }).click();
     await expect(activeFrame(page)).toHaveAttribute('src', new RegExp(SALTWATER_BEFORE));
     await expect(page.frameLocator('iframe[data-active]').locator('body')).toBeVisible();
+  });
+
+  test('the real mod-labs demo loads, its navigation works and its forms send nothing', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'The demo shows its menu button in a phone-sized frame.');
+    test.skip(!demoExists('mod-labs'), 'Demo build is not in public/demos yet.');
+    const writes: string[] = [];
+    page.on('request', (request) => {
+      if (request.method() !== 'GET' && request.method() !== 'HEAD') {
+        writes.push(`${request.method()} ${request.url()}`);
+      }
+    });
+    await page.goto('/sandbox#mod-labs/after');
+    await stage(page).scrollIntoViewIfNeeded();
+    await expect(viewport(page)).toHaveAttribute('data-state', 'ready');
+    const frame = page.frameLocator('iframe[data-active]');
+    await expect(frame.locator('h1').first()).toBeVisible();
+
+    // Navigation inside the demo stays inside the demo.
+    await frame.locator('header nav a', { hasText: 'Services' }).first().click();
+    await expect(frame.locator('h1').first()).toBeVisible();
+    await expect(frame.locator('a[aria-current="page"]').first()).toContainText(/services/i);
+
+    // The request form is neutralized: a valid submit shows the preview message and sends nothing.
+    await frame.locator('a[href$="/quote"]').first().click();
+    await frame.locator('#quote-name').fill('Demo Visitor');
+    await frame.locator('#quote-email').fill('visitor@example.com');
+    await frame
+      .locator('#quote-message')
+      .fill('Testing the preview form with a long enough message.');
+    await frame.locator('input[name="consent"]').check();
+    await frame.locator('select[name="requestType"]').selectOption({ index: 1 });
+    await frame.locator('[data-submit]').click();
+    await expect(frame.locator('.form-status')).toContainText(
+      'This is a preview. Nothing was sent.',
+    );
+    await page.waitForTimeout(500);
+    expect(writes).toEqual([]);
   });
 });

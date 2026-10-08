@@ -2,6 +2,8 @@ import { readdirSync, readFileSync } from 'node:fs';
 
 import { expect, test } from '@playwright/test';
 
+import { structuredData } from './support';
+
 // Read as files: the test runner cannot use the site's import.meta.glob loader.
 interface ReviewRecord {
   id: string;
@@ -120,9 +122,11 @@ test.describe('home testimonials', () => {
 
   test('the Work card callout no longer mentions an earlier version', async ({ page }) => {
     await page.goto('/#work');
-    await expect(page.getByTestId('project-origin')).toHaveText(
-      'A brand-new design, built from scratch.',
-    );
+    const origins = page.getByTestId('project-origin');
+    await expect(origins).toHaveCount(2);
+    for (const origin of await origins.all()) {
+      await expect(origin).toHaveText('A brand-new design, built from scratch.');
+    }
   });
 });
 
@@ -271,10 +275,10 @@ test.describe('/team and founders', () => {
     const footer = page.locator('body > footer');
     await expect(footer).toContainText('Alvaro Peña, Founder & Tech Lead');
     await expect(footer).toContainText('Aaron Peña-Diamond, Co-Founder');
-    const ld = JSON.parse(
-      (await page.locator('script[type="application/ld+json"]').first().textContent()) ?? '{}',
+    const ld = (await structuredData(page)).find(
+      (block) => block['@type'] === 'ProfessionalService',
     );
-    expect(ld.founder).toEqual([
+    expect(ld?.founder).toEqual([
       { '@type': 'Person', name: 'Alvaro Peña', jobTitle: 'Founder & Tech Lead' },
       { '@type': 'Person', name: 'Aaron Peña-Diamond', jobTitle: 'Co-Founder' },
     ]);

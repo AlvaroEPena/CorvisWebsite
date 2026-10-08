@@ -87,3 +87,9 @@
 - `showOnReviewsPage` toggle in both editors; confirm-gated "Remove from home screen" (custom field) in Home reviews; Reviews link added to navbar after Sandbox (burger below 1120px).
 - Verified in the mocked-GitHub editor harness: confirm/cancel, single-field commits. Verified: typecheck/lint/format clean, 220 unit, 489 e2e passed / 0 failed, Lighthouse `/` 100, `/reviews` 100 (mobile).
 - Still to do by owner: real token Save from the live /admin; empty-state copy for /reviews to confirm.
+
+## 2026-10-09 — Rounds 8-9 (owner): live home previews, Mod Labs, search: done
+
+- Scroll-through timing fixed (start when fully visible, ~1 s holds). Home slider and Work previews show the real demo builds with live water. Mod Labs added to sandbox, Work and demos. SEO structured data/title/verification hooks, `docs/seo-checklist.md`.
+- Verified: typecheck/lint/format clean, 245 unit, 533 e2e passed / 0 failed, Lighthouse `/` mobile 99 (desktop 100), `/sandbox` 100, A11y 100, SEO 100.
+- Owner steps pending: push; test a real /admin Save; Search Console sitemap shows "Couldn't fetch" at first (normal, retry in 1-3 days); add "Website by Corvis" footers to Mod Labs and Refined; replace fictional reviews with real ones before promoting.

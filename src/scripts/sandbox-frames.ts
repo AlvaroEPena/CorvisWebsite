@@ -35,8 +35,11 @@ async function responds(src: string): Promise<boolean> {
  * it resolves relative URLs exactly like the directory, and Cloudflare simply redirects it to the
  * directory URL. Returns undefined when the demo is absent.
  */
+/** The page URL of a demo registry path: `<dir>/` becomes `<dir>/index.html`. */
+export const demoPageUrl = (src: string): string => (src.endsWith('/') ? `${src}index.html` : src);
+
 async function resolveAvailable(src: string): Promise<string | undefined> {
-  const page = src.endsWith('/') ? `${src}index.html` : src;
+  const page = demoPageUrl(src);
   return (await responds(page)) ? page : undefined;
 }
 

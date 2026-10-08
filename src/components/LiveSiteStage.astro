@@ -1,0 +1,35 @@
+---
+import { getSandboxProject } from '../content/sandbox';
+import { demoPageUrl } from '../scripts/sandbox-frames';
+
+/**
+ * One real demo site (the same build the /sandbox shows) laid over its CSS poster. The poster is the
+ * slot content: it is what no-JS visitors, Save-Data visitors and anyone waiting for the demo see,
+ * and what stays if the demo is missing. scripts/live-browse.ts mounts the decorative iframe next to
+ * it when the host (`[data-live-host]`) is near the viewport. Styles for the iframe live in
+ * styles/motion.css next to the browse-through they replace.
+ */
+interface Props {
+  projectId: string;
+  version: 'before' | 'after';
+  /** Fills a positioned parent (the slider layers) instead of taking the poster's height. */
+  fill?: boolean;
+}
+
+const { projectId, version, fill = false } = Astro.props;
+const entry = getSandboxProject(projectId)?.versions[version];
+if (!entry) throw new Error(`No ${version} demo registered for "${projectId}"`);
+---
+
+<div
+  class:list={['live-stage', fill && 'live-fill']}
+  data-live-stage
+  data-src={demoPageUrl(entry.src)}
+  data-title={entry.title}
+>
+  <slot />
+</div>
+
+<script>
+  import '../scripts/live-browse';
+</script>

@@ -27,7 +27,12 @@ const TEXT_EXTENSIONS = new Set([
 ]);
 
 /** Refined Celebrations & Co. is shown with its real name, copy and photos (owner permission). */
-const REAL_PROJECT_PATHS = ['public/demos/refined-celebrations/', 'src/assets/portfolio/refined/'];
+const REAL_PROJECT_PATHS = [
+  'public/demos/refined-celebrations/',
+  'public/demos/mod-labs/',
+  'src/assets/portfolio/refined/',
+  'src/assets/portfolio/modlabs/',
+];
 
 function walk(directory: string): string[] {
   return readdirSync(directory).flatMap((name) => {

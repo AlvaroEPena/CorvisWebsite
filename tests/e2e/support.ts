@@ -52,15 +52,22 @@ export async function mockApi(
   return seen;
 }
 
-/** Scrolls the whole page once so scroll-driven reveals have run before measuring or screenshotting. */
+/**
+ * Scrolls the whole page once so scroll-driven reveals have run before measuring or screenshotting, and
+ * ends at the top. Jumps are instant on purpose: the page uses smooth scrolling, and a measurement taken
+ * mid-glide can catch the sticky top bar over a button (axe then reports it as "partially obscured").
+ */
 export async function revealEverything(page: Page): Promise<void> {
   await page.evaluate(async () => {
+    const jump = (top: number) => window.scrollTo({ top, behavior: 'instant' });
     const step = Math.max(window.innerHeight * 0.6, 200);
     for (let y = 0; y < document.body.scrollHeight; y += step) {
-      window.scrollTo(0, y);
+      jump(y);
       await new Promise((resolve) => setTimeout(resolve, 60));
     }
-    window.scrollTo(0, 0);
+    jump(0);
+    // Wait for two frames at the top, so nothing is still moving when the caller measures.
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   });
   await page.evaluate(() => document.fonts.ready);
 }
@@ -84,6 +91,7 @@ export async function axeViolations(page: Page) {
   const results = await new AxeBuilder({ page })
     .withTags(WCAG_TAGS)
     .exclude('[data-viewport] iframe')
+    .exclude('.live-frame')
     .analyze();
   return results.violations.map((violation) => ({
     id: violation.id,
@@ -121,4 +129,10 @@ export async function settleAnimations(page: Page): Promise<void> {
 /** True when a demo build has been copied into public/demos (the build can run without them). */
 export function demoExists(id: string): boolean {
   return existsSync(join(process.cwd(), 'public', 'demos', id, 'index.html'));
+}
+
+/** The page's JSON-LD blocks, parsed. */
+export async function structuredData(page: Page): Promise<Record<string, unknown>[]> {
+  const texts = await page.locator('script[type="application/ld+json"]').allTextContents();
+  return texts.map((text) => JSON.parse(text) as Record<string, unknown>);
 }

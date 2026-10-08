@@ -160,10 +160,31 @@ if (!first) throw new Error('The sandbox needs at least one project');
   }
 
   /* ---------- Project picker ---------- */
+  /* One column on phones, two on tablets (an odd last card spans the row), as many as fit on desktop. */
   .picker {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    grid-template-columns: 1fr;
     gap: 0.9rem;
+  }
+
+  @media (min-width: 40rem) {
+    .picker {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pick:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .picker {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    }
+
+    .pick:last-child:nth-child(odd) {
+      grid-column: auto;
+    }
   }
 
   .pick {

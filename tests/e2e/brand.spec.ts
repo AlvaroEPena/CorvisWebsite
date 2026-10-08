@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { structuredData } from './support';
+
 /** The owner's mark: inline vector in the chrome, the new favicon set, and the social image. */
 
 const PNG_SIGNATURE = '89504e470d0a1a0a';
@@ -76,9 +78,11 @@ test.describe('icons and social image', () => {
       'href',
       '/favicon-32.png',
     );
-    const ld = await page.locator('script[type="application/ld+json"]').first().textContent();
-    expect(JSON.parse(ld ?? '{}')).toMatchObject({
-      logo: expect.stringMatching(/\/logo-512\.png$/),
+    const business = (await structuredData(page)).find(
+      (block) => block['@type'] === 'ProfessionalService',
+    );
+    expect(business).toMatchObject({
+      logo: { '@type': 'ImageObject', url: expect.stringMatching(/\/logo-512\.png$/) },
       image: expect.stringMatching(/\/og\.png$/),
     });
   });

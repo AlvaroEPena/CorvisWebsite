@@ -2,11 +2,14 @@
 import { redesignSample } from '../content/redesign-demo';
 import { sandboxCta } from '../content/sandbox-copy';
 import { describePosition } from '../scripts/slider-math';
+import LiveSiteStage from './LiveSiteStage.astro';
 import NewSiteMock from './mocks/NewSiteMock.astro';
 import OldSiteMock from './mocks/OldSiteMock.astro';
 
 const START = 50;
 const project = redesignSample;
+/** The registry project whose real builds replace the mocks once loaded (same as /sandbox). */
+const LIVE_PROJECT = 'saltwater-row';
 ---
 
 <section class="redesign section" id="redesign" aria-labelledby="redesign-title">
@@ -24,6 +27,9 @@ const project = redesignSample;
 
     <div
       class="frame panel browse-host"
+      data-live-host
+      data-browse-duration="80"
+      data-browse-tuning="browse-slow"
       data-ba
       data-testid="redesign-slider"
       style={`--ba-pos:${START}%;--browse-duration:80s;--browse-keyframes:browse-slow`}
@@ -31,20 +37,24 @@ const project = redesignSample;
       <div class="stage" aria-hidden="true">
         <!-- AFTER: the rebuilt site, always underneath. -->
         <div class="layer after">
-          <div class="browse">
-            <div class="browse-track">
-              <NewSiteMock project={project} />
+          <LiveSiteStage projectId={LIVE_PROJECT} version="after" fill>
+            <div class="browse">
+              <div class="browse-track">
+                <NewSiteMock project={project} />
+              </div>
             </div>
-          </div>
+          </LiveSiteStage>
         </div>
 
         <!-- BEFORE: the dated site, clipped to the left of the handle. -->
         <div class="layer before" data-ba-before style={`clip-path:inset(0 ${100 - START}% 0 0)`}>
-          <div class="browse">
-            <div class="browse-track">
-              <OldSiteMock project={project} />
+          <LiveSiteStage projectId={LIVE_PROJECT} version="before" fill>
+            <div class="browse">
+              <div class="browse-track">
+                <OldSiteMock project={project} />
+              </div>
             </div>
-          </div>
+          </LiveSiteStage>
         </div>
 
         <span class="tag tag-before">Before</span>
@@ -134,7 +144,7 @@ const project = redesignSample;
     overflow: hidden;
   }
 
-  .layer > .browse {
+  .layer :global(.live-stage) > .browse {
     position: absolute;
     inset: 0;
   }

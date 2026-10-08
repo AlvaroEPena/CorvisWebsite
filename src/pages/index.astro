@@ -13,12 +13,18 @@ import { faq } from '../content/faq';
 import { services } from '../content/services';
 import { site } from '../content/site';
 import Layout from '../layouts/Layout.astro';
-import { faqJsonLd, professionalServiceJsonLd } from '../layouts/seo';
+import { faqJsonLd, professionalServiceJsonLd, websiteJsonLd } from '../layouts/seo';
 
 const origin = (Astro.site ?? new URL(site.url)).toString();
 ---
 
-<Layout structuredData={[professionalServiceJsonLd(site, services, origin), faqJsonLd(faq)]}>
+<Layout
+  structuredData={[
+    websiteJsonLd(site, origin),
+    professionalServiceJsonLd(site, services, origin),
+    faqJsonLd(faq),
+  ]}
+>
   <Hero />
   <Proof />
   <Services />
