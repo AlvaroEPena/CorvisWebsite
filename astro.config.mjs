@@ -6,7 +6,7 @@ import { defineConfig, fontProviders } from 'astro/config';
 // Static output, deployed to Cloudflare Workers static assets (see wrangler.jsonc).
 // The contact endpoint is a separate Worker (src/worker) served on /api/*.
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL || 'https://corvis.example',
+  site: process.env.PUBLIC_SITE_URL || 'https://thecorvis.com',
   output: 'static',
   trailingSlash: 'never',
   build: { format: 'file', inlineStylesheets: 'always' },

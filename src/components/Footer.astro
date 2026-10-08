@@ -21,6 +21,10 @@ const year = new Date().getFullYear();
         <a class="mail" href={`mailto:${site.email}`}>
           {site.email}
         </a>
+        <a class="mail" href={`tel:${site.phoneE164}`}>
+          {site.phone}
+        </a>
+        <p class="owner">{site.owner}, Founder</p>
       </div>
       <nav aria-label="Footer">
         <ul>
@@ -61,6 +65,11 @@ const year = new Date().getFullYear();
     gap: 1rem;
     max-width: 24rem;
     color: var(--ink-soft);
+  }
+
+  .owner {
+    margin: 0;
+    font-size: 0.875rem;
   }
 
   .mail {

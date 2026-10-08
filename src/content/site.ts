@@ -2,12 +2,15 @@
 export const site = {
   name: 'Corvis',
   slogan: 'The Core Vision',
-  url: 'https://corvis.example',
+  url: 'https://thecorvis.com',
   title: 'Corvis | The Core Vision - Web design studio',
   description:
     'Corvis is a web design studio. We redesign existing websites and build new ones around the single idea that makes your business different. Book a free consult.',
-  /** Placeholder until the owner supplies a real address. */
-  email: 'hello@corvis.example',
+  email: 'aaron@thecorvis.com',
+  phone: '+1 801-784-0475',
+  /** E.164 form for tel: links and structured data. */
+  phoneE164: '+18017840475',
+  owner: 'Aaron Peña-Diamond',
   socials: {} as Record<string, string>,
   cta: { label: 'Book a free consult', href: '#contact' },
   secondaryCta: { label: 'See our work', href: '#work' },

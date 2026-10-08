@@ -85,18 +85,18 @@ test.describe('SEO', () => {
     expect(description?.length ?? 999).toBeLessThanOrEqual(170);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       'href',
-      'https://corvis.example/',
+      'https://thecorvis.com/',
     );
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', /Corvis/);
     await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', /.+/);
     await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'website');
     await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
       'content',
-      'https://corvis.example/',
+      'https://thecorvis.com/',
     );
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
       'content',
-      'https://corvis.example/og.png',
+      'https://thecorvis.com/og.png',
     );
     await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
       'content',
@@ -146,8 +146,8 @@ test.describe('SEO', () => {
     expect(index.status()).toBe(200);
     const sitemap = await request.get('/sitemap-0.xml');
     const xml = await sitemap.text();
-    expect(xml).toContain('<loc>https://corvis.example/</loc>');
-    expect(xml).toContain('<loc>https://corvis.example/privacy</loc>');
+    expect(xml).toContain('<loc>https://thecorvis.com/</loc>');
+    expect(xml).toContain('<loc>https://thecorvis.com/privacy</loc>');
     expect(xml).not.toContain('/thanks');
     expect(xml).not.toContain('/404');
 

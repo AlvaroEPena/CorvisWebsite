@@ -16,6 +16,8 @@ interface BusinessFacts {
   name: string;
   description: string;
   email: string;
+  phoneE164: string;
+  owner: string;
   socials: Record<string, string>;
 }
 
@@ -34,6 +36,8 @@ export function professionalServiceJsonLd(
     description: business.description,
     url: origin,
     email: business.email,
+    telephone: business.phoneE164,
+    founder: { '@type': 'Person', name: business.owner },
     image: absoluteUrl('/og.png', origin),
     areaServed: 'Worldwide',
     ...(sameAs.length > 0 ? { sameAs } : {}),
