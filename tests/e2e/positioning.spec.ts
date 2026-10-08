@@ -40,14 +40,16 @@ test.describe('public copy rules', () => {
 });
 
 test.describe('portfolio', () => {
-  test('shows one clearly labeled sample project with no real-business details', async ({
-    page,
-  }) => {
+  test('shows Refined Celebrations as a new design with no sandbox button', async ({ page }) => {
     await page.goto('/#work');
     const work = page.getByTestId('work');
     await expect(work.getByTestId('project-showcase')).toHaveCount(1);
-    await expect(work).toContainText('Sample project / concept work');
-    await expect(work).toContainText('Saltwater Row');
+    await expect(work).toContainText('Refined Celebrations & Co.');
+    await expect(work).toContainText('Indianapolis');
+    await expect(work.getByTestId('project-origin')).toContainText('built from scratch');
+    await expect(work).not.toContainText(/saltwater|sample project/i);
+    // The only way into the sandbox from the home page body is the button under the slider.
+    await expect(work.locator('a[href*="sandbox"], button')).toHaveCount(0);
     await expect(page.locator('[data-testid="redesign-slider"] > div').first()).toHaveAttribute(
       'aria-hidden',
       'true',
@@ -56,11 +58,6 @@ test.describe('portfolio', () => {
     const html = await work.evaluate((node) => node.outerHTML);
     expect(html).not.toMatch(REAL_BUSINESS);
     expect(html).not.toMatch(/href="https?:\/\/(?!corvis)/);
-
-    const names = await page.evaluate(() =>
-      [...document.querySelectorAll('#work img')].map((i) => i.getAttribute('src') ?? ''),
-    );
-    for (const source of names) expect(source).not.toMatch(REAL_BUSINESS);
   });
 
   test('images set dimensions so the section cannot shift layout', async ({ page }) => {

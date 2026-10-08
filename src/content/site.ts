@@ -18,6 +18,7 @@ export const site = {
     { label: 'Services', href: '#services' },
     { label: 'Work', href: '#work' },
     { label: 'Redesign', href: '#redesign' },
+    { label: 'Sandbox', href: '/sandbox' },
     { label: 'Process', href: '#process' },
     { label: 'Pricing', href: '#pricing' },
     { label: 'FAQ', href: '#faq' },

@@ -1,0 +1,141 @@
+---
+import SandboxStudio from '../components/sandbox/SandboxStudio.astro';
+import { sandboxPage } from '../content/sandbox-copy';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title={sandboxPage.title} description={sandboxPage.description}>
+  <section class="sandbox section" aria-labelledby="sandbox-title" data-testid="sandbox">
+    <div class="aura" style="--aura-color:rgb(124 124 255 / .3);top:-12rem;left:-22rem"></div>
+    <div class="aura" style="--aura-color:rgb(255 192 131 / .45);top:8rem;right:-24rem"></div>
+
+    <div class="container">
+      <header class="intro">
+        <h1 id="sandbox-title">{sandboxPage.heading}</h1>
+        <p>{sandboxPage.lead}</p>
+      </header>
+
+      <SandboxStudio />
+
+      <section class="tips" aria-labelledby="tips-title">
+        <h2 id="tips-title">{sandboxPage.tipsTitle}</h2>
+        <ol>
+          {sandboxPage.tips.map((tip) => (
+            <li>
+              <h3>{tip.title}</h3>
+              <p>{tip.text}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="cta panel" aria-labelledby="sandbox-cta-title">
+        <div>
+          <h2 id="sandbox-cta-title">{sandboxPage.cta.title}</h2>
+          <p>{sandboxPage.cta.text}</p>
+        </div>
+        <a class="btn btn-primary btn-shine" data-magnetic href={sandboxPage.cta.href}>
+          {sandboxPage.cta.label}
+          <svg class="btn-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path
+              d="M4 10h11m-4-5 5 5-5 5"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </svg>
+        </a>
+      </section>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .sandbox {
+    padding-top: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .intro {
+    display: grid;
+    gap: 1rem;
+    max-width: 46rem;
+    margin-bottom: clamp(1.75rem, 3.5vw, 2.75rem);
+  }
+
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 4.25rem);
+    line-height: 1.02;
+  }
+
+  .intro p {
+    max-width: 40rem;
+    color: var(--ink-soft);
+    font-size: 1.125rem;
+  }
+
+  .tips {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: clamp(3rem, 6vw, 5rem);
+  }
+
+  .tips h2 {
+    font-size: 1.6rem;
+    line-height: 1.2;
+  }
+
+  .tips ol {
+    display: grid;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tips li {
+    display: grid;
+    gap: 0.35rem;
+    padding-top: 1rem;
+    border-top: 2px solid rgb(59 59 214 / 0.25);
+  }
+
+  .tips h3 {
+    font-size: 1.15rem;
+  }
+
+  .tips li p {
+    color: var(--ink-soft);
+    font-size: 0.98rem;
+  }
+
+  .cta {
+    display: grid;
+    gap: 1.5rem;
+    justify-items: start;
+    margin-top: clamp(3rem, 6vw, 5rem);
+    padding: clamp(1.75rem, 4vw, 3rem);
+  }
+
+  .cta h2 {
+    font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+    line-height: 1.12;
+  }
+
+  .cta p {
+    margin-top: 0.5rem;
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 48rem) {
+    .tips ol {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2rem;
+    }
+
+    .cta {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+  }
+</style>

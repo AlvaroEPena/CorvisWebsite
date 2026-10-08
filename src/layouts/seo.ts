@@ -39,6 +39,7 @@ export function professionalServiceJsonLd(
     telephone: business.phoneE164,
     founder: { '@type': 'Person', name: business.owner },
     image: absoluteUrl('/og.png', origin),
+    logo: absoluteUrl('/logo-512.png', origin),
     areaServed: 'Worldwide',
     ...(sameAs.length > 0 ? { sameAs } : {}),
     hasOfferCatalog: {

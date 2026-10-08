@@ -7,6 +7,11 @@
 const root = document.documentElement;
 
 async function startMotion(): Promise<void> {
+  // Pages without hero objects or parallax (sandbox, 404...) never need GSAP's weight.
+  if (!document.querySelector('[data-hero-obj], [data-parallax]')) {
+    root.setAttribute('data-motion-ready', '');
+    return;
+  }
   const [{ gsap }, { ScrollTrigger }] = await Promise.all([
     import('gsap'),
     import('gsap/ScrollTrigger'),

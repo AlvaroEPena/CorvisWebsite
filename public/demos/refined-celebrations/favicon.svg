@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 90" width="300" height="450">
+
+  <!-- Glass outline -->
+  <path d="M10 4 L50 4 L38 64 L22 64 Z" stroke="#1a1714" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+
+  <!-- Champagne liquid fill -->
+  <path d="M16 40 L44 40 L38 64 L22 64 Z" fill="#C17B7B" opacity="0.38"/>
+
+  <!-- Stem -->
+  <line x1="30" y1="64" x2="30" y2="80" stroke="#1a1714" stroke-width="1.5"/>
+
+  <!-- Base -->
+  <line x1="16" y1="80" x2="44" y2="80" stroke="#1a1714" stroke-width="1.5"/>
+
+  <!-- Bubble trail inside glass -->
+  <circle cx="30" cy="57" r="2" fill="#C17B7B" opacity="0.95"/>
+  <circle cx="27" cy="48" r="1.6" fill="#C17B7B" opacity="0.8"/>
+  <circle cx="32" cy="41" r="1.35" fill="#C17B7B" opacity="0.65"/>
+  <circle cx="28" cy="34" r="1.1" fill="#C17B7B" opacity="0.45"/>
+
+  <!-- Overflow bubbles above rim -->
+  <circle cx="19" cy="11" r="3" fill="none" stroke="#C17B7B" stroke-width="1.2"/>
+  <circle cx="31" cy="5" r="2.4" fill="none" stroke="#C17B7B" stroke-width="1.2"/>
+  <circle cx="43" cy="11" r="1.9" fill="none" stroke="#C17B7B" stroke-width="1.2"/>
+
+</svg>

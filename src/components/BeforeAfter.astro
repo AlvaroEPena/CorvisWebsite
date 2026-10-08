@@ -1,12 +1,12 @@
 ---
-import { projects } from '../content/projects';
+import { redesignSample } from '../content/redesign-demo';
+import { sandboxCta } from '../content/sandbox-copy';
 import { describePosition } from '../scripts/slider-math';
 import NewSiteMock from './mocks/NewSiteMock.astro';
 import OldSiteMock from './mocks/OldSiteMock.astro';
 
 const START = 50;
-const project = projects[0];
-if (!project) throw new Error('The redesign demo needs at least one project');
+const project = redesignSample;
 ---
 
 <section class="redesign section" id="redesign" aria-labelledby="redesign-title">
@@ -17,7 +17,8 @@ if (!project) throw new Error('The redesign demo needs at least one project');
       <h2 id="redesign-title">A real before and after.</h2>
       <p>
         A dated site on the left, the rebuild on the right. Drag the handle, or focus it and use the
-        arrow keys. A sample project with the details changed.
+        arrow keys. A sample project with the details changed, and you can test drive both versions
+        for real in the sandbox.
       </p>
     </div>
 
@@ -68,6 +69,26 @@ if (!project) throw new Error('The redesign demo needs at least one project');
         data-ba-input
       />
     </div>
+
+    <div class="explore reveal">
+      <a
+        class="btn btn-glass btn-shine"
+        href={sandboxCta.href}
+        data-magnetic
+        data-testid="explore-sandbox"
+      >
+        {sandboxCta.label}
+        <svg class="btn-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path
+            d="M4 10h11m-4-5 5 5-5 5"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></path>
+        </svg>
+      </a>
+    </div>
   </div>
 </section>
 
@@ -76,10 +97,19 @@ if (!project) throw new Error('The redesign demo needs at least one project');
 </script>
 
 <style>
+  .explore {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
   .frame {
     position: relative;
     padding: clamp(0.5rem, 1.2vw, 0.9rem);
     border-radius: 36px;
+    /* The range thumb is 100vh tall so a touch anywhere on the stage drags it; clip it to the frame
+       so it cannot cover the controls below. */
+    overflow: clip;
   }
 
   .stage {

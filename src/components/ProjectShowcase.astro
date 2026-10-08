@@ -1,11 +1,11 @@
 ---
 import { Image } from 'astro:assets';
-import type { Project } from '../content/projects';
-import NewSiteMock from './mocks/NewSiteMock.astro';
+import type { WorkProject } from '../content/projects';
+import SitePreview from './mocks/SitePreview.astro';
 import { portfolioImage } from './mocks/portfolio-images';
 
 interface Props {
-  project: Project;
+  project: WorkProject;
   index: number;
 }
 
@@ -17,7 +17,8 @@ const isReversed = index % 2 === 1;
 <article
   class:list={['showcase', isReversed && 'reversed']}
   data-testid="project-showcase"
-  data-placeholder={project.placeholder}
+  data-project={project.id}
+  data-sandbox-id={project.sandboxId}
   aria-labelledby={`project-${project.id}`}
 >
   <div class="window browse-host" aria-hidden="true">
@@ -25,11 +26,11 @@ const isReversed = index % 2 === 1;
       <span class="dot"></span>
       <span class="dot"></span>
       <span class="dot"></span>
-      <span class="address">{project.site.domain}</span>
+      <span class="address">{project.preview.domain}</span>
     </div>
     <div class="browse viewport" data-testid="project-browse">
       <div class="browse-track">
-        <NewSiteMock project={project} />
+        <SitePreview project={project} />
       </div>
     </div>
   </div>
@@ -39,6 +40,9 @@ const isReversed = index % 2 === 1;
     <h3 id={`project-${project.id}`}>{project.name}</h3>
     <p class="category">{project.category}</p>
     <p>{project.summary}</p>
+    <p class="origin" data-testid="project-origin">
+      {project.originNote}
+    </p>
     <div class="cols">
       <div>
         <h4>What we built</h4>
@@ -116,7 +120,7 @@ const isReversed = index % 2 === 1;
 
   .viewport {
     aspect-ratio: 16 / 10;
-    background: #061320;
+    background: var(--core-900);
   }
 
   .summary {
@@ -136,6 +140,14 @@ const isReversed = index % 2 === 1;
 
   .category {
     color: var(--core-600);
+    font-weight: 600;
+  }
+
+  .origin {
+    padding: 0.5rem 0.9rem;
+    border-left: 3px solid var(--vision-500);
+    background: rgb(255 255 255 / 0.6);
+    border-radius: 0 12px 12px 0;
     font-weight: 600;
   }
 

@@ -1,5 +1,5 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { extname, join, relative } from 'node:path';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { extname, join, relative, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -21,7 +21,13 @@ const TEXT_EXTENSIONS = new Set([
   '.md',
   '.mjs',
   '.js',
+  '.map',
+  '.xml',
+  '.webmanifest',
 ]);
+
+/** Refined Celebrations & Co. is shown with its real name, copy and photos (owner permission). */
+const REAL_PROJECT_PATHS = ['public/demos/refined-celebrations/', 'src/assets/portfolio/refined/'];
 
 function walk(directory: string): string[] {
   return readdirSync(directory).flatMap((name) => {
@@ -31,7 +37,13 @@ function walk(directory: string): string[] {
 }
 
 const root = process.cwd();
-const files = ['src', 'public'].flatMap((folder) => walk(join(root, folder)));
+const toPosix = (file: string) => relative(root, file).replaceAll(sep, '/');
+const files = ['src', 'public']
+  .flatMap((folder) => walk(join(root, folder)))
+  .filter((file) => !REAL_PROJECT_PATHS.some((prefix) => toPosix(file).startsWith(prefix)));
+const saltwaterDemos = existsSync(join(root, 'public/demos'))
+  ? readdirSync(join(root, 'public/demos')).filter((name) => name.startsWith('saltwater-row'))
+  : [];
 
 describe('sanitized portfolio', () => {
   it('finds files to scan', () => {
@@ -47,7 +59,27 @@ describe('sanitized portfolio', () => {
   });
 
   it('keeps real-business strings out of file names', () => {
-    const offenders = files.filter((file) => FORBIDDEN.test(relative(root, file)));
+    const offenders = files.filter((file) => FORBIDDEN.test(toPosix(file)));
     expect(offenders).toEqual([]);
+  });
+
+  // The demo builds are copied in from sibling projects; they may not exist yet in a fresh checkout.
+  describe.skipIf(saltwaterDemos.length === 0)('saltwater-row demo builds', () => {
+    const demoFiles = saltwaterDemos.flatMap((name) => walk(join(root, 'public/demos', name)));
+
+    it('contains files to scan', () => {
+      expect(demoFiles.length).toBeGreaterThan(0);
+    });
+
+    it('keeps real-business strings out of every demo text file and file name', () => {
+      const offenders = demoFiles
+        .filter(
+          (file) =>
+            FORBIDDEN.test(toPosix(file)) ||
+            (TEXT_EXTENSIONS.has(extname(file)) && FORBIDDEN.test(readFileSync(file, 'utf8'))),
+        )
+        .map(toPosix);
+      expect(offenders).toEqual([]);
+    });
   });
 });

@@ -6,11 +6,11 @@
  * width, so the page scales like a screenshot. Water motion is two drifting copies of one still.
  */
 import { Image } from 'astro:assets';
-import type { Project } from '../../content/projects';
+import type { RedesignSample } from '../../content/redesign-demo';
 import { portfolioImage } from './portfolio-images';
 
 interface Props {
-  project: Project;
+  project: RedesignSample;
 }
 
 const { project } = Astro.props;

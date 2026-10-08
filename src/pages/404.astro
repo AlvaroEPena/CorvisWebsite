@@ -1,5 +1,5 @@
 ---
-import FloatingObject from '../components/FloatingObject.astro';
+import Logo from '../components/Logo.astro';
 import { site } from '../content/site';
 import Layout from '../layouts/Layout.astro';
 ---
@@ -15,11 +15,9 @@ import Layout from '../layouts/Layout.astro';
         <a class="btn btn-primary" href="/">
           Back to the homepage
         </a>
-        <FloatingObject
-          kind="bead"
-          tone="amber"
-          style="width:6rem;height:6rem;right:2rem;top:2rem"
-        />
+        <span class="emblem" aria-hidden="true">
+          <Logo size="lg" showName={false} />
+        </span>
       </div>
     </div>
   </section>
@@ -39,6 +37,19 @@ import Layout from '../layouts/Layout.astro';
     justify-items: start;
     padding: clamp(2rem, 6vw, 4rem);
     overflow: hidden;
+  }
+
+  .emblem {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .emblem {
+      display: block;
+    }
   }
 
   h1 {

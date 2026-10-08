@@ -1,17 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs>
-    <linearGradient id="shell" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7c7cff"/>
-      <stop offset="1" stop-color="#14163f"/>
-    </linearGradient>
-    <radialGradient id="core" cx=".5" cy=".52" r=".5">
-      <stop offset="0" stop-color="#fff1dc"/>
-      <stop offset=".3" stop-color="#ffc083"/>
-      <stop offset=".6" stop-color="#ff8a2b"/>
-      <stop offset="1" stop-color="#ff8a2b" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-  <circle cx="32" cy="32" r="30" fill="url(#shell)"/>
-  <circle cx="32" cy="33" r="22" fill="url(#core)"/>
-  <ellipse cx="22" cy="17" rx="9" ry="4.5" fill="#fff" opacity=".45" transform="rotate(-28 22 17)"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="98.75 101.5 408.5 408.5">
+<style>
+.mark-ring{fill:none;stroke:#3b3bd6}
+.mark-chevron{fill:none;stroke:#0e1024}
+.mark-dot{fill:#ff8a2b}
+@media (prefers-color-scheme:dark){.mark-ring{stroke:#8f8fff}.mark-chevron{stroke:#fff}}
+</style>
+<g transform="matrix(1 0 0 -1 0 792)">
+<g transform="matrix(4.76 0 0 -4.76 101.32 724)">
+<path fill="none" class="mark-ring" stroke-width="11" stroke-miterlimit="4" d="M70.93 23.21C56.979 12.307 36.995 13.937 24.995 26.956C12.994 39.975 12.994 60.025 24.995 73.044C36.995 86.063 56.979 87.693 70.93 76.79"/>
+</g>
+<g transform="matrix(4.76 0 0 -4.76 101.32 724)">
+<path fill="none" class="mark-chevron" stroke-width="10.6" stroke-miterlimit="4" d="M57 33L37 50L57 67"/>
+</g>
+<path class="mark-dot" stroke="none" d="M436.9 486C436.9 468.912 423.048 455.06 405.96 455.06C388.872 455.06 375.02 468.912 375.02 486C375.02 503.088 388.872 516.94 405.96 516.94C423.048 516.94 436.9 503.088 436.9 486Z"/>
+</g>
 </svg>

@@ -1,11 +1,15 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, type Request } from '@playwright/test';
 
-/** Pages that exist in the production build (spec section 3 and 6b). */
+/** Pages that exist in the production build (spec sections 3, 6b and 15). */
 export const PAGES = [
   { name: 'home', path: '/' },
   { name: 'privacy', path: '/privacy' },
   { name: 'thanks', path: '/thanks' },
+  { name: 'sandbox', path: '/sandbox' },
   { name: '404', path: '/this-page-does-not-exist' },
 ] as const;
 
@@ -74,7 +78,11 @@ export async function expectNoHorizontalScroll(page: Page): Promise<void> {
 export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
 export async function axeViolations(page: Page) {
-  const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+  // The demo frames are separate sites with their own audits; only the page around them is checked.
+  const results = await new AxeBuilder({ page })
+    .withTags(WCAG_TAGS)
+    .exclude('[data-viewport] iframe')
+    .analyze();
   return results.violations.map((violation) => ({
     id: violation.id,
     impact: violation.impact,
@@ -106,4 +114,9 @@ export async function settleAnimations(page: Page): Promise<void> {
         .map((animation) => animation.finished),
     ),
   );
+}
+
+/** True when a demo build has been copied into public/demos (the build can run without them). */
+export function demoExists(id: string): boolean {
+  return existsSync(join(process.cwd(), 'public', 'demos', id, 'index.html'));
 }

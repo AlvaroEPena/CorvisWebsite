@@ -5,6 +5,8 @@ import { managedPlan, pricing } from '../../src/content/pricing';
 import { proofChips, proofStats } from '../../src/content/proof';
 import { processSteps } from '../../src/content/process';
 import { projects } from '../../src/content/projects';
+import { redesignSample } from '../../src/content/redesign-demo';
+import { sandboxProjects } from '../../src/content/sandbox';
 import { services } from '../../src/content/services';
 import { site } from '../../src/content/site';
 import { testimonials } from '../../src/content/testimonials';
@@ -47,13 +49,26 @@ describe('faqJsonLd', () => {
 });
 
 describe('content invariants', () => {
-  it('flags every placeholder price, testimonial and project', () => {
-    for (const item of [...pricing, managedPlan, ...testimonials, ...projects]) {
+  it('flags every placeholder price, testimonial and the sample redesign', () => {
+    for (const item of [...pricing, managedPlan, ...testimonials, redesignSample]) {
       expect(item.placeholder).toBe(true);
     }
   });
+  it('links every Work project to a sandbox project and sample copy never mentions removed ones', () => {
+    const sandboxIds = sandboxProjects.map((project) => project.id);
+    for (const project of projects) expect(sandboxIds).toContain(project.sandboxId);
+    expect(JSON.stringify(testimonials)).not.toMatch(/saltwater/i);
+  });
   it('keeps typography on plain hyphens (no em or en dashes in copy)', () => {
-    const copy = JSON.stringify({ site, services, projects, pricing, testimonials, faq });
+    const copy = JSON.stringify({
+      site,
+      services,
+      projects,
+      redesignSample,
+      pricing,
+      testimonials,
+      faq,
+    });
     expect(copy).not.toMatch(/[–—]/);
   });
   it('never uses the banned words in public copy', () => {
@@ -61,6 +76,7 @@ describe('content invariants', () => {
       site,
       services,
       projects,
+      redesignSample,
       pricing,
       managedPlan,
       testimonials,

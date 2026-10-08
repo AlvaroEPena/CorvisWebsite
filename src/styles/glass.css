@@ -69,3 +69,71 @@
   backdrop-filter: none;
   background: rgb(255 255 255 / 0.95);
 }
+
+/*
+ * Logo tile: a small frosted-glass rounded square behind the brand mark. It sits inside surfaces
+ * that already blur (the nav pill), so it adds a translucent fill, a specular highlight and a soft
+ * shadow but NO backdrop-filter of its own (keeps the blur budget). The sheen sweeps on hover.
+ */
+.glass-tile {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid rgb(255 255 255 / 0.85);
+  background:
+    radial-gradient(120% 70% at 25% 0%, rgb(255 255 255 / 0.95), transparent 60%),
+    linear-gradient(145deg, rgb(255 255 255 / 0.9), rgb(228 228 255 / 0.6));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 1),
+    inset 0 -1px 0 rgb(59 59 214 / 0.08),
+    0 1px 2px rgb(20 22 63 / 0.08),
+    0 8px 16px -8px rgb(59 59 214 / 0.4);
+}
+
+.glass-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgb(255 255 255 / 0.85) 50%,
+    transparent 65%
+  );
+  transform: translateX(-130%);
+  transition: transform 0.7s var(--ease-out);
+  pointer-events: none;
+}
+
+.glass-tile-host:hover .glass-tile::after,
+.glass-tile-host:focus-visible .glass-tile::after {
+  transform: translateX(130%);
+}
+
+/* Tile for dark surfaces: darker glass, light edge. */
+.glass-tile-dark {
+  border-color: rgb(255 255 255 / 0.22);
+  background:
+    radial-gradient(120% 70% at 25% 0%, rgb(255 255 255 / 0.28), transparent 60%),
+    linear-gradient(145deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.04));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.3),
+    0 8px 18px -8px rgb(0 0 0 / 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-tile::after {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-tile {
+    background: #fff;
+  }
+  .glass-tile-dark {
+    background: rgb(32 34 92 / 0.96);
+  }
+}

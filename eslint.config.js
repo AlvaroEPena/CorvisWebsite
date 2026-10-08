@@ -7,6 +7,7 @@ export default [
     ignores: [
       '.wrangler/**',
       'dist/**',
+      'public/demos/**',
       '.astro/**',
       'node_modules/**',
       'playwright-report/**',
@@ -16,7 +17,18 @@ export default [
   {
     files: ['**/*.mjs', '*.config.*'],
     languageOptions: {
-      globals: { process: 'readonly', Buffer: 'readonly', console: 'readonly', fetch: 'readonly' },
+      globals: {
+        process: 'readonly',
+        Buffer: 'readonly',
+        console: 'readonly',
+        fetch: 'readonly',
+        URL: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        AbortController: 'readonly',
+        document: 'readonly',
+        window: 'readonly',
+      },
     },
   },
   js.configs.recommended,

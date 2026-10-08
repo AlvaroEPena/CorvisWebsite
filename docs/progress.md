@@ -47,3 +47,10 @@
 - Hero dot-field, button micro-interactions, scroll-linked effects; real before/after redesign demo (old vs rebuilt pool-builder site, sanitized) with scroll-through; single sanitized sample project "Saltwater Row Outdoor Living" (original client's photos kept per owner decision, details removed, EXIF stripped).
 - Verified: check (145 tests), build, e2e 215 pass / 0 fail, Lighthouse mobile 100/100/100/100 (LCP 1.6 s), no banned words, no real-business strings in dist.
 - Claims the owner must be able to deliver: 14-day launch, up to 10 service/location pages, instant email alerts per client, hosting/security/backups with rollback, done-for-you copywriting.
+
+## 2026-10-09 — Round 3 (owner): new logo, sandbox, Refined Celebrations: done
+- New logo (owner PDF converted to vector, glass tile) everywhere; favicon set and OG regenerated.
+- `/sandbox` test-drive page with project picker, Before/After toggle (only for projects with a before), device sizes, reload, fullscreen, deep links.
+- Real before/after pool-builder demo (sanitized, working) and Refined Celebrations (real info, no before) embedded as same-origin demos.
+- Work section now shows Refined Celebrations. One explore button under the before/after slider.
+- Verified: typecheck 0 errors, lint and format clean, 168 unit tests, 330 e2e passed / 0 failed, Lighthouse `/` mobile 99, `/sandbox` mobile 100, A11y 100; all 667 demo assets return 200 under wrangler dev; headers verified with curl.

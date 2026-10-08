@@ -5,11 +5,11 @@
  * the root font-size is tied to the container width, so the whole page scales like a screenshot.
  */
 import { Image } from 'astro:assets';
-import type { Project } from '../../content/projects';
+import type { RedesignSample } from '../../content/redesign-demo';
 import { portfolioImage } from './portfolio-images';
 
 interface Props {
-  project: Project;
+  project: RedesignSample;
 }
 
 const { project } = Astro.props;

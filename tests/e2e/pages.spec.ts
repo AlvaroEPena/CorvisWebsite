@@ -116,8 +116,9 @@ test.describe('SEO', () => {
         (await page.locator('meta[name="description"]').getAttribute('content')) ?? '',
       );
     }
-    expect(titles.size).toBe(3);
-    expect(descriptions.size).toBe(3);
+    const expected = PAGES.filter((entry) => entry.name !== '404').length;
+    expect(titles.size).toBe(expected);
+    expect(descriptions.size).toBe(expected);
   });
 
   test('JSON-LD parses, has ProfessionalService + FAQPage and no ratings or reviews', async ({

@@ -1,0 +1,1 @@
+import"./lightbox.DthdHWa_.js";var e=.8;document.querySelectorAll(`[data-gallery-scroller]`).forEach(t=>{let n=t.querySelector(`[data-gallery-track]`);n&&t.querySelectorAll(`[data-scroll]`).forEach(t=>{t.addEventListener(`click`,()=>{let r=Number(t.dataset.scroll);n.scrollBy({left:r*n.clientWidth*e,behavior:`smooth`})})})});

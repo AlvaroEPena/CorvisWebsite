@@ -1,0 +1,571 @@
+---
+/**
+ * The test-drive studio: project picker, Before/After switch, device width, and a glass browser
+ * frame holding the live demo iframes. Markup only; behavior lives in scripts/sandbox.ts and every
+ * project fact comes from src/content/sandbox.ts.
+ */
+import { sandboxProjects } from '../../content/sandbox';
+import { sandboxPage } from '../../content/sandbox-copy';
+
+const first = sandboxProjects[0];
+if (!first) throw new Error('The sandbox needs at least one project');
+---
+
+<div class="studio" data-sandbox>
+  <div class="picker" role="tablist" aria-label={sandboxPage.pickerLabel} data-picker>
+    {sandboxProjects.map((project, index) => (
+      <button
+        type="button"
+        role="tab"
+        class="pick panel"
+        id={`sandbox-tab-${project.id}`}
+        aria-selected={index === 0 ? 'true' : 'false'}
+        aria-controls="sandbox-panel"
+        tabindex={index === 0 ? 0 : -1}
+        data-project-id={project.id}
+        data-name={project.name}
+        data-url={project.displayUrl}
+        data-before-src={project.versions.before?.src}
+        data-before-title={project.versions.before?.title}
+        data-after-src={project.versions.after.src}
+        data-after-title={project.versions.after.title}
+      >
+        <span class="pick-category">{project.category}</span>
+        <span class="pick-name">{project.name}</span>
+        <span class="pick-summary">{project.summary}</span>
+      </button>
+    ))}
+  </div>
+
+  <div class="toolbar">
+    <div class="version-slot">
+      <div
+        class="segmented"
+        role="group"
+        aria-label={sandboxPage.versionLabel}
+        data-version-group
+        hidden={!first.versions.before}
+      >
+        <button type="button" aria-pressed="false" data-version="before">
+          Before
+        </button>
+        <button type="button" aria-pressed="true" data-version="after">
+          After
+        </button>
+      </div>
+      <p class="live-label" data-live-label hidden={Boolean(first.versions.before)}>
+        {sandboxPage.liveLabel}
+      </p>
+    </div>
+
+    <div class="segmented devices" role="group" aria-label={sandboxPage.deviceLabel} data-devices>
+      {sandboxPage.devices.map((device, index) => (
+        <button
+          type="button"
+          aria-pressed={index === 0 ? 'true' : 'false'}
+          data-device={device.id}
+          data-width={device.width}
+        >
+          {device.label}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <div class="stage" data-stage>
+    <div class="browser" data-browser>
+      <div class="chrome">
+        <span class="lights" aria-hidden="true">
+          <i></i>
+          <i></i>
+          <i></i>
+        </span>
+        <div class="address" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
+            <path
+              d="M4.5 7V5.5a3.5 3.5 0 0 1 7 0V7M3.5 7h9v6.5h-9z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linejoin="round"
+            ></path>
+          </svg>
+          <span data-address>{first.displayUrl}</span>
+        </div>
+        <button type="button" class="tool" data-reload aria-label="Reload preview">
+          <svg viewBox="0 0 20 20" fill="none" width="18" height="18" aria-hidden="true">
+            <path
+              d="M16 10a6 6 0 1 1-1.8-4.3M16 3.5V6h-2.5"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="tool"
+          data-fullscreen
+          aria-label="Open preview full screen"
+          aria-pressed="false"
+        >
+          <svg viewBox="0 0 20 20" fill="none" width="18" height="18" aria-hidden="true">
+            <path
+              d="M12 3.5h4.5V8M8 16.5H3.5V12M16.5 3.5l-5 5M3.5 16.5l5-5"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </svg>
+        </button>
+      </div>
+
+      <div
+        class="viewport"
+        id="sandbox-panel"
+        role="tabpanel"
+        aria-labelledby={`sandbox-tab-${first.id}`}
+        data-viewport
+        data-state="loading"
+      >
+        <div class="poster" aria-hidden="true">
+          <span class="spinner"></span>
+          <span class="poster-text">Loading the live build</span>
+        </div>
+        <div class="unavailable" data-unavailable>
+          <p class="unavailable-title">{sandboxPage.unavailableTitle}</p>
+          <p>{sandboxPage.unavailableText}</p>
+        </div>
+        <i class="sweep" aria-hidden="true" data-sweep></i>
+        <noscript>
+          <p class="no-script">Turn on JavaScript to test drive this project.</p>
+        </noscript>
+      </div>
+    </div>
+  </div>
+
+  <p class="sr-only" role="status" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/sandbox';
+</script>
+
+<style>
+  .studio {
+    --frame-height: clamp(30rem, 80dvh, 56rem);
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  /* ---------- Project picker ---------- */
+  .picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    gap: 0.9rem;
+  }
+
+  .pick {
+    display: grid;
+    gap: 0.35rem;
+    align-content: start;
+    min-height: 3rem;
+    padding: 1.1rem 1.25rem;
+    border-radius: 22px;
+    color: var(--ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      transform 0.25s var(--ease-out),
+      box-shadow 0.25s var(--ease-out),
+      border-color 0.25s;
+  }
+
+  .pick:hover {
+    transform: translateY(-2px);
+  }
+
+  .pick[aria-selected='true'] {
+    border-color: var(--core-600);
+    background: linear-gradient(140deg, #fff, rgb(228 228 255 / 0.85));
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 0 0 3px rgb(59 59 214 / 0.18),
+      0 22px 44px -20px rgb(59 59 214 / 0.45);
+  }
+
+  .pick-category {
+    color: var(--core-600);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .pick-name {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .pick-summary {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 3.25rem;
+  }
+
+  .live-label {
+    width: fit-content;
+    padding: 0.55rem 1rem;
+    border-radius: var(--radius-pill);
+    background: rgb(25 181 165 / 0.14);
+    color: #0b5d55;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .segmented {
+    display: inline-flex;
+    gap: 0.2rem;
+    padding: 0.25rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgb(255 255 255 / 0.85);
+    background: linear-gradient(140deg, rgb(255 255 255 / 0.8), rgb(255 255 255 / 0.5));
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 10px 24px -14px rgb(59 59 214 / 0.35);
+  }
+
+  .segmented[hidden],
+  .live-label[hidden] {
+    display: none;
+  }
+
+  .segmented button {
+    min-height: 2.5rem;
+    padding: 0 1.15rem;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--ink-soft);
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color 0.25s,
+      color 0.25s,
+      box-shadow 0.25s;
+  }
+
+  .segmented button[aria-pressed='true'] {
+    background: var(--core-900);
+    color: #fff;
+    box-shadow: 0 6px 14px -6px rgb(20 22 63 / 0.6);
+  }
+
+  .segmented button:not([aria-pressed='true']):hover {
+    background: rgb(59 59 214 / 0.1);
+    color: var(--ink);
+  }
+
+  .devices {
+    display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .devices {
+      display: inline-flex;
+    }
+  }
+
+  /* ---------- Browser frame ---------- */
+  .stage {
+    display: flex;
+    justify-content: center;
+    padding: clamp(0.5rem, 1.6vw, 1.25rem);
+    border-radius: 34px;
+    border: 1px solid rgb(255 255 255 / 0.75);
+    background:
+      radial-gradient(70% 60% at 50% 0%, rgb(124 124 255 / 0.18), transparent 70%),
+      linear-gradient(160deg, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.25));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.95),
+      0 40px 80px -40px rgb(59 59 214 / 0.35);
+  }
+
+  .browser {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    border-radius: 22px;
+    border: 1px solid rgb(255 255 255 / 0.9);
+    background: #fff;
+    box-shadow:
+      0 1px 2px rgb(20 22 63 / 0.06),
+      0 30px 60px -30px rgb(20 22 63 / 0.5);
+    transition: width 0.5s var(--ease-out);
+  }
+
+  .chrome {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    background: linear-gradient(180deg, #f6f6fc, #ecebf5);
+    border-bottom: 1px solid rgb(20 22 63 / 0.08);
+  }
+
+  .lights {
+    display: none;
+    gap: 0.4rem;
+  }
+
+  .lights i {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: #ff6b5e;
+  }
+
+  .lights i:nth-child(2) {
+    background: #f6bd3a;
+  }
+
+  .lights i:nth-child(3) {
+    background: #3fc556;
+  }
+
+  @media (min-width: 30rem) {
+    .lights {
+      display: inline-flex;
+    }
+  }
+
+  .address {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: var(--radius-pill);
+    background: #fff;
+    box-shadow: inset 0 0 0 1px rgb(20 22 63 / 0.1);
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+  }
+
+  .address span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tool {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .tool:hover {
+    background: rgb(59 59 214 / 0.1);
+    color: var(--core-600);
+  }
+
+  .viewport {
+    position: relative;
+    height: var(--frame-height);
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .viewport :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.4s var(--ease-out),
+      visibility 0s 0.4s;
+  }
+
+  .viewport :global(iframe[data-active]) {
+    z-index: 1;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.4s var(--ease-out);
+  }
+
+  /* While the active version loads, its iframe stays hidden behind the poster. */
+  .viewport[data-state='loading'] :global(iframe[data-active]),
+  .viewport[data-state='unavailable'] :global(iframe[data-active]) {
+    opacity: 0;
+  }
+
+  .poster,
+  .unavailable {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: none;
+    place-content: center;
+    justify-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+    background:
+      radial-gradient(60% 50% at 30% 20%, rgb(255 192 131 / 0.4), transparent 70%),
+      radial-gradient(60% 60% at 80% 90%, rgb(124 124 255 / 0.3), transparent 70%),
+      linear-gradient(160deg, #f8f7ff, #ecebff);
+    color: var(--ink-soft);
+  }
+
+  .viewport[data-state='loading'] .poster {
+    display: grid;
+  }
+
+  .viewport[data-state='unavailable'] .unavailable {
+    display: grid;
+  }
+
+  .unavailable p {
+    max-width: 26rem;
+  }
+
+  .unavailable-title {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 3px solid rgb(59 59 214 / 0.18);
+    border-top-color: var(--core-600);
+    animation: spin 0.9s linear infinite;
+  }
+
+  .poster-text {
+    font-weight: 600;
+  }
+
+  /* Glass wipe played when the version or project changes. Transform only. */
+  .sweep {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(
+      100deg,
+      transparent 30%,
+      rgb(255 255 255 / 0.65) 48%,
+      rgb(228 228 255 / 0.5) 52%,
+      transparent 70%
+    );
+  }
+
+  .sweep[data-play] {
+    animation: sweep 0.7s var(--ease-out);
+  }
+
+  .no-script {
+    position: relative;
+    z-index: 4;
+    padding: 2rem;
+    background: #fff;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes sweep {
+    from {
+      opacity: 1;
+      transform: translateX(-100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(100%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .browser,
+    .pick,
+    .viewport :global(iframe),
+    .viewport :global(iframe[data-active]) {
+      transition: none;
+    }
+
+    .spinner,
+    .sweep[data-play] {
+      animation: none;
+    }
+  }
+
+  /* ---------- Full screen (native or the fixed fallback) ---------- */
+  .browser:fullscreen {
+    width: 100% !important;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .browser:fullscreen .viewport,
+  .browser[data-expanded] .viewport {
+    flex: 1;
+    height: auto;
+  }
+
+  .browser[data-expanded] {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    width: 100% !important;
+    height: 100dvh;
+    border-radius: 0;
+  }
+</style>

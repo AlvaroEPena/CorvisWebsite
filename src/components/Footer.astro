@@ -1,12 +1,12 @@
 ---
 import { site } from '../content/site';
+import { resolveHref } from '../lib/links';
 import Logo from './Logo.astro';
 
 interface Props {
   isHome: boolean;
 }
 const { isHome } = Astro.props;
-const base = isHome ? '' : '/';
 const year = new Date().getFullYear();
 ---
 
@@ -14,7 +14,11 @@ const year = new Date().getFullYear();
   <div class="container">
     <div class="top">
       <div class="about">
-        <a href={isHome ? '#main' : '/'} aria-label={`${site.name} home`}>
+        <a
+          class="glass-tile-host brand"
+          href={isHome ? '#main' : '/'}
+          aria-label={`${site.name} home`}
+        >
           <Logo />
         </a>
         <p>{site.slogan}. Websites built around the one idea that makes your business different.</p>
@@ -30,11 +34,11 @@ const year = new Date().getFullYear();
         <ul>
           {site.navigation.map((link) => (
             <li>
-              <a href={`${base}${link.href}`}>{link.label}</a>
+              <a href={resolveHref(link.href, isHome)}>{link.label}</a>
             </li>
           ))}
           <li>
-            <a href={`${base}${site.cta.href}`}>Contact</a>
+            <a href={resolveHref(site.cta.href, isHome)}>Contact</a>
           </li>
         </ul>
       </nav>
@@ -65,6 +69,13 @@ const year = new Date().getFullYear();
     gap: 1rem;
     max-width: 24rem;
     color: var(--ink-soft);
+  }
+
+  .brand {
+    display: inline-flex;
+    width: fit-content;
+    text-decoration: none;
+    border-radius: var(--radius-pill);
   }
 
   .owner {

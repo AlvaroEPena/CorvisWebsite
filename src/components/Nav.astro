@@ -1,5 +1,6 @@
 ---
 import { site } from '../content/site';
+import { resolveHref } from '../lib/links';
 import Logo from './Logo.astro';
 
 interface Props {
@@ -7,30 +8,28 @@ interface Props {
   isHome: boolean;
 }
 const { isHome } = Astro.props;
-const base = isHome ? '' : '/';
-const links = site.navigation.map((link) => ({ ...link, href: `${base}${link.href}` }));
+const links = site.navigation.map((link) => ({ ...link, href: resolveHref(link.href, isHome) }));
+const ctaHref = resolveHref(site.cta.href, isHome);
+const currentPath = Astro.url.pathname.replace(/\.html$/, '');
 ---
 
 <header class="site-header">
   <nav class="nav glass" aria-label="Primary" data-testid="nav">
-    <a class="brand" href={isHome ? '#main' : '/'} aria-label={`${site.name} home`}>
+    <a class="brand glass-tile-host" href={isHome ? '#main' : '/'} aria-label={`${site.name} home`}>
       <Logo />
     </a>
 
     <ul class="links">
       {links.map((link) => (
         <li>
-          <a href={link.href}>{link.label}</a>
+          <a href={link.href} aria-current={link.href === currentPath ? 'page' : undefined}>
+            {link.label}
+          </a>
         </li>
       ))}
     </ul>
 
-    <a
-      class="btn btn-primary btn-shine cta"
-      data-magnetic
-      href={`${base}${site.cta.href}`}
-      data-testid="nav-cta"
-    >
+    <a class="btn btn-primary btn-shine cta" data-magnetic href={ctaHref} data-testid="nav-cta">
       {site.cta.label}
     </a>
 
@@ -53,7 +52,7 @@ const links = site.navigation.map((link) => ({ ...link, href: `${base}${link.hre
           </li>
         ))}
       </ul>
-      <a class="btn btn-primary" href={`${base}${site.cta.href}`}>
+      <a class="btn btn-primary" href={ctaHref}>
         {site.cta.label}
       </a>
     </div>
@@ -78,7 +77,7 @@ const links = site.navigation.map((link) => ({ ...link, href: `${base}${link.hre
     max-width: 72rem;
     min-height: 4rem;
     margin-inline: auto;
-    padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+    padding: 0.5rem 0.5rem 0.5rem 0.75rem;
     border-radius: var(--radius-pill);
     pointer-events: auto;
     /* Fixed bars repaint on every scroll frame: smaller blur, near-opaque fill. */
@@ -116,6 +115,10 @@ const links = site.navigation.map((link) => ({ ...link, href: `${base}${link.hre
     transition:
       background-color 0.2s,
       color 0.2s;
+  }
+
+  .links a[aria-current='page'] {
+    color: var(--core-600);
   }
 
   .links a:hover {

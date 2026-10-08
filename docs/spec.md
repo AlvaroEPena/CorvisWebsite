@@ -193,3 +193,31 @@ public copy.
   be added later (Chad's site, Refined Celebrations). The #redesign demo is the real before/after of that same
   pool-builder site (old site vs our rebuild), recreated in HTML/CSS with identifying details replaced and a
   scroll-through animation. A couple of sample testimonials stay, labeled as sample feedback.
+
+## 15. Change request 2026-10-09 (owner): new logo, sandbox "test drive", Refined Celebrations
+
+- **Logo:** replace every logo/mark with the owner's new mark (`src/assets/brand/corvis-mark.svg`, converted from
+  `corvis-code-c-tight.pdf`): indigo C (#3b3bd6) containing an ink chevron (#0e1024) and an amber dot (#ff8a2b),
+  exactly our palette. Mark only; the wordmark "Corvis" stays typeset in the display font. Glassy treatment: frosted
+  glass tile/pill behind the mark in nav and footer, specular highlight, soft shadow; a light variant for dark
+  surfaces. Update favicon set, apple-touch icon, OG image, JSON-LD logo, 404/thanks/privacy pages.
+- **Sandbox page `/sandbox`:** a new page inside the normal Corvis chrome (nav, footer) where visitors "test drive" real,
+  working builds of past projects inside a glass browser frame (iframe, same-origin demos under `/demos/<id>/`).
+  Controls: project picker, Before/After toggle (only for projects that have a `before`; fresh designs show one site and
+  no toggle), device width (desktop/tablet/phone), reload, fullscreen. Deep link `#<id>/<before|after>`. Data lives in
+  `src/content/sandbox.ts` (orchestrator-owned contract). Demos are noindex and robots-disallowed.
+- **Before/after section:** keep the slider and add ONE glass button under it: "Explore this redesign site and more",
+  linking to `/sandbox#saltwater-row/after`. No other explore buttons anywhere.
+- **Work section:** remove the Saltwater Row sample. Show Refined Celebrations & Co. (owner-made site, permission
+  confirmed, REAL name/details/photos allowed) as a new-design project with no "before". Data-driven; no explore button.
+- **Demo builds:** `sites/saltwater-row` (sanitized, working rebuild with the live water hero) and
+  `sites/saltwater-row-before` (responsive recreation of the old site) built with a base path and copied into
+  `public/demos/`; Refined Celebrations built from `sites/refined-celebrations` into `public/demos/refined-celebrations/`
+  with analytics stripped, the HoneyBook inquiry embed neutralized and images reduced to stay under ~20 MB.
+
+### 15.1 Delivered (2026-10-09)
+
+- Routes: `/sandbox` (new). Headers (`public/_headers`): `/demos/*` allows same-origin framing (`X-Frame-Options: SAMEORIGIN`, `frame-ancestors 'self'`), has its own CSP (global CSP detached with `! Content-Security-Policy`) and `X-Robots-Tag: noindex, nofollow`; all other pages keep `DENY` and add `frame-src 'self'`. `robots.txt` disallows `/demos/`.
+- Demo builds are committed under `public/demos/` (about 35 MB total). Rebuild commands: `node scripts/build-demo-refined.mjs` (from `sites/refined-celebrations`, in a scratch copy, never touching that repo) and `npm run build:corvis` inside `sites/saltwater-row` and `sites/saltwater-row-before`.
+- The Refined Celebrations demo strips analytics, the CMS and the HoneyBook embed (replaced by a static "turned off in this preview" panel) and compresses images; it is a copy, so re-run the script after the real site changes.
+- `astro preview` does not apply `_headers` and 404s on directory URLs; verify headers and demo paths with `npm run build` then `npx wrangler dev`.
