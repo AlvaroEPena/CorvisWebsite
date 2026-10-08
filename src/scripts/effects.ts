@@ -1,3 +1,4 @@
+import { observeInView } from './in-view';
 import { initMagnetic } from './magnetic';
 
 /**
@@ -8,6 +9,7 @@ const root = document.documentElement;
 
 if (!root.hasAttribute('data-save-data')) {
   initMagnetic();
+  observeInView('.browse-host');
 
   const host = document.querySelector<HTMLElement>('[data-dotfield]');
   const canvas = host?.querySelector<HTMLCanvasElement>('canvas');

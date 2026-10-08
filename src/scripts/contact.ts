@@ -5,7 +5,9 @@
 const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
 
 if (form) {
-  const startedAt = performance.now();
+  // performance.now() already counts from navigation start, which is when the form was rendered.
+  // Measuring from this module's own start would undercount whenever the script loads late.
+  const startedAt = 0;
   let started = false;
 
   // Never let a native submit leak personal data into a URL before the real handler is attached.

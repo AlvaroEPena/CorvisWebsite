@@ -44,6 +44,6 @@
 ## 2026-10-08 — Change request round 2 (owner): done
 
 - New packages: Launchpad $4,500, Market Leader $6,800, required managed plan $149/mo (spec §14). Deposits are placeholder 50% ($2,250 / $3,400). Phone-routing claim removed per owner.
-- Hero dot-field, button micro-interactions, scroll-linked effects; Alder & Finch landscaping before/after with scroll-through; single sanitized sample project "Saltwater Row Outdoor Living" (original client's photos kept per owner decision, details removed, EXIF stripped).
+- Hero dot-field, button micro-interactions, scroll-linked effects; real before/after redesign demo (old vs rebuilt pool-builder site, sanitized) with scroll-through; single sanitized sample project "Saltwater Row Outdoor Living" (original client's photos kept per owner decision, details removed, EXIF stripped).
 - Verified: check (145 tests), build, e2e 215 pass / 0 fail, Lighthouse mobile 100/100/100/100 (LCP 1.6 s), no banned words, no real-business strings in dist.
 - Claims the owner must be able to deliver: 14-day launch, up to 10 service/location pages, instant email alerts per client, hosting/security/backups with rollback, done-for-you copywriting.

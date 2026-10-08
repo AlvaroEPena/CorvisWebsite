@@ -1,7 +1,12 @@
 ---
+import { projects } from '../content/projects';
 import { describePosition } from '../scripts/slider-math';
+import NewSiteMock from './mocks/NewSiteMock.astro';
+import OldSiteMock from './mocks/OldSiteMock.astro';
 
 const START = 50;
+const project = projects[0];
+if (!project) throw new Error('The redesign demo needs at least one project');
 ---
 
 <section class="redesign section" id="redesign" aria-labelledby="redesign-title">
@@ -9,10 +14,10 @@ const START = 50;
   <div class="container">
     <div class="section-heading reveal">
       <p class="eyebrow">Before and after</p>
-      <h2 id="redesign-title">Same business. A very different first impression.</h2>
+      <h2 id="redesign-title">A real before and after.</h2>
       <p>
-        Drag the handle, or focus it and use the arrow keys, to see a typical tired small-business
-        site become something people trust at a glance.
+        A dated site on the left, the rebuild on the right. Drag the handle, or focus it and use the
+        arrow keys. A sample project with the details changed.
       </p>
     </div>
 
@@ -20,112 +25,23 @@ const START = 50;
       class="frame panel browse-host"
       data-ba
       data-testid="redesign-slider"
-      style={`--ba-pos:${START}%`}
+      style={`--ba-pos:${START}%;--browse-duration:80s`}
     >
       <div class="stage" aria-hidden="true">
-        <!-- AFTER: the Corvis redesign, always underneath. -->
+        <!-- AFTER: the rebuilt site, always underneath. -->
         <div class="layer after">
           <div class="browse">
-            <div class="browse-track a-page">
-              <header class="a-nav">
-                <span class="a-logo">
-                  <i></i>Alder &amp; Finch
-                </span>
-                <span class="a-links">
-                  <b>Design</b>
-                  <b>Projects</b>
-                  <b>Care plans</b>
-                </span>
-                <span class="a-cta">Get a quote</span>
-              </header>
-              <section class="a-hero">
-                <div class="a-copy">
-                  <span class="a-badge">Landscape design and care</span>
-                  <span class="a-title">Gardens that earn the second look.</span>
-                  <span class="a-sub">
-                    We design, build and look after outdoor spaces you will actually use.
-                  </span>
-                  <span class="a-btn">Request a quote</span>
-                </div>
-                <div class="a-art">
-                  <i class="a-orb"></i>
-                  <i class="a-leaf l1"></i>
-                  <i class="a-leaf l2"></i>
-                </div>
-              </section>
-              <section class="a-services">
-                <span class="a-card">
-                  <b></b>Garden design<small>Plans drawn around how you live.</small>
-                </span>
-                <span class="a-card">
-                  <b></b>Installation<small>Planting, paving and lighting.</small>
-                </span>
-                <span class="a-card">
-                  <b></b>Seasonal care<small>Reliable upkeep, all year.</small>
-                </span>
-              </section>
-              <section class="a-gallery">
-                <span class="a-heading">Recent gardens</span>
-                <div class="a-tiles">
-                  <i class="t1"></i>
-                  <i class="t2"></i>
-                  <i class="t3"></i>
-                  <i class="t4"></i>
-                </div>
-              </section>
-              <section class="a-quote">
-                <span class="a-heading">Ready for a garden you love?</span>
-                <span class="a-btn">Get your free quote</span>
-              </section>
+            <div class="browse-track">
+              <NewSiteMock project={project} />
             </div>
           </div>
         </div>
 
-        <!-- BEFORE: a deliberately dated, cluttered brochure site, clipped to the left of the handle. -->
+        <!-- BEFORE: the dated site, clipped to the left of the handle. -->
         <div class="layer before" data-ba-before style={`clip-path:inset(0 ${100 - START}% 0 0)`}>
           <div class="browse">
-            <div class="browse-track b-page">
-              <div class="b-banner">ALDER &amp; FINCH LANDSCAPING!!!</div>
-              <div class="b-tag">Quality lawn care and landscaping since forever - Call today</div>
-              <div class="b-nav">
-                Home | About Us | Our Services | Photo Gallery | Links | Specials | Guestbook |
-                Contact Us
-              </div>
-              <div class="b-hero">
-                <span>Beautiful Lawns!</span>
-              </div>
-              <div class="b-cols">
-                <div class="b-text">
-                  <p>
-                    <u>Click here</u> to see our services. We have been in business for many years
-                    and we do lawns, trees, hedges, patios, mulch, sod, snow removal and more!! Call
-                    today for a FREE estimate. <span class="b-new">NEW!</span>
-                  </p>
-                  <p>
-                    Our crew is friendly and we are fully insured. We work in all kinds of weather.{' '}
-                    <u>Click here</u> for our coupons. Please sign our guestbook.
-                  </p>
-                  <p>
-                    <u>Lawn mowing</u> | <u>Tree trimming</u> | <u>Hedges</u> | <u>Mulch</u> |{' '}
-                    <u>Sod</u> | <u>Patios</u> | <u>Leaf cleanup</u>
-                  </p>
-                </div>
-                <div class="b-side">
-                  <div class="b-special">
-                    SPECIAL!
-                    <br />
-                    10% off
-                    <br />
-                    first mow
-                  </div>
-                  <div class="b-pic">[ photo ]</div>
-                </div>
-              </div>
-              <div class="b-ribbon">This site is under construction. Please check back soon!</div>
-              <div class="b-foot">
-                You are visitor number 004281 &nbsp; Best viewed in Internet Explorer &nbsp;
-                Copyright 2004
-              </div>
+            <div class="browse-track">
+              <OldSiteMock project={project} />
             </div>
           </div>
         </div>
@@ -138,7 +54,7 @@ const START = 50;
       </div>
 
       <label class="sr-only" for="ba-range">
-        Compare the original site with the Corvis redesign. Use the left and right arrow keys.
+        Compare the original site with the rebuilt site. Use the left and right arrow keys.
       </label>
       <input
         id="ba-range"
@@ -193,355 +109,8 @@ const START = 50;
     inset: 0;
   }
 
-  /* ---------- BEFORE: dated, cluttered brochure site ---------- */
   .before {
-    background: #ece9d8;
-    color: #000;
-    font-family: 'Times New Roman', Times, serif;
     z-index: 1;
-  }
-
-  .b-banner {
-    padding: 2.2cqw 1cqw;
-    background: #000080;
-    color: #ffff00;
-    font-family: 'Comic Sans MS', 'Comic Neue', cursive;
-    font-size: 3.4cqw;
-    font-weight: 700;
-    text-align: center;
-    border-bottom: 0.5cqw ridge #808080;
-  }
-
-  .b-tag {
-    padding: 0.6cqw 1cqw;
-    background: #006400;
-    color: #fff;
-    font-size: 1.5cqw;
-    text-align: center;
-  }
-
-  .b-nav {
-    padding: 0.9cqw 1.5cqw;
-    background: #c0c0c0;
-    border-bottom: 0.3cqw solid #808080;
-    color: #0000ee;
-    font-size: 1.5cqw;
-    text-decoration: underline;
-    white-space: nowrap;
-  }
-
-  /* A cheap stock-style banner: flat green hills under a hard blue sky. */
-  .b-hero {
-    display: grid;
-    place-items: center;
-    height: 20cqw;
-    background:
-      radial-gradient(60% 70% at 25% 120%, #2e7d32 0 60%, transparent 61%),
-      radial-gradient(70% 80% at 80% 130%, #1b5e20 0 60%, transparent 61%),
-      linear-gradient(#4aa3e8, #bfe3ff);
-    border-bottom: 0.4cqw solid #808080;
-  }
-
-  .b-hero span {
-    color: #fff;
-    font-family: 'Comic Sans MS', 'Comic Neue', cursive;
-    font-size: 5cqw;
-    font-weight: 700;
-    text-shadow: 0.4cqw 0.4cqw 0 #000;
-  }
-
-  .b-cols {
-    display: flex;
-    gap: 2cqw;
-    padding: 2.5cqw 3cqw;
-  }
-
-  .b-text {
-    flex: 1;
-    font-size: 1.8cqw;
-    line-height: 1.25;
-    color: #222;
-  }
-
-  .b-text p {
-    margin: 0 0 1.5cqw;
-  }
-
-  .b-text u {
-    color: #0000ee;
-  }
-
-  .b-new {
-    margin-left: 1cqw;
-    padding: 0.2cqw 1cqw;
-    background: #b00000;
-    color: #fff;
-    font-weight: 700;
-    font-size: 1.6cqw;
-  }
-
-  .b-side {
-    display: grid;
-    flex: none;
-    gap: 1.5cqw;
-    width: 24cqw;
-    align-content: start;
-  }
-
-  .b-special {
-    padding: 1.2cqw;
-    border: 0.5cqw dashed #b00000;
-    background: #ffffcc;
-    color: #b00000;
-    font-size: 2cqw;
-    font-weight: 700;
-    text-align: center;
-  }
-
-  .b-pic {
-    display: grid;
-    place-items: center;
-    height: 16cqw;
-    border: 0.7cqw outset #c0c0c0;
-    background: #d0d0d0;
-    color: #333;
-    font-size: 1.8cqw;
-  }
-
-  .b-ribbon {
-    margin: 1cqw 3cqw 3cqw;
-    padding: 1cqw;
-    background: #ffcc00;
-    border: 0.3cqw solid #000;
-    color: #000;
-    font-size: 1.7cqw;
-    font-weight: 700;
-    text-align: center;
-  }
-
-  .b-foot {
-    padding: 1.2cqw 3cqw;
-    background: #c0c0c0;
-    border-top: 0.3cqw solid #808080;
-    font-size: 1.5cqw;
-    color: #333;
-  }
-
-  /* ---------- AFTER: modern landscaping site ---------- */
-  .a-page {
-    display: grid;
-    gap: 4cqw;
-    padding: 2.4cqw 3cqw 4cqw;
-    background:
-      radial-gradient(60% 40% at 90% 0%, rgb(255 192 131 / 0.55), transparent 60%), #f5f3ef;
-    color: #0e1024;
-    font-family: var(--font-body);
-  }
-
-  .a-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1cqw 1.4cqw;
-    border-radius: 99cqw;
-    background: rgb(255 255 255 / 0.9);
-    box-shadow: 0 1cqw 3cqw -1.4cqw rgb(15 80 60 / 0.35);
-    font-size: 1.6cqw;
-    font-weight: 600;
-  }
-
-  .a-logo {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.8cqw;
-    font-family: var(--font-display);
-    font-size: 1.9cqw;
-  }
-
-  .a-logo i {
-    width: 2.4cqw;
-    height: 2.4cqw;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #fff, #19b5a5 55%, #0b5d55);
-  }
-
-  .a-links {
-    display: flex;
-    gap: 2.4cqw;
-    color: #4a4d6b;
-    font-weight: 500;
-  }
-
-  .a-cta,
-  .a-btn {
-    padding: 0.9cqw 2cqw;
-    border-radius: 99cqw;
-    background: #14163f;
-    color: #fff;
-    font-size: 1.6cqw;
-    font-weight: 600;
-  }
-
-  .a-hero {
-    display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 3cqw;
-    align-items: center;
-  }
-
-  .a-copy {
-    display: grid;
-    gap: 1.6cqw;
-    justify-items: start;
-  }
-
-  .a-badge {
-    padding: 0.5cqw 1.6cqw;
-    border-radius: 99cqw;
-    background: rgb(25 181 165 / 0.15);
-    color: #0b5d55;
-    font-size: 1.3cqw;
-    font-weight: 600;
-  }
-
-  .a-title {
-    font-family: var(--font-display);
-    font-size: 5.2cqw;
-    font-weight: 700;
-    line-height: 0.98;
-    letter-spacing: -0.04em;
-  }
-
-  .a-sub {
-    max-width: 34cqw;
-    color: #4a4d6b;
-    font-size: 1.7cqw;
-    line-height: 1.4;
-  }
-
-  .a-btn {
-    background: linear-gradient(135deg, #19b5a5, #0b5d55);
-    padding: 1.2cqw 2.6cqw;
-  }
-
-  .a-art {
-    position: relative;
-    height: 34cqw;
-    border-radius: 3cqw;
-    overflow: hidden;
-    background:
-      radial-gradient(90% 70% at 90% 100%, #ffc083, transparent 60%),
-      linear-gradient(160deg, #19b5a5, #08272a);
-  }
-
-  .a-orb {
-    position: absolute;
-    width: 66%;
-    aspect-ratio: 1;
-    left: 50%;
-    top: 50%;
-    translate: -50% -50%;
-    border-radius: 50%;
-    background:
-      radial-gradient(ellipse 28% 16% at 30% 20%, rgb(255 255 255 / 0.65), transparent 70%),
-      radial-gradient(circle at 50% 55%, #e8fff9 0, #7fe9db 28%, #138077 62%, #08272a);
-  }
-
-  .a-leaf {
-    position: absolute;
-    width: 9cqw;
-    height: 14cqw;
-    border-radius: 100% 0 100% 0;
-    background: linear-gradient(150deg, #9be58a, #1f7a3a);
-  }
-
-  .l1 {
-    left: 6%;
-    bottom: 6%;
-    rotate: -20deg;
-  }
-
-  .l2 {
-    right: 8%;
-    top: 8%;
-    rotate: 140deg;
-  }
-
-  .a-services {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2cqw;
-  }
-
-  .a-card {
-    display: grid;
-    gap: 0.8cqw;
-    padding: 2.6cqw;
-    border-radius: 2.4cqw;
-    background: #fff;
-    box-shadow: 0 2cqw 5cqw -3cqw rgb(15 80 60 / 0.4);
-    font-size: 2cqw;
-    font-weight: 700;
-  }
-
-  .a-card b {
-    width: 4cqw;
-    height: 4cqw;
-    border-radius: 50%;
-    background: linear-gradient(145deg, #ffc083, #ff8a2b);
-  }
-
-  .a-card small {
-    color: #4a4d6b;
-    font-size: 1.5cqw;
-    font-weight: 400;
-  }
-
-  .a-gallery {
-    display: grid;
-    gap: 2cqw;
-  }
-
-  .a-heading {
-    font-family: var(--font-display);
-    font-size: 3.6cqw;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-
-  .a-tiles {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.6cqw;
-  }
-
-  .a-tiles i {
-    aspect-ratio: 3 / 4;
-    border-radius: 2cqw;
-  }
-
-  .t1 {
-    background: linear-gradient(160deg, #9be58a, #1f7a3a);
-  }
-  .t2 {
-    background: linear-gradient(160deg, #ffd9a8, #c2410a);
-  }
-  .t3 {
-    background: linear-gradient(160deg, #8ff0e3, #0b5d55);
-  }
-  .t4 {
-    background: linear-gradient(160deg, #cfd0ff, #3b3bd6);
-  }
-
-  .a-quote {
-    display: grid;
-    gap: 2cqw;
-    justify-items: center;
-    padding: 5cqw 3cqw;
-    border-radius: 3cqw;
-    background: linear-gradient(160deg, #0f4f4a, #08272a);
-    color: #fff;
-    text-align: center;
   }
 
   /* ---------- Controls ---------- */

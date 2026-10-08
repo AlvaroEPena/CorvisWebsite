@@ -1,18 +1,6 @@
 ---
-import type { ImageMetadata } from 'astro';
 import { projects } from '../content/projects';
 import ProjectShowcase from './ProjectShowcase.astro';
-
-// Resolves every portfolio photo once; keys look like "pool/pool-01".
-const modules = import.meta.glob<{ default: ImageMetadata }>('../assets/portfolio/**/*.avif', {
-  eager: true,
-});
-const images = Object.fromEntries(
-  Object.entries(modules).map(([path, module]) => [
-    path.replace('../assets/portfolio/', '').replace(/\.avif$/, ''),
-    module.default,
-  ]),
-);
 ---
 
 <section class="work section" id="work" aria-labelledby="work-title" data-testid="work">
@@ -22,7 +10,7 @@ const images = Object.fromEntries(
       <h2 id="work-title">Sites that sound like the business behind them.</h2>
       <p>
         {projects.length === 1
-          ? 'Our first sample project, shown as concept work while we publish real case studies.'
+          ? 'Our first sample project is a real rebuild with the details changed, shown as concept work while we publish case studies.'
           : 'Sample projects, shown as concept work while we publish real case studies.'}
       </p>
     </div>
@@ -30,7 +18,7 @@ const images = Object.fromEntries(
     <div class="list" data-count={projects.length}>
       {projects.map((project, index) => (
         <div class="item reveal">
-          <ProjectShowcase project={project} images={images} index={index} />
+          <ProjectShowcase project={project} index={index} />
         </div>
       ))}
     </div>

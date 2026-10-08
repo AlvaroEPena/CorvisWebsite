@@ -13,7 +13,7 @@ import sharp from 'sharp';
 const sourceDir = process.argv[2];
 if (!sourceDir) throw new Error('Pass the source photos directory as the first argument.');
 
-// Hand-picked (people, logos, text and watermarks excluded). Order = pool-01..pool-08.
+// Hand-picked (people, logos, text and watermarks excluded). Order = pool-01..pool-NN.
 const picks = [
   '012491-img_6545.jpg',
   '216e23-img_1018-2-.jpg',
@@ -23,6 +23,10 @@ const picks = [
   '06c090-img_2558-copy.jpg',
   'bbefff-img_2588-copy-2.jpg',
   'd90a33-img_6547.jpg',
+  'd9c18b-img_3038-copy.jpg',
+  'd19543-img_3349.jpg',
+  '2b3462-jeremie-ott-3-1-.jpg',
+  'ca095c-img_0523-2-.jpg',
 ];
 
 const outDir = new URL('../src/assets/portfolio/pool/', import.meta.url);

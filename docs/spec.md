@@ -190,6 +190,6 @@ public copy.
   off-screen, honoring reduced-motion/Save-Data; Lighthouse mobile must stay >= 95 and LCP < 2.0 s.
   **Portfolio:** single project for now, a sanitized remake of a real pool-builder site (owner
   decision: remove identifying business details, keep their photos). Data-driven (`projects.ts`) so more can
-  be added later (Chad's site, Refined Celebrations). Alder & Finch landscaping stays as the concept
-  shown in the before/after "redesign" demo, made to look like a real landscaping redesign with a
+  be added later (Chad's site, Refined Celebrations). The #redesign demo is the real before/after of that same
+  pool-builder site (old site vs our rebuild), recreated in HTML/CSS with identifying details replaced and a
   scroll-through animation. A couple of sample testimonials stay, labeled as sample feedback.

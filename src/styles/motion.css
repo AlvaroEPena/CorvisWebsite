@@ -91,7 +91,8 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  :root:not([data-save-data]) .browse-track {
+  /* Runs only while the mock is on screen (data-in-view is set by scripts/in-view.ts). */
+  :root:not([data-save-data]) .browse-host[data-in-view] .browse-track {
     animation: browse var(--browse-duration, 26s) ease-in-out infinite alternate;
     will-change: transform;
   }

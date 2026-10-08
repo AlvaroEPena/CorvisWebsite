@@ -6,7 +6,7 @@ import { PAGES } from './support';
 
 const BANNED_WORDS = /template|framework|\bAI\b/i;
 const REAL_BUSINESS =
-  /zydeco|baton rouge|louisiana|\b225\b|\(?225\)?[ -]?\d{3}[ -]?\d{4}|zydecoconstruction/i;
+  /zydeco|baton rouge|louisiana|\b225\b|348-5122|highlandia|lyon|\bHFS\b|wafb|wgno|usa today|house ?beautiful|daily advertiser|alder|finch/i;
 
 test.describe('public copy rules', () => {
   for (const { name, path } of PAGES) {
@@ -28,6 +28,7 @@ test.describe('public copy rules', () => {
         ].join('\n'),
       );
       expect(head).not.toMatch(BANNED_WORDS);
+      expect(text + ' ' + head).not.toMatch(REAL_BUSINESS);
     });
   }
 
@@ -46,6 +47,11 @@ test.describe('portfolio', () => {
     const work = page.getByTestId('work');
     await expect(work.getByTestId('project-showcase')).toHaveCount(1);
     await expect(work).toContainText('Sample project / concept work');
+    await expect(work).toContainText('Saltwater Row');
+    await expect(page.locator('[data-testid="redesign-slider"] > div').first()).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
 
     const html = await work.evaluate((node) => node.outerHTML);
     expect(html).not.toMatch(REAL_BUSINESS);
@@ -79,8 +85,19 @@ test.describe('motion fallbacks', () => {
         .first()
         .evaluate((el) => getComputedStyle(el).animationName);
 
-    expect(await animationOf('#redesign .browse-track')).toBe('browse');
-    expect(await animationOf('#work .browse-track')).toBe('browse');
+    // Off-screen mocks stay idle; each one starts once it is on screen.
+    expect(await animationOf('#redesign .browse-track')).toBe('none');
+    for (const section of ['#redesign', '#work']) {
+      await page
+        .locator(section + ' .browse-host')
+        .first()
+        .scrollIntoViewIfNeeded();
+      await expect(page.locator(section + ' .browse-host').first()).toHaveAttribute(
+        'data-in-view',
+        '',
+      );
+      expect(await animationOf(section + ' .browse-track')).toBe('browse');
+    }
 
     await page.emulateMedia({ reducedMotion: 'reduce' });
     expect(await animationOf('#redesign .browse-track')).toBe('none');
