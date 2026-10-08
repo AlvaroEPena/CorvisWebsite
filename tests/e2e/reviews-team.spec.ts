@@ -122,10 +122,12 @@ test.describe('home testimonials', () => {
   test('the Work card callout no longer mentions an earlier version', async ({ page }) => {
     await page.goto('/#work');
     const origins = page.getByTestId('project-origin');
-    await expect(origins).toHaveCount(2);
-    for (const origin of await origins.all()) {
-      await expect(origin).toHaveText('A brand-new design, built from scratch.');
-    }
+    await expect(origins).toHaveCount(3);
+    await expect(origins.nth(0)).toHaveText('A brand-new design, built from scratch.');
+    await expect(origins.nth(1)).toHaveText('A brand-new design, built from scratch.');
+    await expect(origins.nth(2)).toHaveText(
+      'A concept design, built from scratch. Company details are placeholders.',
+    );
   });
 });
 

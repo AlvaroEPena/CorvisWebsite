@@ -107,3 +107,8 @@
 ## 2026-10-09 — Headshot sharpness fix
 
 - Cause: the portrait was encoded twice (AVIF q58 by `scripts/make-team-photos.mjs`, then again at q42 by astro:assets). Now the script writes JPEG q95 4:4:4 masters (`<id>-card.jpg` 800x1000, `<id>-avatar.jpg` 288x288, Lanczos plus light sharpen) and the site encodes them once (card q55, widths 320/480/640/800; avatar q75). `/team` mobile LCP about 1.8 to 2.0 s (was 1.5 s with the soft image), Performance 97 to 99.
+
+## 2026-10-09 — Round 11: Grit concept project: done
+
+- Grit demo, sandbox card (4th) and Work showcase (3rd, "Concept project"); live-sites timing tests relaxed for slow headless GL (start under 6 s, longest still under 1.5 s).
+- Verified: typecheck/lint/format clean, 260 unit, e2e 571+ passed with timing tests stable over repeated runs, Lighthouse `/` and `/sandbox` 100 on all categories (mobile).

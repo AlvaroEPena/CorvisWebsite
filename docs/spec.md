@@ -273,3 +273,9 @@ public copy.
 
 - `src/scripts/nav-spy.ts` (+ pure `nav-spy-math.ts`): on the home page the navbar link of the section being read gets `aria-current="location"` and a glass pill glides behind it (`.links::before`, transform and width only, positioned with `--ind-x`/`--ind-w` measured against the list; no pill under reduced motion transitions). Reading line is 34% from the top; the redesign demo counts as Work; sections without a link (hero, testimonials, contact) show no highlight; a nav click goes straight to its target for 1.1 s. On other pages the pill rests under the current page's link.
 - Redesign removed from the navbar and footer (it is part of Work). Navbar: Services, Work, Process, Pricing, FAQ, Meet the team, Sandbox, Reviews.
+
+### 16.6 Grit concept project (2026-10-09)
+
+- Sandbox registry now has 4 projects (adds `grit`: concept, fictional company, free-licence Unsplash photos) and Work has 3 showcases (Refined Celebrations and Mod Labs are `status: 'live'` with the "Live project" pill; Grit is `status: 'concept'` with a "Concept project" pill and the note that company details are placeholders). The sandbox picker is 1 column on phones and 2x2 from tablet up.
+- Demo: `public/demos/grit` (10.3 MB, 28 pages, forms neutralized) built by `node scripts/build-demo-grit.mjs` from `sites/grit` (scratch copy). Source text edits made for the demo (in `sites/grit`): owner name removed, a few service names reworded to avoid verbatim overlap with the reference site (overlap check `scripts/demo-grit/overlap-check.mjs`: 0 runs of 8+ words). `README.md`, `docs/` and `src/components/sections/content.ts` in `sites/grit` still name the founder (the demo patches content.ts).
+- Guard: `tests/unit/sanitize.test.ts` forbids `protech`, `protechcoatings` and `chad` in `public/demos/grit` and `src/assets/portfolio/grit`. Thumbnails: `scripts/optimize-grit.mjs`, credit line "Photos: Unsplash".

@@ -12,7 +12,7 @@ export const sandboxPage = {
   description:
     'Open real, working Corvis builds in a live browser frame. Click around, switch between the old and new site, and see them at desktop, tablet and phone width.',
   heading: 'Test drive our work.',
-  lead: 'Everything below is the real build running live, not a screenshot. Click through it, resize it to a phone, flip between the old and new site. Sample projects have their details changed.',
+  lead: 'Everything below is the real build running live, not a screenshot. Click through it, resize it to a phone, flip between the old and new site. Sample projects have their details changed, and concept projects are previews with placeholder company details.',
   pickerLabel: 'Projects',
   versionLabel: 'Version',
   liveLabel: 'Built from scratch',

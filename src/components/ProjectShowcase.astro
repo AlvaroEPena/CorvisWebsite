@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import type { WorkProject } from '../content/projects';
+import { statusLabel, type WorkProject } from '../content/projects';
 import { getSandboxProject } from '../content/sandbox';
 import { portfolioImage } from '../lib/portfolio-images';
 import LiveSiteStage from './LiveSiteStage.astro';
@@ -39,7 +39,9 @@ const isReversed = index % 2 === 1;
   </div>
 
   <div class="summary">
-    <p class="label">{project.label}</p>
+    <p class="label" data-testid="project-status">
+      {statusLabel[project.status]}
+    </p>
     <h3 id={`project-${project.id}`}>{project.name}</h3>
     <p class="category">{project.category}</p>
     <p>{project.summary}</p>
@@ -78,6 +80,12 @@ const isReversed = index % 2 === 1;
         </li>
       ))}
     </ul>
+    {project.photoCredit && (
+      <p class="credit" title={project.photoCredit.detail} data-testid="photo-credit">
+        <span aria-hidden="true">{project.photoCredit.text}</span>
+        <span class="sr-only">{project.photoCredit.detail}</span>
+      </p>
+    )}
   </div>
 </article>
 
@@ -164,7 +172,7 @@ const isReversed = index % 2 === 1;
     font-weight: 600;
   }
 
-  .summary > p:not(.label, .category) {
+  .summary > p:not(.label, .category, .credit) {
     max-width: 34rem;
     color: var(--ink-soft);
   }
@@ -188,6 +196,12 @@ const isReversed = index % 2 === 1;
     list-style: disc;
     color: var(--ink-soft);
     font-size: 0.95rem;
+  }
+
+  .credit {
+    margin: -0.25rem 0 0;
+    color: var(--ink-mute);
+    font-size: 0.8rem;
   }
 
   .thumbs {

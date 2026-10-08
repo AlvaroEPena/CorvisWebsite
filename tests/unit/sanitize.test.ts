@@ -88,3 +88,31 @@ describe('sanitized portfolio', () => {
     });
   });
 });
+
+/**
+ * Grit is a concept for a prospective owner (fictional company, filler contacts). The names of the
+ * business it was made for, and of the person who asked, must never appear in its demo or assets.
+ * "diamond" is deliberately not forbidden: Corvis's own pages name Aaron Peña-Diamond.
+ */
+const GRIT_FORBIDDEN = /protech|protechcoatings|chad/i;
+const GRIT_PATHS = ['public/demos/grit', 'src/assets/portfolio/grit'];
+const gritFiles = GRIT_PATHS.filter((path) => existsSync(join(root, path))).flatMap((path) =>
+  walk(join(root, path)),
+);
+
+describe.skipIf(gritFiles.length === 0)('grit concept', () => {
+  it('contains files to scan', () => {
+    expect(gritFiles.length).toBeGreaterThan(10);
+  });
+
+  it('never names the business or person it was made for, in any text file or file name', () => {
+    const offenders = gritFiles
+      .filter(
+        (file) =>
+          GRIT_FORBIDDEN.test(toPosix(file)) ||
+          (TEXT_EXTENSIONS.has(extname(file)) && GRIT_FORBIDDEN.test(readFileSync(file, 'utf8'))),
+      )
+      .map(toPosix);
+    expect(offenders).toEqual([]);
+  });
+});

@@ -8,12 +8,29 @@
  * confirmed we may show it with its real name, copy and photographs (photos live in
  * src/assets/portfolio/refined/, re-encoded by scripts/optimize-refined.mjs). Mod Labs is the
  * owner's own site, so its real name, prices and bench photos may be shown too (photos in
- * src/assets/portfolio/modlabs/, re-encoded by scripts/optimize-modlabs.mjs).
+ * src/assets/portfolio/modlabs/, re-encoded by scripts/optimize-modlabs.mjs). Grit is a CONCEPT: a
+ * preview made for a prospective owner, with a fictional company, filler contacts and free-licence
+ * Unsplash photographs (src/assets/portfolio/grit/, scripts/optimize-grit.mjs). It says so on its card.
  */
 export interface WorkPhoto {
   /** File name (without extension) inside the project's folder in src/assets/portfolio. */
   file: string;
   alt: string;
+}
+
+/** Whether a project is a real client site or a concept made to show a prospective owner. */
+export type ProjectStatus = 'live' | 'concept';
+
+export const statusLabel: Record<ProjectStatus, string> = {
+  live: 'Live project',
+  concept: 'Concept project',
+};
+
+/** Credit for photographs we do not own, shown under the thumbnails. */
+export interface PhotoCredit {
+  text: string;
+  /** Who took them, for the tooltip and screen readers. */
+  detail: string;
 }
 
 export interface WorkProject {
@@ -22,8 +39,8 @@ export interface WorkProject {
   sandboxId: string;
   name: string;
   category: string;
-  /** Chip on the card. */
-  label: string;
+  /** Shown as the pill on the card: a live client site, or a concept. */
+  status: ProjectStatus;
   /** Folder name inside src/assets/portfolio. */
   folder: string;
   /** What we built and why it works, in plain language. */
@@ -34,6 +51,8 @@ export interface WorkProject {
   originNote: string;
   /** Four photographs shown as thumbnails under the case summary, in order. */
   photos: readonly WorkPhoto[];
+  /** Present when the photographs are licensed from someone else. */
+  photoCredit?: PhotoCredit;
 }
 
 export const projects: readonly WorkProject[] = [
@@ -42,7 +61,7 @@ export const projects: readonly WorkProject[] = [
     sandboxId: 'refined-celebrations',
     name: 'Refined Celebrations & Co.',
     category: 'New website design',
-    label: 'Live project',
+    status: 'live',
     folder: 'refined',
     summary:
       'A boutique wedding, corporate and event planning company with its own photography, serving Indianapolis and Salt Lake City. Its website had to feel as considered as the celebrations it plans.',
@@ -82,7 +101,7 @@ export const projects: readonly WorkProject[] = [
     sandboxId: 'mod-labs',
     name: 'Mod Labs',
     category: 'New website design',
-    label: 'Live project',
+    status: 'live',
     folder: 'modlabs',
     summary:
       'A console modding and electronics repair shop in Seattle. The site had to make a fiddly, technical service feel clear and trustworthy: what each job costs, what is included, and how to get one booked.',
@@ -116,5 +135,50 @@ export const projects: readonly WorkProject[] = [
         alt: 'A red clear-shell Nintendo Switch OLED standing on its dock after a modchip install',
       },
     ],
+  },
+  {
+    id: 'grit',
+    sandboxId: 'grit',
+    name: 'Grit',
+    category: 'New website design (concept)',
+    status: 'concept',
+    folder: 'grit',
+    summary:
+      'A concept site for a bridge deck repair and protection contractor: "Bridge decks built to outlast the traffic." It shows how a heavy-civil company can look as solid online as its work does, from deck overlays and waterproofing to carbon fiber strengthening and expansion joints.',
+    built: [
+      'A cinematic dusk-bridge home page with scroll reveals and the line "Bridge decks. Built to last."',
+      'Service pages for deck overlays, waterproofing, concrete repair, strengthening, joints and coatings, reached from a services menu on desktop and a full-screen menu on mobile',
+      'A four-stage process timeline and a filterable project gallery with a lightbox and photo credits',
+      'Quote and job inquiry forms',
+    ],
+    whyItWorks: [
+      'Charcoal, steel and a safety-orange accent read as authority and trust to public-sector and contractor buyers.',
+      'Every service is scannable, and finished projects are shown as proof.',
+      'Lean pages and sized images keep it fast on a phone, where site visits often happen.',
+    ],
+    originNote: 'A concept design, built from scratch. Company details are placeholders.',
+    photos: [
+      {
+        file: 'dusk-bridge',
+        alt: 'An arched highway bridge at dusk with light trails crossing a river beneath an orange sky',
+      },
+      {
+        file: 'bridge-construction',
+        alt: 'Cable-stayed bridge deck sections reaching outward during construction under an overcast sky',
+      },
+      {
+        file: 'deck-overlay',
+        alt: 'A crew applying a surface treatment to a roadway, with a distributor truck and steam rising',
+      },
+      {
+        file: 'steel-truss',
+        alt: 'The blue steel truss underside of a bridge seen from below against a pale sky',
+      },
+    ],
+    photoCredit: {
+      text: 'Photos: Unsplash',
+      detail:
+        'Photographs by Jeremy Doddridge, Mason Kimbarovsky, Tom Shamberger and benjamin lehman, used under the Unsplash License.',
+    },
   },
 ];

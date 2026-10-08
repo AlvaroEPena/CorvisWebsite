@@ -66,6 +66,18 @@ export const sandboxProjects: readonly SandboxProject[] = [
       after: { src: '/demos/mod-labs/', title: 'Mod Labs: the website' },
     },
   },
+  {
+    id: 'grit',
+    name: 'Grit',
+    category: 'New website design (concept)',
+    summary:
+      'A concept site for a bridge deck repair and protection contractor: bold industrial design, clear services and a filterable project gallery.',
+    displayUrl: 'grit.example',
+    sample: true,
+    versions: {
+      after: { src: '/demos/grit/', title: 'Grit: the concept website' },
+    },
+  },
 ];
 
 export const getSandboxProject = (id: string): SandboxProject | undefined =>

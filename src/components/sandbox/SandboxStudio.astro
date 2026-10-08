@@ -158,7 +158,7 @@ if (!first) throw new Error('The sandbox needs at least one project');
   }
 
   /* ---------- Project picker ---------- */
-  /* One column on phones, two on tablets (an odd last card spans the row), as many as fit on desktop. */
+  /* One column on phones, two from tablet up: four cards make a tidy 2 by 2, and an odd count spans its last row. */
   .picker {
     display: grid;
     grid-template-columns: 1fr;
@@ -172,16 +172,6 @@ if (!first) throw new Error('The sandbox needs at least one project');
 
     .pick:last-child:nth-child(odd) {
       grid-column: 1 / -1;
-    }
-  }
-
-  @media (min-width: 64rem) {
-    .picker {
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
-    }
-
-    .pick:last-child:nth-child(odd) {
-      grid-column: auto;
     }
   }
 

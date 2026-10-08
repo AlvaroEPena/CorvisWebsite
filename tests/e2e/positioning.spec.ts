@@ -40,21 +40,39 @@ test.describe('public copy rules', () => {
 });
 
 test.describe('portfolio', () => {
-  test('shows Refined Celebrations and Mod Labs as new designs with no sandbox button', async ({
+  test('shows Refined Celebrations, Mod Labs and the Grit concept with no sandbox button', async ({
     page,
   }) => {
     await page.goto('/#work');
     const work = page.getByTestId('work');
-    await expect(work.getByTestId('project-showcase')).toHaveCount(2);
+    await expect(work.getByTestId('project-showcase')).toHaveCount(3);
     await expect(work).toContainText('Refined Celebrations & Co.');
     await expect(work).toContainText('Indianapolis');
     await expect(work).toContainText('Mod Labs');
     await expect(work).toContainText('from $100');
     await expect(work).toContainText('Seattle');
     const origins = work.getByTestId('project-origin');
-    await expect(origins).toHaveCount(2);
+    await expect(origins).toHaveCount(3);
     for (const origin of await origins.all())
       await expect(origin).toContainText('built from scratch');
+    await expect(work).toContainText('Grit');
+    // Live client sites say so; the Grit concept says it is a concept with placeholder details.
+    await expect(work.getByTestId('project-status')).toHaveText([
+      'Live project',
+      'Live project',
+      'Concept project',
+    ]);
+    await expect(origins.nth(2)).toHaveText(
+      'A concept design, built from scratch. Company details are placeholders.',
+    );
+    // The Unsplash photo credit is shown only under the concept's thumbnails.
+    const credit = work.getByTestId('photo-credit');
+    await expect(credit).toHaveCount(1);
+    await expect(credit).toContainText('Photos: Unsplash');
+    await expect(credit).toHaveAttribute(
+      'title',
+      /Jeremy Doddridge.*Mason Kimbarovsky.*Tom Shamberger.*benjamin lehman.*Unsplash License/,
+    );
     await expect(work).not.toContainText(/saltwater|sample project/i);
     // The only way into the sandbox from the home page body is the button under the slider.
     await expect(work.locator('a[href*="sandbox"], button')).toHaveCount(0);
