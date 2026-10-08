@@ -7,7 +7,7 @@ export const processSteps: readonly ProcessStep[] = [
   {
     title: 'Listen',
     description:
-      'A free consult. We learn what you sell, who buys it and where customers look for you today.',
+      'A free consult with Aaron. We learn what you sell, who buys it and where customers look for you today.',
   },
   {
     title: 'Agree the plan',

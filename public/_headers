@@ -30,3 +30,13 @@
 
 /apple-touch-icon.png
   Cache-Control: public, max-age=86400
+
+# Reviews editor (Sveltia CMS). Cloudflare joins duplicate headers with a comma, which would enforce
+# the site CSP too, so detach it first and set the editor's own. Never framed, never indexed or cached.
+/admin*
+  ! Content-Security-Policy
+  ! X-Frame-Options
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' blob: data: https://avatars.githubusercontent.com https://raw.githubusercontent.com; media-src blob:; frame-src blob:; worker-src 'self' blob:; connect-src 'self' blob: data: https://api.github.com https://www.githubstatus.com; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'
+  X-Frame-Options: DENY
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store

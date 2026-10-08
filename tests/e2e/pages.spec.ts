@@ -63,13 +63,7 @@ test.describe('404', () => {
   });
 
   test('protected-looking and API paths do not expose anything', async ({ request }) => {
-    for (const path of [
-      '/admin',
-      '/api/secret',
-      '/.env',
-      '/src/worker/env.ts',
-      '/wrangler.jsonc',
-    ]) {
+    for (const path of ['/api/secret', '/.env', '/src/worker/env.ts', '/wrangler.jsonc']) {
       const response = await request.get(path);
       expect(response.status(), path).toBe(404);
     }

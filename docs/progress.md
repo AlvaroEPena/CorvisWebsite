@@ -66,3 +66,11 @@
 
 - Pixelation and flicker came from animating a bar behind an SVG mask (re-rasterized each frame at low resolution). The sweep is now a gradient painted directly on the ring and chevron strokes, animated with SVG (SMIL) and started/paused by `scripts/hero-mark.ts`; no mask, no moving layer. Chevron overlay uses flat ends. Static under reduced motion and Save-Data.
 - Verified at 2x device pixel ratio frames; typecheck/lint/format clean, 173 unit, 367 e2e passed / 0 failed.
+
+## 2026-10-09 — Round 5 (owner): reviews page + admin, team page, founders: done
+
+- Copy trimmed (Work callout; testimonials note removed). 11 fictional reviews in `src/content/reviews.json` (validated by `src/lib/reviews.ts`; `placeholder` stays data-only; never Review JSON-LD). Home preview shows the `featured` ones; `/reviews` lists all; "View their new site" is a disabled button until `siteHref` is set (one links to the sandbox).
+- `/admin` (Sveltia CMS, GitHub token sign-in, no OAuth Worker): add/remove/edit/reorder reviews and tick home-page ones; each Save commits to `AlvaroEPena/CorvisWebsite` `main`. Guide: `docs/admin-setup.md`. Untried until the owner signs in with a real token. `/admin` is noindex, no-store, unframed, out of the sitemap and robots.
+- `/team` "Meet the team" (Alvaro Peña, Founder & Tech Lead; Aaron Peña-Diamond, Co-Founder, business and sales). Nav order: Services, Work, Redesign, Process, Pricing, FAQ, Meet the team, Sandbox. Footer and JSON-LD list both founders.
+- Verified: typecheck/lint/format clean, 196 unit, 438 e2e passed / 0 failed, Lighthouse `/` 99, `/reviews` 100, `/team` 100 (mobile), A11y 100.
+- Reminder: replace the fictional reviews with real client reviews before promoting the site.

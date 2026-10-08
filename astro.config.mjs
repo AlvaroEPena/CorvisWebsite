@@ -11,7 +11,12 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'never',
   build: { format: 'file', inlineStylesheets: 'always' },
-  integrations: [sitemap({ filter: (page) => !page.endsWith('/thanks') }), demosRouting()],
+  integrations: [
+    sitemap({
+      filter: (page) => !page.endsWith('/thanks') && !/^https?:\/\/[^/]+\/admin(\/|$)/.test(page),
+    }),
+    demosRouting(),
+  ],
   image: { layout: 'constrained' },
   vite: { plugins: [tailwindcss()] },
   // Self-hosted at build time by the Fonts API (no third-party request at runtime).

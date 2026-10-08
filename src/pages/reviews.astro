@@ -1,0 +1,168 @@
+---
+import FloatingObject from '../components/FloatingObject.astro';
+import ReviewCard from '../components/ReviewCard.astro';
+import { reviewsPage } from '../content/reviews-copy';
+import Layout from '../layouts/Layout.astro';
+import { getAllReviews } from '../lib/reviews';
+
+const reviews = getAllReviews();
+---
+
+<Layout title={reviewsPage.title} description={reviewsPage.description}>
+  <section class="reviews section" aria-labelledby="reviews-title" data-testid="reviews">
+    <div class="aura" style="--aura-color:rgb(255 192 131 / .5);top:-10rem;right:-18rem"></div>
+    <div class="aura" style="--aura-color:rgb(124 124 255 / .3);top:30rem;left:-26rem"></div>
+
+    <div class="container">
+      <header class="intro">
+        <h1 id="reviews-title">{reviewsPage.heading}</h1>
+        <p>{reviewsPage.lead}</p>
+        <p class="count" data-testid="reviews-count">
+          {reviews.length} reviews
+        </p>
+        <FloatingObject
+          kind="bead"
+          tone="amber"
+          delay="-2s"
+          style="width:4.5rem;height:4.5rem;right:8%;top:0"
+        />
+        <FloatingObject
+          kind="capsule"
+          tone="indigo"
+          tilt="28deg"
+          delay="-4s"
+          style="width:2.4rem;height:6rem;right:2%;top:5rem"
+        />
+        <FloatingObject
+          kind="bead"
+          tone="pearl"
+          delay="-1s"
+          style="width:2.6rem;height:2.6rem;right:20%;top:6.5rem"
+        />
+      </header>
+
+      <div class="wall">
+        {reviews.map((review, index) => (
+          <ReviewCard review={review} index={index} />
+        ))}
+      </div>
+
+      <p class="back">
+        <a href={reviewsPage.homeLink.href}>{reviewsPage.homeLink.label}</a>
+      </p>
+
+      <section class="cta panel" aria-labelledby="reviews-cta-title">
+        <div>
+          <h2 id="reviews-cta-title">{reviewsPage.cta.title}</h2>
+          <p>{reviewsPage.cta.text}</p>
+        </div>
+        <a class="btn btn-primary btn-shine" data-magnetic href={reviewsPage.cta.href}>
+          {reviewsPage.cta.label}
+          <svg class="btn-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path
+              d="M4 10h11m-4-5 5 5-5 5"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </svg>
+        </a>
+      </section>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .reviews {
+    padding-top: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .intro {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .intro > * {
+    max-width: 46rem;
+  }
+
+  h1 {
+    font-size: clamp(2.6rem, 7vw, 4.75rem);
+    line-height: 1;
+  }
+
+  .intro > p:not(.count) {
+    max-width: 38rem;
+    color: var(--ink-soft);
+    font-size: 1.125rem;
+  }
+
+  .count {
+    width: fit-content;
+    padding: 0.4rem 1rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgb(59 59 214 / 0.22);
+    background: rgb(255 255 255 / 0.6);
+    color: var(--core-600);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  /* Masonry-like: columns of cards of different heights. 1 on phones, 2 on tablet, 3 on desktop. */
+  .wall {
+    columns: 1;
+    column-gap: 1.25rem;
+  }
+
+  .back {
+    margin-top: 1.5rem;
+  }
+
+  .back a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    color: var(--core-600);
+    font-weight: 600;
+  }
+
+  .cta {
+    display: grid;
+    gap: 1.5rem;
+    justify-items: start;
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding: clamp(1.75rem, 4vw, 3rem);
+  }
+
+  .cta h2 {
+    font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+    line-height: 1.12;
+  }
+
+  .cta p {
+    margin-top: 0.5rem;
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 40rem) {
+    .wall {
+      columns: 2;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .cta {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .wall {
+      columns: 3;
+    }
+  }
+</style>

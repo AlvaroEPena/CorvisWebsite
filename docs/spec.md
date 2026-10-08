@@ -221,3 +221,20 @@ public copy.
 - Demo builds are committed under `public/demos/` (about 35 MB total). Rebuild commands: `node scripts/build-demo-refined.mjs` (from `sites/refined-celebrations`, in a scratch copy, never touching that repo) and `npm run build:corvis` inside `sites/saltwater-row` and `sites/saltwater-row-before`.
 - The Refined Celebrations demo strips analytics, the CMS and the HoneyBook embed (replaced by a static "turned off in this preview" panel) and compresses images; it is a copy, so re-run the script after the real site changes.
 - `astro preview` does not apply `_headers` and 404s on directory URLs; verify headers and demo paths with `npm run build` then `npx wrangler dev`.
+
+## 16. Change request 2026-10-09 (owner): reviews page + admin, team page, copy
+
+- **Copy:** remove "There is no earlier version of this site." from the Refined Celebrations card (keep the first sentence).
+  Remove the "Sample feedback shown as a preview..." note and any "sample feedback" wording from the testimonials: the
+  fictional reviews are simply listed. (Reviews stay flagged `placeholder: true` in data only; never emit Review or
+  AggregateRating JSON-LD.)
+- **Reviews:** under the home testimonials, a "More reviews" button to a new page `/reviews`: all reviews as glass cards in a
+  polished layout, each with a "View their new site" button that is disabled (not a link) until a project has a target
+  (`siteHref`). Reviews data lives in `src/content/reviews.json` (list order = display order; per review: id, name, role,
+  company, quote, `featured` = shown on the home preview, optional `siteHref`).
+- **Reviews admin `/admin`:** git-based Sveltia CMS (like sites/refined-celebrations): add, remove, edit, reorder reviews and
+  tick which appear on the home page; each Save commits `src/content/reviews.json` to GitHub (AlvaroEPena/CorvisWebsite,
+  branch main) and Cloudflare Workers Builds redeploys. Sign-in with a GitHub personal access token (no OAuth Worker).
+  noindex, no-store, own CSP (global CSP detached), never framed.
+- **Team:** Alvaro Peña = Founder & Tech Lead; Aaron Peña-Diamond = Co-Founder, business and sales, the person clients talk
+  to. New page `/team` ("Meet the team"), nav item right after FAQ (then Sandbox). Footer, JSON-LD founders and copy updated.

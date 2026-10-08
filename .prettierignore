@@ -2,3 +2,4 @@ dist/
 .astro/
 .wrangler/
 public/demos/
+src/content/reviews.json

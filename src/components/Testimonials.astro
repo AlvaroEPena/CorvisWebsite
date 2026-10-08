@@ -1,12 +1,8 @@
 ---
-import { testimonials } from '../content/testimonials';
+import { getFeaturedReviews, initialsOf } from '../lib/reviews';
+import Monogram from './Monogram.astro';
 
-const initials = (name: string) =>
-  name
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 2);
+const reviews = getFeaturedReviews();
 ---
 
 <section
@@ -19,25 +15,16 @@ const initials = (name: string) =>
   <div class="container">
     <div class="section-heading reveal">
       <h2 id="testimonials-title">What working with us feels like.</h2>
-      <p class="sample-note" data-testid="testimonials-sample-note">
-        Sample feedback shown as a preview. Real client quotes replace these at launch.
-      </p>
     </div>
 
     <div class="layout">
-      {testimonials.map((item, index) => (
-        <figure
-          class:list={['quote', 'panel', 'reveal', index === 0 && 'lead', index === 2 && 'shift']}
-          data-placeholder={item.placeholder}
-        >
-          <p class="sample">Sample feedback</p>
+      {reviews.map((item, index) => (
+        <figure class:list={['quote', 'panel', 'reveal', index === 0 && 'lead']}>
           <blockquote>
             <p>&ldquo;{item.quote}&rdquo;</p>
           </blockquote>
           <figcaption>
-            <span class="avatar" aria-hidden="true">
-              {initials(item.name)}
-            </span>
+            <Monogram initials={initialsOf(item.name)} tone={index % 2 === 0 ? 'core' : 'vision'} />
             <span>
               <strong>{item.name}</strong>
               <span class="role">
@@ -48,17 +35,25 @@ const initials = (name: string) =>
         </figure>
       ))}
     </div>
+
+    <div class="more reveal">
+      <a class="btn btn-glass btn-shine" href="/reviews" data-magnetic data-testid="more-reviews">
+        More reviews
+        <svg class="btn-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path
+            d="M4 10h11m-4-5 5 5-5 5"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></path>
+        </svg>
+      </a>
+    </div>
   </div>
 </section>
 
 <style>
-  .sample-note {
-    margin-top: 0.75rem;
-    font-size: 0.875rem;
-    color: var(--ink-soft, rgb(14 16 36 / 0.7));
-    font-style: italic;
-  }
-
   .layout {
     display: grid;
     gap: 1.25rem;
@@ -76,16 +71,6 @@ const initials = (name: string) =>
     margin: 0;
   }
 
-  .sample {
-    width: fit-content;
-    padding: 0.2rem 0.7rem;
-    border-radius: var(--radius-pill);
-    background: rgb(59 59 214 / 0.09);
-    color: var(--core-900);
-    font-size: 0.78rem;
-    font-weight: 600;
-  }
-
   blockquote p {
     font-family: var(--font-display);
     font-size: 1.3rem;
@@ -95,8 +80,8 @@ const initials = (name: string) =>
   }
 
   .lead blockquote p {
-    font-size: clamp(1.6rem, 3vw, 2.4rem);
-    line-height: 1.18;
+    font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+    line-height: 1.2;
     letter-spacing: -0.03em;
   }
 
@@ -116,33 +101,27 @@ const initials = (name: string) =>
     font-size: 0.9rem;
   }
 
-  .avatar {
-    flex: none;
-    display: grid;
-    place-items: center;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 50%;
-    background: linear-gradient(145deg, #7c7cff, #14163f);
-    color: #fff;
-    font-family: var(--font-display);
-    font-weight: 700;
-    letter-spacing: 0.02em;
+  .more {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(1.75rem, 3vw, 2.5rem);
   }
 
-  .shift .avatar {
-    background: linear-gradient(145deg, #ffc083, #c2410a);
-  }
-
+  /* Rows of 7+5 and 5+7 columns, so one to six reviews all sit in a balanced grid. */
   @media (min-width: 64rem) {
     .layout {
       grid-template-columns: repeat(12, minmax(0, 1fr));
     }
-    .lead {
-      grid-column: 1 / span 7;
-    }
-    .quote:not(.lead) {
+    .quote {
       grid-column: span 5;
+    }
+    .quote:nth-child(4n + 1),
+    .quote:nth-child(4n) {
+      grid-column: span 7;
+    }
+    .quote:nth-child(4n + 3):last-child,
+    .quote:only-child {
+      grid-column: 1 / -1;
     }
   }
 </style>

@@ -87,7 +87,7 @@ export const projects: readonly WorkProject[] = [
       'Two services, two clear paths: planning and photography never compete for attention.',
       'Lean pages and sized images keep it quick on a phone, where most couples browse.',
     ],
-    originNote: 'A brand-new design, built from scratch. There is no earlier version of this site.',
+    originNote: 'A brand-new design, built from scratch.',
     photos: [
       {
         file: 'reception-toast',

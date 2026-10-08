@@ -1,0 +1,24 @@
+---
+// The reviews editor at /admin. Deliberately outside the site Layout: no nav, footer or site scripts.
+// Sveltia CMS takes over the whole page once `init` runs. Setup: docs/admin-setup.md.
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Corvis admin</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <noscript>The editor needs JavaScript. Please turn it on and reload this page.</noscript>
+    <script>
+      import { init } from '@sveltia/cms';
+      import { config } from '../../admin/config';
+
+      init({ config });
+    </script>
+  </body>
+</html>

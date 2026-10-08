@@ -14,7 +14,16 @@ const HERO_ELEMENTS = [
   '.hero .object',
 ];
 
-const LINK_LABELS = ['Services', 'Work', 'Redesign', 'Process', 'Pricing', 'FAQ', 'Sandbox'];
+const LINK_LABELS = [
+  'Services',
+  'Work',
+  'Redesign',
+  'Process',
+  'Pricing',
+  'FAQ',
+  'Meet the team',
+  'Sandbox',
+];
 
 /** Product of opacity along the ancestor chain: 1 means fully visible. */
 function effectiveOpacity(page: Page, selector: string): Promise<number> {
@@ -44,7 +53,7 @@ test.describe('navigation order', () => {
   test('the footer keeps its own order', async ({ page }) => {
     await page.goto('/');
     const labels = await page.locator('body > footer nav a').allInnerTexts();
-    expect(labels.slice(0, 7)).toEqual([
+    expect(labels.slice(0, 9)).toEqual([
       'Services',
       'Work',
       'Redesign',
@@ -52,6 +61,8 @@ test.describe('navigation order', () => {
       'Process',
       'Pricing',
       'FAQ',
+      'Meet the team',
+      'Reviews',
     ]);
   });
 });

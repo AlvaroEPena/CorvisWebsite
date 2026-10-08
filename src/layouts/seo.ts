@@ -17,7 +17,7 @@ interface BusinessFacts {
   description: string;
   email: string;
   phoneE164: string;
-  owner: string;
+  team: readonly { name: string; role: string }[];
   socials: Record<string, string>;
 }
 
@@ -37,7 +37,11 @@ export function professionalServiceJsonLd(
     url: origin,
     email: business.email,
     telephone: business.phoneE164,
-    founder: { '@type': 'Person', name: business.owner },
+    founder: business.team.map((member) => ({
+      '@type': 'Person',
+      name: member.name,
+      jobTitle: member.role,
+    })),
     image: absoluteUrl('/og.png', origin),
     logo: absoluteUrl('/logo-512.png', origin),
     areaServed: 'Worldwide',

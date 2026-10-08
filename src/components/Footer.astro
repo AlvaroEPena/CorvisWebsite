@@ -28,7 +28,16 @@ const year = new Date().getFullYear();
         <a class="mail" href={`tel:${site.phoneE164}`}>
           {site.phone}
         </a>
-        <p class="owner">{site.owner}, Founder</p>
+        <p class="owner">
+          {site.team.map((member, index) => (
+            <>
+              {index > 0 && ' · '}
+              <span>
+                {member.name}, {member.role}
+              </span>
+            </>
+          ))}
+        </p>
       </div>
       <nav aria-label="Footer">
         <ul>

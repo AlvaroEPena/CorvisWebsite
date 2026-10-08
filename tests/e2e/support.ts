@@ -10,6 +10,8 @@ export const PAGES = [
   { name: 'privacy', path: '/privacy' },
   { name: 'thanks', path: '/thanks' },
   { name: 'sandbox', path: '/sandbox' },
+  { name: 'reviews', path: '/reviews' },
+  { name: 'team', path: '/team' },
   { name: '404', path: '/this-page-does-not-exist' },
 ] as const;
 

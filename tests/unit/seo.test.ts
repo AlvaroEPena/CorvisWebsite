@@ -9,7 +9,7 @@ import { redesignSample } from '../../src/content/redesign-demo';
 import { sandboxProjects } from '../../src/content/sandbox';
 import { services } from '../../src/content/services';
 import { site } from '../../src/content/site';
-import { testimonials } from '../../src/content/testimonials';
+import reviewsFile from '../../src/content/reviews.json';
 import {
   absoluteUrl,
   canonicalPath,
@@ -36,6 +36,14 @@ describe('professionalServiceJsonLd', () => {
     expect(data['@type']).toBe('ProfessionalService');
     for (const service of services) expect(JSON.stringify(data)).toContain(service.title);
   });
+  it('names both founders with their job titles', () => {
+    expect(data.founder).toEqual([
+      { '@type': 'Person', name: 'Alvaro Peña', jobTitle: 'Founder & Tech Lead' },
+      { '@type': 'Person', name: 'Aaron Peña-Diamond', jobTitle: 'Co-Founder' },
+    ]);
+    expect(data.email).toBe(site.email);
+    expect(data.telephone).toBe(site.phoneE164);
+  });
   it('never emits ratings or reviews (placeholder testimonials)', () => {
     expect(JSON.stringify(data)).not.toMatch(/aggregateRating|ratingValue|review/i);
   });
@@ -49,15 +57,15 @@ describe('faqJsonLd', () => {
 });
 
 describe('content invariants', () => {
-  it('flags every placeholder price, testimonial and the sample redesign', () => {
-    for (const item of [...pricing, managedPlan, ...testimonials, redesignSample]) {
+  it('flags every placeholder price and the sample redesign', () => {
+    for (const item of [...pricing, managedPlan, redesignSample]) {
       expect(item.placeholder).toBe(true);
     }
   });
   it('links every Work project to a sandbox project and sample copy never mentions removed ones', () => {
     const sandboxIds = sandboxProjects.map((project) => project.id);
     for (const project of projects) expect(sandboxIds).toContain(project.sandboxId);
-    expect(JSON.stringify(testimonials)).not.toMatch(/saltwater/i);
+    expect(JSON.stringify(reviewsFile)).not.toMatch(/saltwater row/i);
   });
   it('keeps typography on plain hyphens (no em or en dashes in copy)', () => {
     const copy = JSON.stringify({
@@ -66,7 +74,7 @@ describe('content invariants', () => {
       projects,
       redesignSample,
       pricing,
-      testimonials,
+      reviewsFile,
       faq,
     });
     expect(copy).not.toMatch(/[–—]/);
@@ -79,7 +87,7 @@ describe('content invariants', () => {
       redesignSample,
       pricing,
       managedPlan,
-      testimonials,
+      reviewsFile,
       faq,
       processSteps,
       proofStats,

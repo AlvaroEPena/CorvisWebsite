@@ -10,7 +10,11 @@ export const site = {
   phone: '+1 801-784-0475',
   /** E.164 form for tel: links and structured data. */
   phoneE164: '+18017840475',
-  owner: 'Aaron Peña-Diamond',
+  /** Founders, in the order shown. Phone and email above are Aaron's: he is the point of contact. */
+  team: [
+    { id: 'alvaro', name: 'Alvaro Peña', role: 'Founder & Tech Lead' },
+    { id: 'aaron', name: 'Aaron Peña-Diamond', role: 'Co-Founder' },
+  ],
   socials: {} as Record<string, string>,
   cta: { label: 'Book a free consult', href: '#contact' },
   secondaryCta: { label: 'See our work', href: '#work' },
@@ -21,6 +25,7 @@ export const site = {
     { label: 'Process', href: '#process' },
     { label: 'Pricing', href: '#pricing' },
     { label: 'FAQ', href: '#faq' },
+    { label: 'Meet the team', href: '/team' },
     { label: 'Sandbox', href: '/sandbox' },
   ],
   /** Footer keeps the Sandbox link next to the work it shows, ahead of Process. */
@@ -32,6 +37,8 @@ export const site = {
     { label: 'Process', href: '#process' },
     { label: 'Pricing', href: '#pricing' },
     { label: 'FAQ', href: '#faq' },
+    { label: 'Meet the team', href: '/team' },
+    { label: 'Reviews', href: '/reviews' },
   ],
   hero: {
     badge: 'Done-For-You Digital Real Estate',

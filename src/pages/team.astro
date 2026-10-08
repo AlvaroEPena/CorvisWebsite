@@ -1,0 +1,254 @@
+---
+import { Image } from 'astro:assets';
+
+import FloatingObject from '../components/FloatingObject.astro';
+import Monogram from '../components/Monogram.astro';
+import { site } from '../content/site';
+import { teamPage, teamProfiles } from '../content/team';
+import Layout from '../layouts/Layout.astro';
+import { teamPhoto } from '../lib/team-photos';
+
+const members = site.team.map((member) => {
+  const profile = teamProfiles.find((candidate) => candidate.id === member.id);
+  if (!profile) throw new Error(`Missing team profile for ${member.id}`);
+  const photo = profile.photo ? teamPhoto(profile.photo.file) : undefined;
+  return { ...member, ...profile, photoImage: photo };
+});
+---
+
+<Layout title={teamPage.title} description={teamPage.description}>
+  <section class="team section" aria-labelledby="team-title" data-testid="team">
+    <div class="aura" style="--aura-color:rgb(124 124 255 / .3);top:-10rem;left:-20rem"></div>
+    <div class="aura" style="--aura-color:rgb(255 192 131 / .5);top:10rem;right:-22rem"></div>
+
+    <div class="container">
+      <header class="intro">
+        <h1 id="team-title">{teamPage.heading}</h1>
+        <p>{teamPage.lead}</p>
+        <FloatingObject
+          kind="bead"
+          tone="indigo"
+          delay="-3s"
+          style="width:3.2rem;height:3.2rem;right:10%;top:0.5rem"
+        />
+        <FloatingObject
+          kind="capsule"
+          tone="amber"
+          tilt="-24deg"
+          delay="-1s"
+          style="width:2.6rem;height:6.4rem;right:3%;top:4rem"
+        />
+      </header>
+
+      <ul class="people" aria-label={teamPage.teamLabel}>
+        {members.map((member, index) => (
+          <li class="person panel reveal" data-testid="team-member">
+            <div class="avatar">
+              {member.photoImage && member.photo ? (
+                <Image
+                  src={member.photoImage}
+                  alt={member.photo.alt}
+                  width={192}
+                  height={192}
+                  class="photo"
+                />
+              ) : (
+                <Monogram
+                  initials={member.monogram}
+                  size="lg"
+                  tone={index % 2 === 0 ? 'core' : 'vision'}
+                />
+              )}
+            </div>
+            <h2>{member.name}</h2>
+            <p class="role">{member.role}</p>
+            <p class="summary">{member.summary}</p>
+            {member.bio.map((paragraph) => (
+              <p class="bio">{paragraph}</p>
+            ))}
+          </li>
+        ))}
+      </ul>
+
+      <section class="together" aria-labelledby="together-title">
+        <h2 id="together-title">{teamPage.workTitle}</h2>
+        <ol>
+          {teamPage.steps.map((step) => (
+            <li class="reveal">
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="cta panel" aria-labelledby="team-cta-title">
+        <div>
+          <h2 id="team-cta-title">{teamPage.cta.title}</h2>
+          <p>{teamPage.cta.text}</p>
+        </div>
+        <a class="btn btn-primary btn-shine" data-magnetic href={teamPage.cta.href}>
+          {teamPage.cta.label}
+          <svg class="btn-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path
+              d="M4 10h11m-4-5 5 5-5 5"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </svg>
+        </a>
+      </section>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .team {
+    padding-top: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .intro {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .intro > * {
+    max-width: 46rem;
+  }
+
+  h1 {
+    font-size: clamp(2.6rem, 7vw, 4.75rem);
+    line-height: 1;
+  }
+
+  .intro p {
+    max-width: 36rem;
+    color: var(--ink-soft);
+    font-size: 1.125rem;
+  }
+
+  .people {
+    display: grid;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .person {
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    padding: clamp(1.75rem, 3.4vw, 2.75rem);
+  }
+
+  .avatar {
+    margin-bottom: 0.75rem;
+  }
+
+  .photo {
+    display: block;
+    width: 6rem;
+    height: 6rem;
+    border-radius: 28px;
+    object-fit: cover;
+    border: 1px solid rgb(255 255 255 / 0.85);
+    box-shadow: 0 8px 16px -8px rgb(59 59 214 / 0.4);
+  }
+
+  .person h2 {
+    font-size: clamp(1.8rem, 3.4vw, 2.5rem);
+    line-height: 1.1;
+  }
+
+  .role {
+    color: var(--core-600);
+    font-weight: 600;
+  }
+
+  .summary {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.35;
+  }
+
+  .bio {
+    color: var(--ink-soft);
+    max-width: 34rem;
+  }
+
+  .together {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: clamp(3rem, 6vw, 5rem);
+  }
+
+  .together > h2 {
+    font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+    line-height: 1.1;
+  }
+
+  .together ol {
+    display: grid;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+
+  .together li {
+    display: grid;
+    gap: 0.35rem;
+    padding-top: 1rem;
+    border-top: 2px solid rgb(59 59 214 / 0.25);
+  }
+
+  .together h3 {
+    font-size: 1.2rem;
+  }
+
+  .together li p {
+    color: var(--ink-soft);
+  }
+
+  .cta {
+    display: grid;
+    gap: 1.5rem;
+    justify-items: start;
+    margin-top: clamp(3rem, 6vw, 5rem);
+    padding: clamp(1.75rem, 4vw, 3rem);
+  }
+
+  .cta h2 {
+    font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+    line-height: 1.12;
+  }
+
+  .cta p {
+    margin-top: 0.5rem;
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 48rem) {
+    .people {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .together ol {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2rem;
+    }
+
+    .cta {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+  }
+</style>

@@ -3,7 +3,7 @@ export const proofStats = [
   { value: 14, suffix: '', label: 'Days from kickoff to a live site' },
   { value: 10, suffix: '', label: 'Local search pages in The Market Leader' },
   { value: 95, suffix: '+', label: 'Lighthouse score we build to, on mobile' },
-  { value: 1, suffix: '', label: 'Person you talk to, start to finish' },
+  { value: 1, suffix: '', label: 'Person you talk to: Aaron, from first call to launch' },
 ] as const;
 
 export const proofChips = [
