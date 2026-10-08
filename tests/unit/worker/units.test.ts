@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { resolveConfig } from '../../../src/worker/env';
+import {
+  TURNSTILE_TEST_SECRET,
+  resolveMailConfig,
+  resolvePandaDocConfig,
+  resolveTurnstileConfig,
+} from '../../../src/worker/env';
 import { escapeHtml } from '../../../src/worker/escape';
 import { createRateLimiter } from '../../../src/worker/rate-limit';
 
@@ -10,40 +15,66 @@ describe('escapeHtml', () => {
     );
   });
 
-  it('does not double-escape plain text and leaves it unchanged', () => {
+  it('leaves plain text unchanged', () => {
     expect(escapeHtml('plain text 123')).toBe('plain text 123');
   });
 });
 
-describe('resolveConfig', () => {
-  it('selects demo mode and the test Turnstile secret for an empty env', () => {
-    const result = resolveConfig({});
-    expect(result).toMatchObject({
-      ok: true,
-      config: { mail: { mode: 'demo' }, isTurnstileTestSecret: true },
+describe('resolveTurnstileConfig', () => {
+  it('uses the configured secret', () => {
+    expect(resolveTurnstileConfig({ TURNSTILE_SECRET_KEY: 's' })).toEqual({
+      secret: 's',
+      isTestSecret: false,
     });
   });
 
+  it('fails closed without a secret outside development', () => {
+    expect(resolveTurnstileConfig({})).toBeUndefined();
+    expect(resolveTurnstileConfig({ ENVIRONMENT: 'production' })).toBeUndefined();
+  });
+
+  it('falls back to the test secret only when ENVIRONMENT=development', () => {
+    expect(resolveTurnstileConfig({ ENVIRONMENT: 'development' })).toEqual({
+      secret: TURNSTILE_TEST_SECRET,
+      isTestSecret: true,
+    });
+  });
+});
+
+describe('resolveMailConfig', () => {
+  it('selects demo mode for an empty env', () => {
+    expect(resolveMailConfig({})).toEqual({ ok: true, mail: { mode: 'demo' } });
+  });
+
   it('selects live mode when the key and both addresses are valid', () => {
-    const result = resolveConfig({
-      RESEND_API_KEY: 'k',
-      CONTACT_TO_EMAIL: 'owner@corvis.example',
-      CONTACT_FROM_EMAIL: 'hello@corvis.example',
-      TURNSTILE_SECRET_KEY: 's',
-    });
-    expect(result).toMatchObject({
-      ok: true,
-      config: { mail: { mode: 'live', to: 'owner@corvis.example' }, turnstileSecret: 's' },
-    });
+    expect(
+      resolveMailConfig({
+        RESEND_API_KEY: 'k',
+        CONTACT_TO_EMAIL: 'owner@corvis.example',
+        CONTACT_FROM_EMAIL: 'hello@corvis.example',
+      }),
+    ).toMatchObject({ ok: true, mail: { mode: 'live', to: 'owner@corvis.example' } });
   });
 
   it('reports only the names of invalid variables', () => {
     expect(
-      resolveConfig({ RESEND_API_KEY: 'k', CONTACT_FROM_EMAIL: 'hello@corvis.example' }),
-    ).toEqual({
-      ok: false,
-      problems: ['CONTACT_TO_EMAIL'],
-    });
+      resolveMailConfig({ RESEND_API_KEY: 'k', CONTACT_FROM_EMAIL: 'hello@corvis.example' }),
+    ).toEqual({ ok: false, problems: ['CONTACT_TO_EMAIL'] });
+  });
+});
+
+describe('resolvePandaDocConfig', () => {
+  it('is disabled unless both the key and template id are set', () => {
+    expect(resolvePandaDocConfig({})).toBeUndefined();
+    expect(resolvePandaDocConfig({ PANDADOC_API_KEY: 'k' })).toBeUndefined();
+    expect(resolvePandaDocConfig({ PANDADOC_TEMPLATE_ID: 't' })).toBeUndefined();
+  });
+
+  it('only auto-sends for the exact string "true"', () => {
+    const base = { PANDADOC_API_KEY: 'k', PANDADOC_TEMPLATE_ID: 't' };
+    expect(resolvePandaDocConfig({ ...base, PANDADOC_AUTO_SEND: 'true' })?.autoSend).toBe(true);
+    expect(resolvePandaDocConfig({ ...base, PANDADOC_AUTO_SEND: 'yes' })?.autoSend).toBe(false);
+    expect(resolvePandaDocConfig(base)?.autoSend).toBe(false);
   });
 });
 

@@ -10,7 +10,7 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'never',
   build: { format: 'file' },
-  integrations: [sitemap()],
+  integrations: [sitemap({ filter: (page) => !page.endsWith('/thanks') })],
   image: { layout: 'constrained' },
   vite: { plugins: [tailwindcss()] },
   // Self-hosted at build time by the Fonts API (no third-party request at runtime).

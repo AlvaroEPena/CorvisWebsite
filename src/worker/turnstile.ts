@@ -1,3 +1,5 @@
+import { LOG_PREFIX, type Logger } from './deps';
+
 const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const TIMEOUT_MS = 8000;
 
@@ -6,6 +8,7 @@ interface VerifyOptions {
   secret: string;
   remoteIp: string | null;
   fetch: typeof fetch;
+  logger: Pick<Logger, 'error'>;
 }
 
 /** Server-side Turnstile check. Any network or protocol failure counts as "not verified". */
@@ -14,6 +17,7 @@ export async function verifyTurnstile({
   secret,
   remoteIp,
   fetch: fetchImpl,
+  logger,
 }: VerifyOptions): Promise<boolean> {
   const form = new URLSearchParams({ secret, response: token });
   if (remoteIp) form.set('remoteip', remoteIp);
@@ -30,8 +34,8 @@ export async function verifyTurnstile({
       ? result.success === true
       : false;
   } catch (error) {
-    console.error(
-      '[corvis-contact] Turnstile verification request failed',
+    logger.error(
+      `${LOG_PREFIX} Turnstile verification request failed`,
       error instanceof Error ? error.name : 'UnknownError',
     );
     return false;

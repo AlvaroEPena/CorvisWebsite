@@ -1,17 +1,18 @@
+import { DEPOSIT_PACKAGES } from '../lib/contracts/checkout';
 import type { BUDGETS, SERVICES, ContactInput } from '../lib/contracts/contact';
 import { escapeHtml } from './escape';
 
 const RESEND_URL = 'https://api.resend.com/emails';
 const TIMEOUT_MS = 8000;
 
-const SERVICE_LABELS: Record<(typeof SERVICES)[number], string> = {
+export const SERVICE_LABELS: Record<(typeof SERVICES)[number], string> = {
   redesign: 'Website redesign',
   'new-build': 'New website build',
   'care-plan': 'Care plan',
   'not-sure': 'Not sure yet',
 };
 
-const BUDGET_LABELS: Record<(typeof BUDGETS)[number], string> = {
+export const BUDGET_LABELS: Record<(typeof BUDGETS)[number], string> = {
   'under-3k': 'Under $3k',
   '3k-6k': '$3k to $6k',
   '6k-12k': '$6k to $12k',
@@ -22,7 +23,7 @@ const BUDGET_LABELS: Record<(typeof BUDGETS)[number], string> = {
 export interface OutgoingEmail {
   from: string;
   to: string;
-  replyTo: string;
+  replyTo?: string;
   subject: string;
   text: string;
   html: string;
@@ -48,36 +49,88 @@ function describeFields(lead: ContactInput): Array<[label: string, value: string
   return fields.filter((field): field is [string, string] => Boolean(field[1]));
 }
 
-export function buildLeadEmail(
-  lead: ContactInput,
-  addresses: { from: string; to: string },
-): OutgoingEmail {
-  const fields = describeFields(lead);
-
+function renderEmail(
+  fields: Array<[label: string, value: string]>,
+  message?: string,
+): { text: string; html: string } {
   const text = [
     ...fields.map(([label, value]) => `${label}: ${value}`),
-    '',
-    'Message:',
-    lead.message,
+    ...(message === undefined ? [] : ['', 'Message:', message]),
   ].join('\n');
 
-  // Website is rendered as text, never as a link: z.url() also accepts schemes like javascript:.
   const rows = fields
     .map(
       ([label, value]) =>
         `<tr><th align="left" style="padding:4px 12px 4px 0;vertical-align:top">${escapeHtml(label)}</th><td style="padding:4px 0">${escapeHtml(value)}</td></tr>`,
     )
     .join('');
-  const html =
-    `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:sans-serif;font-size:15px">${rows}</table>` +
-    `<h2 style="font-family:sans-serif;font-size:16px;margin:20px 0 6px">Message</h2>` +
-    `<p style="font-family:sans-serif;font-size:15px;white-space:pre-wrap;margin:0">${escapeHtml(lead.message)}</p>`;
+  const messageHtml =
+    message === undefined
+      ? ''
+      : `<h2 style="font-family:sans-serif;font-size:16px;margin:20px 0 6px">Message</h2>` +
+        `<p style="font-family:sans-serif;font-size:15px;white-space:pre-wrap;margin:0">${escapeHtml(message)}</p>`;
+  const html = `<table role="presentation" cellpadding="0" cellspacing="0" style="font-family:sans-serif;font-size:15px">${rows}</table>${messageHtml}`;
+  return { text, html };
+}
+
+export function buildLeadEmail(
+  lead: ContactInput,
+  addresses: { from: string; to: string },
+): OutgoingEmail {
+  const { text, html } = renderEmail(describeFields(lead), lead.message);
 
   return {
     from: addresses.from,
     to: addresses.to,
     replyTo: lead.email,
     subject: singleLine(`New Corvis inquiry: ${lead.name} (${SERVICE_LABELS[lead.service]})`),
+    text,
+    html,
+  };
+}
+
+export function formatMoney(amountMinor: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency.toUpperCase(),
+    }).format(amountMinor / 100);
+  } catch {
+    return `${(amountMinor / 100).toFixed(2)} ${currency.toUpperCase()}`;
+  }
+}
+
+export interface PaidDeposit {
+  sessionId: string;
+  packageId: string | undefined;
+  amountTotal: number | null;
+  currency: string | null;
+  customerEmail: string | undefined;
+}
+
+/** Owner notification for a paid Stripe deposit. Values come from Stripe but are escaped anyway. */
+export function buildPaymentEmail(
+  deposit: PaidDeposit,
+  addresses: { from: string; to: string },
+): OutgoingEmail {
+  const knownPackage = Object.entries(DEPOSIT_PACKAGES).find(([id]) => id === deposit.packageId);
+  const packageName = knownPackage?.[1].name ?? deposit.packageId ?? 'Unknown package';
+  const amount =
+    deposit.amountTotal === null || deposit.currency === null
+      ? 'Unknown'
+      : formatMoney(deposit.amountTotal, deposit.currency);
+
+  const { text, html } = renderEmail([
+    ['Package', packageName],
+    ['Amount', amount],
+    ['Customer email', deposit.customerEmail ?? 'Not provided'],
+    ['Stripe session', deposit.sessionId],
+  ]);
+  return {
+    from: addresses.from,
+    to: addresses.to,
+    replyTo: deposit.customerEmail,
+    subject: singleLine(`Corvis deposit paid: ${packageName} (${amount})`),
     text,
     html,
   };
@@ -95,7 +148,7 @@ export function createResendSender(apiKey: string, fetchImpl: typeof fetch): Sen
       body: JSON.stringify({
         from: email.from,
         to: [email.to],
-        reply_to: email.replyTo,
+        ...(email.replyTo ? { reply_to: email.replyTo } : {}),
         subject: email.subject,
         text: email.text,
         html: email.html,

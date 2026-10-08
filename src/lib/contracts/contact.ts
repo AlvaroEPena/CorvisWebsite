@@ -29,3 +29,6 @@ export type ContactResponse =
   | { ok: true }
   | { ok: false; error: 'validation'; errors: Record<string, string[]> }
   | { ok: false; error: 'turnstile' | 'too_fast' | 'rate_limited' | 'send_failed' };
+
+/** Non-contract transport failures the Worker may also return; clients treat any `ok:false` as failure. */
+export type TransportError = 'forbidden' | 'not_found' | 'method_not_allowed';

@@ -10,9 +10,9 @@ export const processSteps: readonly ProcessStep[] = [
       'A free consult. We learn what you sell, who buys it and what the current site is costing you.',
   },
   {
-    title: 'Find the core',
+    title: 'Agree the plan',
     description:
-      'We boil the business down to one clear idea and write it up so every page has a job.',
+      'We boil the business down to one clear idea, then send a plain-English proposal you can e-sign.',
   },
   {
     title: 'Design',

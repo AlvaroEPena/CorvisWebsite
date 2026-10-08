@@ -1,4 +1,5 @@
 ---
+import { depositFor } from '../content/deposits';
 import { formatPrice } from '../content/format';
 import { pricing } from '../content/pricing';
 import { site } from '../content/site';
@@ -18,37 +19,71 @@ import { site } from '../content/site';
       </div>
 
       <ul class="cards">
-        {pricing.map((pkg) => (
-          <li
-            class:list={['card', pkg.featured ? 'featured' : 'glass-dark']}
-            data-placeholder={pkg.placeholder}
-          >
-            {pkg.featured && <span class="badge">Most chosen</span>}
-            <h3>{pkg.name}</h3>
-            <p class="blurb">{pkg.blurb}</p>
-            <p class="price">
-              <span class="from">Starting at</span>
-              <span class="amount">{formatPrice(pkg.priceFrom)}</span>
-              {pkg.unit && <span class="unit">{pkg.unit}</span>}
-            </p>
-            <ul class="features">
-              {pkg.features.map((feature) => (
-                <li>{feature}</li>
-              ))}
-            </ul>
-          </li>
-        ))}
+        {pricing.map((pkg) => {
+          const deposit = depositFor(pkg.id);
+          return (
+            <li
+              class:list={['card', pkg.featured ? 'featured' : 'glass-dark']}
+              data-placeholder={pkg.placeholder}
+            >
+              {pkg.featured && <span class="badge">Most chosen</span>}
+              <h3>{pkg.name}</h3>
+              <p class="blurb">{pkg.blurb}</p>
+              <p class="price">
+                <span class="from">Starting at</span>
+                <span class="amount">{formatPrice(pkg.priceFrom)}</span>
+                {pkg.unit && <span class="unit">{pkg.unit}</span>}
+              </p>
+              <ul class="features">
+                {pkg.features.map((feature) => (
+                  <li>{feature}</li>
+                ))}
+              </ul>
+              <div class="actions">
+                <a
+                  class:list={['btn', pkg.featured ? 'btn-primary' : 'btn-light']}
+                  href={site.cta.href}
+                >
+                  {site.cta.label}
+                </a>
+                {deposit && (
+                  <button
+                    class="btn btn-deposit"
+                    type="button"
+                    data-deposit={deposit.id}
+                    data-testid={`deposit-button-${deposit.id}`}
+                  >
+                    Pay project deposit
+                    <span class="deposit-amount" data-placeholder={deposit.placeholder}>
+                      Deposit {formatPrice(deposit.amountUsd)}
+                    </span>
+                  </button>
+                )}
+              </div>
+            </li>
+          );
+        })}
       </ul>
+      <p
+        class="checkout-error"
+        role="alert"
+        data-checkout-error
+        data-testid="checkout-error"
+        data-email={site.email}
+        hidden
+      ></p>
 
-      <div class="cta reveal">
-        <p>Not sure which fits? Tell us about the site you have in mind.</p>
-        <a class="btn btn-light" href={site.cta.href}>
-          {site.cta.label}
-        </a>
-      </div>
+      <p class="trust reveal">
+        Secure payment by Stripe. Deposit is credited to your project. Not sure which fits? Book a
+        free consult first.
+      </p>
     </div>
   </div>
 </section>
+
+<script>
+  import '../scripts/checkout';
+</script>
 
 <style>
   .pricing {
@@ -207,17 +242,17 @@ import { site } from '../content/site';
     transform: rotate(-45deg);
   }
 
-  .cta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 1.25rem 2rem;
-    margin-top: 3rem;
+  .actions {
+    display: grid;
+    gap: 0.7rem;
+    margin-top: 0.75rem;
   }
 
-  .cta p {
-    color: #e6e7ff;
-    font-size: 1.1rem;
+  .actions .btn {
+    width: 100%;
+    flex-wrap: wrap;
+    white-space: normal;
+    text-align: center;
   }
 
   .btn-light {
@@ -230,6 +265,51 @@ import { site } from '../content/site';
   .btn-light:hover {
     transform: translateY(-2px);
     box-shadow: 0 0 0 6px rgb(255 138 43 / 0.3);
+  }
+
+  .btn-deposit {
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-block: 0.65rem;
+    background: transparent;
+    color: #fff;
+    border: 1.5px solid rgb(255 255 255 / 0.5);
+    line-height: 1.15;
+  }
+
+  .btn-deposit:hover {
+    background: rgb(255 255 255 / 0.1);
+  }
+
+  .featured .btn-deposit {
+    color: var(--ink);
+    border-color: rgb(20 22 63 / 0.35);
+  }
+
+  .featured .btn-deposit:hover {
+    background: rgb(20 22 63 / 0.06);
+  }
+
+  .deposit-amount {
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0.85;
+  }
+
+  .checkout-error {
+    margin-top: 1.5rem;
+    padding: 0.9rem 1.1rem;
+    border-radius: 16px;
+    background: #fff1ef;
+    border: 1.5px solid #b42318;
+    color: #7a1a12;
+    font-weight: 600;
+  }
+
+  .trust {
+    margin-top: 2.5rem;
+    color: #e6e7ff;
+    max-width: 40rem;
   }
 
   @media (min-width: 64rem) {

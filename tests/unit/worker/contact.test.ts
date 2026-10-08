@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
-import { MAX_BODY_BYTES } from '../../../src/worker/handler';
+import { describe, expect, it } from 'vitest';
+import { MAX_BODY_BYTES } from '../../../src/worker/contact-handler';
 import { createRateLimiter } from '../../../src/worker/rate-limit';
 import {
   LIVE_ENV,
@@ -143,7 +143,10 @@ describe('spam protection', () => {
 
   it('rejects with 403 turnstile when siteverify says no, and sends no mail', async () => {
     const { handler, network } = createHarness({
-      turnstile: () => Response.json({ success: false, 'error-codes': ['invalid-input-response'] }),
+      responders: {
+        [`POST ${TURNSTILE_URL}`]: () =>
+          Response.json({ success: false, 'error-codes': ['invalid-input-response'] }),
+      },
     });
     const response = await handler(post(validPayload()), LIVE_ENV);
     expect(response.status).toBe(403);
@@ -153,7 +156,7 @@ describe('spam protection', () => {
 
   it('treats a Turnstile outage as a failed check', async () => {
     const { handler, network } = createHarness({
-      turnstile: () => new Response('boom', { status: 500 }),
+      responders: { [`POST ${TURNSTILE_URL}`]: () => new Response('boom', { status: 500 }) },
     });
     const response = await handler(post(validPayload()), LIVE_ENV);
     expect(response.status).toBe(403);
@@ -162,24 +165,25 @@ describe('spam protection', () => {
 
   it('treats a thrown Turnstile request as a failed check', async () => {
     const { handler, logger } = createHarness({
-      turnstile: () => {
-        throw new TypeError('network down');
+      responders: {
+        [`POST ${TURNSTILE_URL}`]: () => {
+          throw new TypeError('network down');
+        },
       },
     });
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const response = await handler(post(validPayload()), LIVE_ENV);
     expect(response.status).toBe(403);
-    expect(errorSpy).toHaveBeenCalled();
-    expect(logger.error).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
+    expect(logger.error).toHaveBeenCalled();
   });
 });
 
 describe('Resend failures', () => {
   it('returns 502 send_failed without leaking provider details or the message', async () => {
     const { handler, logger } = createHarness({
-      resend: () =>
-        new Response('{"message":"domain not verified secret-detail"}', { status: 403 }),
+      responders: {
+        [`POST ${RESEND_URL}`]: () =>
+          new Response('{"message":"domain not verified secret-detail"}', { status: 403 }),
+      },
     });
     const response = await handler(post(validPayload()), LIVE_ENV);
     const text = await response.text();
@@ -196,8 +200,10 @@ describe('Resend failures', () => {
 
   it('returns 502 when the Resend request throws', async () => {
     const { handler } = createHarness({
-      resend: () => {
-        throw new TypeError('network down');
+      responders: {
+        [`POST ${RESEND_URL}`]: () => {
+          throw new TypeError('network down');
+        },
       },
     });
     const response = await handler(post(validPayload()), LIVE_ENV);
@@ -218,6 +224,25 @@ describe('Resend failures', () => {
   });
 });
 
+describe('Turnstile fails closed', () => {
+  it.each([
+    ['unset', {}],
+    ['blank', { TURNSTILE_SECRET_KEY: '  ' }],
+    ['ENVIRONMENT is not "development"', { ENVIRONMENT: 'production' }],
+  ])('rejects leads and calls no service when the secret is %s', async (_name, env) => {
+    const { handler, network, logger } = createHarness();
+    const response = await handler(post(validPayload()), {
+      ...LIVE_ENV,
+      TURNSTILE_SECRET_KEY: '',
+      ...env,
+    });
+    expect(response.status).toBe(500);
+    expect(await bodyOf(response)).toEqual({ ok: false, error: 'send_failed' });
+    expect(network.calls).toHaveLength(0);
+    expect(logger.error.mock.calls.flat().join(' ')).toContain('TURNSTILE_SECRET_KEY');
+  });
+});
+
 describe('demo / dev mode', () => {
   it('returns ok without sending when RESEND_API_KEY is unset, logging a redacted summary', async () => {
     const { handler, network, logger } = createHarness();
@@ -235,17 +260,28 @@ describe('demo / dev mode', () => {
     expect(logged).not.toContain('calm, fast new site');
   });
 
-  it('uses the Turnstile test secret when none is configured, and warns', async () => {
+  it('uses the Turnstile test secret only when ENVIRONMENT=development, and warns', async () => {
     const { handler, network, logger } = createHarness();
-    await handler(post(validPayload()), {});
+    await handler(post(validPayload()), { ENVIRONMENT: 'development' });
     const form = network.callsTo(TURNSTILE_URL)[0]?.init.body as URLSearchParams;
     expect(form.get('secret')).toBe('1x0000000000000000000000000000000AA');
-    expect(JSON.stringify(logger.warn.mock.calls)).toContain('TURNSTILE_SECRET_KEY');
+    expect(JSON.stringify(logger.warn.mock.calls)).toContain('Turnstile test secret');
+  });
+
+  it('prefers a configured secret over the test secret even in development', async () => {
+    const { handler, network } = createHarness();
+    await handler(post(validPayload()), {
+      ENVIRONMENT: 'development',
+      TURNSTILE_SECRET_KEY: 'real',
+    });
+    const form = network.callsTo(TURNSTILE_URL)[0]?.init.body as URLSearchParams;
+    expect(form.get('secret')).toBe('real');
   });
 
   it('treats blank env values as unset', async () => {
     const { handler, network } = createHarness();
     const response = await handler(post(validPayload()), {
+      ENVIRONMENT: 'development',
       RESEND_API_KEY: '  ',
       TURNSTILE_SECRET_KEY: '',
     });

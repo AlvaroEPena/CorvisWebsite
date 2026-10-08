@@ -1,24 +1,28 @@
 import { z } from 'zod';
 import { MIN_FILL_MS, contactInputSchema, type ContactInput } from '../lib/contracts/contact';
 import { readJsonBody } from './body';
-import { resolveConfig, type Env, type WorkerConfig } from './env';
+import { LOG_PREFIX, type Logger, type RouteHandler } from './deps';
+import {
+  resolveMailConfig,
+  resolvePandaDocConfig,
+  resolveTurnstileConfig,
+  type MailConfig,
+} from './env';
+import { clientIp, hasJsonContentType, isSameOrigin } from './guards';
 import { buildLeadEmail, createResendSender } from './mailer';
+import { createProposal } from './pandadoc';
 import type { RateLimiter } from './rate-limit';
 import { jsonResponse } from './response';
 import { verifyTurnstile } from './turnstile';
 
-export const CONTACT_PATH = '/api/contact';
 export const MAX_BODY_BYTES = 16 * 1024;
 
-const LOG_PREFIX = '[corvis-contact]';
-
-export interface HandlerDeps {
+export interface ContactDeps {
   fetch: typeof fetch;
   rateLimiter: RateLimiter;
-  logger: Pick<Console, 'error' | 'warn'>;
+  logger: Logger;
+  sleep: (ms: number) => Promise<void>;
 }
-
-export type RequestHandler = (request: Request, env: Env) => Promise<Response>;
 
 /** Body-level problems reuse the contract's `validation` shape under a `_form` key. */
 function formErrorResponse(message: string, status: number): Response {
@@ -51,16 +55,6 @@ function isTooFastOnly(payload: unknown, error: z.ZodError): boolean {
   );
 }
 
-function isSameOrigin(request: Request): boolean {
-  const origin = request.headers.get('Origin');
-  if (origin === null) return true; // non-browser clients send no Origin
-  try {
-    return new URL(origin).host === new URL(request.url).host;
-  } catch {
-    return false;
-  }
-}
-
 /** Metadata only (email domain, lengths): enough to debug demo mode without logging personal data. */
 function redactedSummary(lead: ContactInput): Record<string, unknown> {
   return {
@@ -73,12 +67,7 @@ function redactedSummary(lead: ContactInput): Record<string, unknown> {
   };
 }
 
-async function deliverLead(
-  lead: ContactInput,
-  config: WorkerConfig,
-  deps: HandlerDeps,
-): Promise<boolean> {
-  const { mail } = config;
+async function deliverLead(lead: ContactInput, mail: MailConfig, deps: ContactDeps) {
   if (mail.mode === 'demo') {
     deps.logger.warn(
       `${LOG_PREFIX} DEMO MODE: RESEND_API_KEY is not set, so this lead was NOT emailed.`,
@@ -100,17 +89,11 @@ async function deliverLead(
   }
 }
 
-export function createContactHandler(deps: HandlerDeps): RequestHandler {
-  return async (request, env) => {
-    const { pathname } = new URL(request.url);
-
-    if (pathname !== CONTACT_PATH) return jsonResponse({ ok: false, error: 'not_found' }, 404);
-    if (request.method !== 'POST') {
-      return jsonResponse({ ok: false, error: 'method_not_allowed' }, 405, { Allow: 'POST' });
-    }
+export function createContactHandler(deps: ContactDeps): RouteHandler {
+  return async (request, env, ctx) => {
     if (!isSameOrigin(request)) return jsonResponse({ ok: false, error: 'forbidden' }, 403);
 
-    const ip = request.headers.get('CF-Connecting-IP');
+    const ip = clientIp(request);
     const limit = deps.rateLimiter.consume(ip ?? 'unknown');
     if (!limit.allowed) {
       return jsonResponse({ ok: false, error: 'rate_limited' }, 429, {
@@ -118,9 +101,7 @@ export function createContactHandler(deps: HandlerDeps): RequestHandler {
       });
     }
 
-    if (!request.headers.get('Content-Type')?.toLowerCase().includes('application/json')) {
-      return formErrorResponse('Request must be JSON', 400);
-    }
+    if (!hasJsonContentType(request)) return formErrorResponse('Request must be JSON', 400);
     const body = await readJsonBody(request, MAX_BODY_BYTES);
     if (body.kind === 'too_large') return formErrorResponse('Request is too large', 413);
     if (body.kind === 'invalid') return formErrorResponse('Request is not valid JSON', 400);
@@ -140,29 +121,50 @@ export function createContactHandler(deps: HandlerDeps): RequestHandler {
     }
     const lead = parsed.data;
 
-    const configResult = resolveConfig(env);
-    if (!configResult.ok) {
-      deps.logger.error(`${LOG_PREFIX} invalid configuration:`, configResult.problems.join(', '));
+    // Fail closed: a missing Turnstile secret must never silently disable the bot check.
+    const turnstile = resolveTurnstileConfig(env);
+    if (turnstile === undefined) {
+      deps.logger.error(`${LOG_PREFIX} TURNSTILE_SECRET_KEY is not set; refusing to accept leads`);
       return jsonResponse({ ok: false, error: 'send_failed' }, 500);
     }
-    const { config } = configResult;
-    if (config.isTurnstileTestSecret) {
+    if (turnstile.isTestSecret) {
       deps.logger.warn(
-        `${LOG_PREFIX} DEV: TURNSTILE_SECRET_KEY is not set; using the test secret.`,
+        `${LOG_PREFIX} DEV: using the Turnstile test secret (ENVIRONMENT=development)`,
       );
+    }
+
+    const mailConfig = resolveMailConfig(env);
+    if (!mailConfig.ok) {
+      deps.logger.error(`${LOG_PREFIX} invalid configuration:`, mailConfig.problems.join(', '));
+      return jsonResponse({ ok: false, error: 'send_failed' }, 500);
     }
 
     const isHuman = await verifyTurnstile({
       token: lead.turnstileToken,
-      secret: config.turnstileSecret,
+      secret: turnstile.secret,
       remoteIp: ip,
       fetch: deps.fetch,
+      logger: deps.logger,
     });
     if (!isHuman) return jsonResponse({ ok: false, error: 'turnstile' }, 403);
 
-    const isDelivered = await deliverLead(lead, config, deps);
-    return isDelivered
-      ? jsonResponse({ ok: true }, 200)
-      : jsonResponse({ ok: false, error: 'send_failed' }, 502);
+    if (!(await deliverLead(lead, mailConfig.mail, deps))) {
+      return jsonResponse({ ok: false, error: 'send_failed' }, 502);
+    }
+
+    // Owner is already notified; the proposal runs after the response and cannot fail the lead.
+    const pandaDoc = resolvePandaDocConfig(env);
+    if (pandaDoc !== undefined) {
+      ctx.waitUntil(
+        createProposal({
+          lead,
+          config: pandaDoc,
+          fetch: deps.fetch,
+          logger: deps.logger,
+          sleep: deps.sleep,
+        }),
+      );
+    }
+    return jsonResponse({ ok: true }, 200);
   };
 }

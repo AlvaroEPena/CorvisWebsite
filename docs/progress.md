@@ -14,3 +14,10 @@
 - Contract `src/lib/contracts/contact.ts`, worker stub, configs, tests; `npm run check` and `npm run build` pass.
 - Dev ports: 4328 (dev), 4329 (e2e preview).
 - Next: Phase 5, frontend-engineer + backend-engineer in parallel.
+
+## 2026-10-08 — Phase 5 build done
+- Frontend (all sections, slider, forms, /thanks, privacy) and Worker (contact, Stripe checkout + webhook, PandaDoc proposal, fail-closed Turnstile) built.
+- Scope added by user: PandaDoc auto-proposal on lead + Stripe deposit checkout (spec §6b).
+- `npm run check` (132 unit tests) and `npm run build` pass. Unused `resend` dep removed (plain fetch).
+- Not yet run: e2e, axe, Lighthouse, live Stripe/PandaDoc (needs owner keys), real-device Safari glass check.
+- Next: Phase 6 QA (qa-tester), Phase 7 review.

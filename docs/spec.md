@@ -70,19 +70,32 @@ No database. Typed content modules in `src/content/`: `site.ts` (name, slogan, e
 (must be empty), `elapsedMs` (number, ≥ 3000). Worker: `src/worker/` handles `/api/*`,
 all other paths fall through to static assets.
 
+### 6b. Payments and proposals (scope added 2026-10-08)
+
+- **Stripe (deposit checkout).** `POST /api/checkout` with `CheckoutInput` (`package`: `launch` | `redesign`,
+  optional `email`) returns `{ok:true,url}` of a Stripe-hosted Checkout Session (mode `payment`, USD,
+  amount looked up server-side from `DEPOSIT_PACKAGES`, never from the client). Success -> `/thanks`
+  (new static page, includes `session_id`), cancel -> `/#pricing`. `POST /api/stripe-webhook` verifies the
+  `Stripe-Signature` (Web Crypto HMAC, timestamp tolerance), handles `checkout.session.completed`, and emails the
+  owner via Resend. The Care & Growth plan has no checkout (CTA goes to `#contact`). Shared schema:
+  `src/lib/contracts/checkout.ts`. No Stripe SDK; plain `fetch` to the REST API (pin an API version header).
+- **PandaDoc (proposal on lead).** After a successful contact submission (owner email sent first), if PandaDoc is
+  configured the Worker creates a document from `PANDADOC_TEMPLATE_ID` for the lead (recipient = lead email,
+  tokens from form fields), and sends it when `PANDADOC_AUTO_SEND=true`, else leaves it as a draft for the owner.
+  PandaDoc failure never fails the lead (logged; owner email still delivered). Runs via `ctx.waitUntil`.
+- Both integrations are optional and degrade to demo mode when keys are unset. Test mode / sandbox first.
+
 ## 7. Auth & permissions
 
 None. Public site; no sessions.
 
 ## 8. Integrations & env vars
 
-| Service                                                                                      | Purpose                                  | Vars                                                       |
-| -------------------------------------------------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------------- |
-| Resend                                                                                       | Email lead to owner (reply-to = visitor) | `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL` |
-| Turnstile                                                                                    | Bot check                                | `PUBLIC_TURNSTILE_SITE_KEY`, secret `TURNSTILE_SECRET_KEY` |
-| Dev/demo mode: if keys are missing the Worker logs the payload and returns `ok` (clearly     |
-| flagged in README) and Turnstile uses Cloudflare's published test keys. Real keys are filled |
-| by the owner only.                                                                           |
+| Service                                                                                                                                                                                                                                                                                             | Purpose                                  | Vars                                                       |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------------- |
+| Resend                                                                                                                                                                                                                                                                                              | Email lead to owner (reply-to = visitor) | `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL` |
+| Turnstile                                                                                                                                                                                                                                                                                           | Bot check                                | `PUBLIC_TURNSTILE_SITE_KEY`, secret `TURNSTILE_SECRET_KEY` |
+| Dev/demo mode: with `ENVIRONMENT=development` (in `.dev.vars` only) the Worker may use Cloudflare's test Turnstile secret, and logs-and-succeeds when Resend/Stripe/PandaDoc keys are missing. In production a missing `TURNSTILE_SECRET_KEY` fails closed. Real keys are filled by the owner only. |
 
 ## 9. Design system
 
@@ -151,3 +164,4 @@ CMS, blog, real calendar embed, analytics, WebGL hero, i18n, real domain/email s
 ## 13. Changelog
 
 - 2026-10-07: draft created from brief + research.
+- 2026-10-08: added Stripe deposit checkout + PandaDoc proposal (�6b, �8); new `/thanks` page; Turnstile secret must fail closed outside dev.
