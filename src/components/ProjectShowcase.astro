@@ -101,14 +101,24 @@ const isReversed = index % 2 === 1;
     align-items: center;
     gap: 0.4rem;
     padding: 0.7rem 1rem;
-    background: #ecebf5;
+    background: linear-gradient(180deg, #f6f6fc, #ecebf5);
+    border-bottom: 1px solid rgb(20 22 63 / 0.08);
   }
 
+  /* The same red, yellow and green lights as the sandbox's browser frame. */
   .dot {
-    width: 0.6rem;
-    height: 0.6rem;
+    width: 0.7rem;
+    height: 0.7rem;
     border-radius: 50%;
-    background: #b9b8cf;
+    background: #ff6b5e;
+  }
+
+  .dot:nth-child(2) {
+    background: #f6bd3a;
+  }
+
+  .dot:nth-child(3) {
+    background: #3fc556;
   }
 
   .address {

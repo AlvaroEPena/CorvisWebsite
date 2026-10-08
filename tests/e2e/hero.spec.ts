@@ -17,7 +17,6 @@ const HERO_ELEMENTS = [
 const LINK_LABELS = [
   'Services',
   'Work',
-  'Redesign',
   'Process',
   'Pricing',
   'FAQ',
@@ -54,10 +53,9 @@ test.describe('navigation order', () => {
   test('the footer keeps its own order', async ({ page }) => {
     await page.goto('/');
     const labels = await page.locator('body > footer nav a').allInnerTexts();
-    expect(labels.slice(0, 9)).toEqual([
+    expect(labels.slice(0, 8)).toEqual([
       'Services',
       'Work',
-      'Redesign',
       'Sandbox',
       'Process',
       'Pricing',

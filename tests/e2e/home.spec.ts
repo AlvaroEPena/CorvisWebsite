@@ -38,7 +38,6 @@ test.describe('J5 FAQ and navigation anchors', () => {
     for (const [label, id] of [
       ['Services', 'services'],
       ['Work', 'work'],
-      ['Redesign', 'redesign'],
       ['Process', 'process'],
       ['Pricing', 'pricing'],
       ['FAQ', 'faq'],

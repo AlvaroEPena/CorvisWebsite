@@ -85,7 +85,7 @@ export const projects: readonly WorkProject[] = [
     label: 'Live project',
     folder: 'modlabs',
     summary:
-      'A console modding and electronics repair shop in Seattle, run by Alvaro. The site had to make a fiddly, technical service feel clear and trustworthy: what each job costs, what is included, and how to get one booked.',
+      'A console modding and electronics repair shop in Seattle. The site had to make a fiddly, technical service feel clear and trustworthy: what each job costs, what is included, and how to get one booked.',
     built: [
       'A home page that leads with clear prices for the most common mods',
       'Quote and booking forms for local drop-off and mail-in jobs',

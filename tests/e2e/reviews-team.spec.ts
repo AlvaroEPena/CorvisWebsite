@@ -41,7 +41,6 @@ const featured = sortedBy(
 const NAV_LABELS = [
   'Services',
   'Work',
-  'Redesign',
   'Process',
   'Pricing',
   'FAQ',

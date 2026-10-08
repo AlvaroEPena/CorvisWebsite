@@ -58,7 +58,7 @@ test.describe('portfolio', () => {
     await expect(work).not.toContainText(/saltwater|sample project/i);
     // The only way into the sandbox from the home page body is the button under the slider.
     await expect(work.locator('a[href*="sandbox"], button')).toHaveCount(0);
-    await expect(page.locator('[data-testid="redesign-slider"] > div').first()).toHaveAttribute(
+    await expect(page.locator('[data-testid="redesign-slider"] .stage')).toHaveAttribute(
       'aria-hidden',
       'true',
     );

@@ -1,4 +1,5 @@
 ---
+import { getSandboxProject } from '../content/sandbox';
 import { sandboxCta } from '../content/sandbox-copy';
 import { describePosition } from '../scripts/slider-math';
 import LiveSiteStage from './LiveSiteStage.astro';
@@ -7,6 +8,7 @@ import PreviewLoading from './PreviewLoading.astro';
 const START = 50;
 /** The registry project whose real builds are shown live (the same as /sandbox). */
 const LIVE_PROJECT = 'saltwater-row';
+const displayUrl = getSandboxProject(LIVE_PROJECT)?.displayUrl ?? '';
 ---
 
 <section class="redesign section" id="redesign" aria-labelledby="redesign-title">
@@ -30,44 +32,55 @@ const LIVE_PROJECT = 'saltwater-row';
       data-testid="redesign-slider"
       style={`--ba-pos:${START}%`}
     >
-      <div class="stage" aria-hidden="true">
-        <!-- AFTER: the rebuilt site, always underneath. -->
-        <div class="layer after">
-          <LiveSiteStage projectId={LIVE_PROJECT} version="after" fill status={false} />
+      <div class="window">
+        <!-- Decorative browser chrome: the wipe starts below it. -->
+        <div class="chrome" aria-hidden="true">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="address">{displayUrl}</span>
         </div>
+        <div class="stage-wrap">
+          <div class="stage" aria-hidden="true">
+            <!-- AFTER: the rebuilt site, always underneath. -->
+            <div class="layer after">
+              <LiveSiteStage projectId={LIVE_PROJECT} version="after" fill status={false} />
+            </div>
 
-        <!-- BEFORE: the dated site, in a box as wide as the left of the handle. Its page is as wide
-             as the whole stage (100cqw) and never changes size; only the window onto it does. -->
-        <div class="layer before" data-ba-before style={`width:${START}%`}>
-          <LiveSiteStage projectId={LIVE_PROJECT} version="before" fill status={false} />
+            <!-- BEFORE: the dated site, in a box as wide as the left of the handle. Its page is as wide
+                 as the whole stage (100cqw) and never changes size; only the window onto it does. -->
+            <div class="layer before" data-ba-before style={`width:${START}%`}>
+              <LiveSiteStage projectId={LIVE_PROJECT} version="before" fill status={false} />
+            </div>
+
+            <!-- One "Preview Loading" for the whole stage, above both panels and clear of the handle's knob. -->
+            <div class="stage-status">
+              <PreviewLoading panel={false} />
+            </div>
+
+            <span class="tag tag-before">Before</span>
+            <span class="tag tag-after">After</span>
+            <span class="handle">
+              <span class="knob"></span>
+            </span>
+          </div>
+
+          <label class="sr-only" for="ba-range">
+            Compare the original site with the rebuilt site. Use the left and right arrow keys.
+          </label>
+          <input
+            id="ba-range"
+            class="range"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value={START}
+            aria-valuetext={describePosition(START)}
+            data-ba-input
+          />
         </div>
-
-        <!-- One "Preview Loading" for the whole stage, above both panels and clear of the handle's knob. -->
-        <div class="stage-status">
-          <PreviewLoading panel={false} />
-        </div>
-
-        <span class="tag tag-before">Before</span>
-        <span class="tag tag-after">After</span>
-        <span class="handle">
-          <span class="knob"></span>
-        </span>
       </div>
-
-      <label class="sr-only" for="ba-range">
-        Compare the original site with the rebuilt site. Use the left and right arrow keys.
-      </label>
-      <input
-        id="ba-range"
-        class="range"
-        type="range"
-        min="0"
-        max="100"
-        step="1"
-        value={START}
-        aria-valuetext={describePosition(START)}
-        data-ba-input
-      />
     </div>
 
     <div class="explore reveal">
@@ -107,8 +120,60 @@ const LIVE_PROJECT = 'saltwater-row';
     position: relative;
     padding: clamp(0.5rem, 1.2vw, 0.9rem);
     border-radius: 36px;
-    /* The range thumb is 100vh tall so a touch anywhere on the stage drags it; clip it to the frame
-       so it cannot cover the controls below. */
+  }
+
+  /* A fake browser window: chrome on top, the before/after stage below it. */
+  .window {
+    overflow: hidden;
+    border-radius: 26px;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px rgb(20 22 63 / 0.08);
+  }
+
+  .chrome {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1rem;
+    background: linear-gradient(180deg, #f6f6fc, #ecebf5);
+    border-bottom: 1px solid rgb(20 22 63 / 0.08);
+  }
+
+  /* The same red, yellow and green lights as the sandbox's browser frame. */
+  .dot {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: #ff6b5e;
+  }
+
+  .dot:nth-child(2) {
+    background: #f6bd3a;
+  }
+
+  .dot:nth-child(3) {
+    background: #3fc556;
+  }
+
+  .address {
+    flex: 1;
+    min-width: 0;
+    margin-left: 0.6rem;
+    padding: 0.2rem 0.8rem;
+    overflow: hidden;
+    border-radius: 99px;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px rgb(20 22 63 / 0.1);
+    color: var(--ink-mute);
+    font-size: 0.78rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* The range thumb is 100vh tall so a touch anywhere on the stage drags it; clip it to the stage
+     so it cannot cover the controls below, and so the handle starts under the browser chrome. */
+  .stage-wrap {
+    position: relative;
     overflow: clip;
   }
 
@@ -116,7 +181,6 @@ const LIVE_PROJECT = 'saltwater-row';
     position: relative;
     container-type: inline-size;
     aspect-ratio: 4 / 3;
-    border-radius: 26px;
     overflow: hidden;
     background: #fff;
     user-select: none;
@@ -286,10 +350,10 @@ const LIVE_PROJECT = 'saltwater-row';
   /* The native range input is the real control: transparent, over the whole stage. */
   .range {
     position: absolute;
-    inset: clamp(0.5rem, 1.2vw, 0.9rem);
+    inset: 0;
     z-index: 5;
-    width: calc(100% - 2 * clamp(0.5rem, 1.2vw, 0.9rem));
-    height: calc(100% - 2 * clamp(0.5rem, 1.2vw, 0.9rem));
+    width: 100%;
+    height: 100%;
     margin: 0;
     opacity: 0;
     cursor: ew-resize;

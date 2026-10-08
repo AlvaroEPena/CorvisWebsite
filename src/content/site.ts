@@ -24,7 +24,6 @@ export const site = {
   navigation: [
     { label: 'Services', href: '#services' },
     { label: 'Work', href: '#work' },
-    { label: 'Redesign', href: '#redesign' },
     { label: 'Process', href: '#process' },
     { label: 'Pricing', href: '#pricing' },
     { label: 'FAQ', href: '#faq' },
@@ -36,7 +35,6 @@ export const site = {
   footerNavigation: [
     { label: 'Services', href: '#services' },
     { label: 'Work', href: '#work' },
-    { label: 'Redesign', href: '#redesign' },
     { label: 'Sandbox', href: '/sandbox' },
     { label: 'Process', href: '#process' },
     { label: 'Pricing', href: '#pricing' },
