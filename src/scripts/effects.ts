@@ -9,7 +9,7 @@ const root = document.documentElement;
 
 if (!root.hasAttribute('data-save-data')) {
   initMagnetic();
-  observeInView('.browse-host');
+  observeInView('.browse-host', { fullyVisible: true });
 
   const host = document.querySelector<HTMLElement>('[data-dotfield]');
   const canvas = host?.querySelector<HTMLCanvasElement>('canvas');

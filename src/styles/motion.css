@@ -74,12 +74,53 @@
   inset: 0 0 auto 0;
 }
 
+/*
+ * Two tunings of the same motion: short holds at each end (about a second), an eased start and finish,
+ * and a steady glide in between, so it begins moving as soon as it is on screen and turns around
+ * quickly. `browse` suits a ~26 s loop, `browse-slow` the 80 s loop. The middle positions are where the
+ * eased ramps hand over to the steady speed (ramp / (2 * (steady + ramp)) of the distance).
+ */
 @keyframes browse {
   0%,
-  10% {
+  4% {
     transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
   }
-  90%,
+
+  12% {
+    transform: translateY(calc((-100% + 100cqh) * 0.0476));
+    animation-timing-function: linear;
+  }
+
+  88% {
+    transform: translateY(calc((-100% + 100cqh) * 0.9524));
+    animation-timing-function: cubic-bezier(0, 0, 0.58, 1);
+  }
+
+  96%,
+  100% {
+    transform: translateY(calc(-100% + 100cqh));
+  }
+}
+
+@keyframes browse-slow {
+  0%,
+  1.5% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
+  }
+
+  4.5% {
+    transform: translateY(calc((-100% + 100cqh) * 0.016));
+    animation-timing-function: linear;
+  }
+
+  95.5% {
+    transform: translateY(calc((-100% + 100cqh) * 0.984));
+    animation-timing-function: cubic-bezier(0, 0, 0.58, 1);
+  }
+
+  98.5%,
   100% {
     transform: translateY(calc(-100% + 100cqh));
   }
@@ -88,7 +129,7 @@
 @media (prefers-reduced-motion: no-preference) {
   /* Runs only while the mock is on screen (data-in-view is set by scripts/in-view.ts). */
   :root:not([data-save-data]) .browse-host[data-in-view] .browse-track {
-    animation: browse var(--browse-duration, 26s) ease-in-out infinite alternate;
+    animation: var(--browse-keyframes, browse) var(--browse-duration, 26s) linear infinite alternate;
     will-change: transform;
   }
 

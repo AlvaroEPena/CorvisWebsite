@@ -84,16 +84,20 @@ test.describe('motion fallbacks', () => {
 
     // Off-screen mocks stay idle; each one starts once it is on screen.
     expect(await animationOf('#redesign .browse-track')).toBe('none');
-    for (const section of ['#redesign', '#work']) {
+    for (const [section, expectedAnimation] of [
+      ['#redesign', 'browse-slow'],
+      ['#work', 'browse'],
+    ] as const) {
+      // A scroll-through starts once the whole mock is on screen, so centre it before checking.
       await page
         .locator(section + ' .browse-host')
         .first()
-        .scrollIntoViewIfNeeded();
+        .evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
       await expect(page.locator(section + ' .browse-host').first()).toHaveAttribute(
         'data-in-view',
         '',
       );
-      expect(await animationOf(section + ' .browse-track')).toBe('browse');
+      expect(await animationOf(section + ' .browse-track')).toBe(expectedAnimation);
     }
 
     await page.emulateMedia({ reducedMotion: 'reduce' });
