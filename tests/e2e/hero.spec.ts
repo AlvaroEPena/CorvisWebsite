@@ -117,12 +117,23 @@ test.describe('hero logo', () => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
     await expect(page.locator('.hm-float')).toHaveCSS('animation-name', /hm-float/);
-    await expect(page.locator('.hm-sweep')).toHaveCSS('animation-name', /hm-sweep/);
+    // The light sweep is an SVG gradient animation started by script (crisp vector, no masked layer).
+    await expect(page.locator('[data-hero-mark]')).toHaveAttribute('data-sweep', 'on');
+    await expect(page.locator('.hm-sweep')).toHaveCount(1);
+    await expect(page.locator('svg mask')).toHaveCount(0);
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    for (const selector of ['.hm-float', '.hm-sweep', '.hm-draw', '.hm-dot-pop', '.hm-halo']) {
+    for (const selector of ['.hm-float', '.hm-draw', '.hm-dot-pop', '.hm-halo']) {
       await expect(page.locator(selector).first()).toHaveCSS('animation-name', 'none');
     }
     await expect(page.locator('.hm-ring')).toBeVisible();
+  });
+
+  test('never starts the light sweep under reduced motion', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    await expect(page.locator('[data-hero-mark]')).toBeVisible();
+    await page.waitForTimeout(500);
+    await expect(page.locator('[data-hero-mark]')).not.toHaveAttribute('data-sweep', 'on');
   });
 
   test('pauses its loops while scrolled out of view', async ({ page, isMobile }) => {
@@ -130,8 +141,14 @@ test.describe('hero logo', () => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
     await expect(page.locator('[data-hero-mark]')).not.toHaveAttribute('data-paused', '');
+    const sweepPaused = () =>
+      page
+        .locator('[data-hero-mark] svg')
+        .evaluate((svg) => (svg as SVGSVGElement).animationsPaused());
+    expect(await sweepPaused()).toBe(false);
     await page.locator('#faq').scrollIntoViewIfNeeded();
     await expect(page.locator('[data-hero-mark]')).toHaveAttribute('data-paused', '');
+    expect(await sweepPaused()).toBe(true);
   });
 
   test('tilts toward the pointer on desktop', async ({ page, isMobile, browserName }) => {

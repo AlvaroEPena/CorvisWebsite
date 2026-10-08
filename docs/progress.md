@@ -61,3 +61,8 @@
 - Fixed inner-page navigation inside the Refined Celebrations demo on the dev server (dev-only rewrite in `scripts/vite-demos-routing.mjs`, wired in `astro.config.mjs`; production was already correct). Pool demos rebuilt with file-style extensionless links.
 - "Live build" label is now "Built from scratch"; Sandbox is last in the navbar; new detailed glass hero logo (`HeroMark.astro`); hero now visible at first paint (removed opacity gate and GSAP entrance); proof numbers are static (count-up removed).
 - Verified: typecheck/lint/format clean, 173 unit tests, 364 e2e passed / 0 failed, Lighthouse mobile `/` 100 and `/sandbox` 100, A11y 100.
+
+## 2026-10-09 — Hero logo light sweep fix
+
+- Pixelation and flicker came from animating a bar behind an SVG mask (re-rasterized each frame at low resolution). The sweep is now a gradient painted directly on the ring and chevron strokes, animated with SVG (SMIL) and started/paused by `scripts/hero-mark.ts`; no mask, no moving layer. Chevron overlay uses flat ends. Static under reduced motion and Save-Data.
+- Verified at 2x device pixel ratio frames; typecheck/lint/format clean, 173 unit, 367 e2e passed / 0 failed.

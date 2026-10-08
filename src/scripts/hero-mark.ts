@@ -15,9 +15,25 @@ const isStatic =
   root.hasAttribute('data-save-data') ||
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+const SWEEP_START_SECONDS = 1.4;
+
 function initHeroMark(mark: HTMLElement): void {
   let isVisible = true;
-  const syncPause = () => mark.toggleAttribute('data-paused', !isVisible || document.hidden);
+  const svg = mark.querySelector('svg');
+  const syncPause = () => {
+    const paused = !isVisible || document.hidden;
+    mark.toggleAttribute('data-paused', paused);
+    // The light sweep is an SVG (SMIL) animation, which CSS animation-play-state does not control.
+    if (paused) svg?.pauseAnimations();
+    else svg?.unpauseAnimations();
+  };
+
+  // Start the light sweep. It is painted as a gradient on the strokes (vector, crisp), not a masked bar.
+  const sweep = mark.querySelector<SVGAnimationElement>('animateTransform[data-sweep]');
+  if (sweep) {
+    sweep.beginElementAt(SWEEP_START_SECONDS);
+    mark.setAttribute('data-sweep', 'on');
+  }
 
   new IntersectionObserver(
     ([entry]) => {
