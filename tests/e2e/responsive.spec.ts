@@ -48,8 +48,8 @@ test.describe('J6 responsive layout', () => {
     await page.goto('/');
     for (const locator of [
       page.getByTestId('contact-form-panel'),
-      page.getByTestId('deposit-button-launch'),
-      page.getByTestId('deposit-button-redesign'),
+      page.getByTestId('deposit-button-launchpad'),
+      page.getByTestId('deposit-button-market-leader'),
     ]) {
       await locator.scrollIntoViewIfNeeded();
       const box = await locator.boundingBox();

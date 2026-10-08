@@ -47,7 +47,11 @@ function whenIdle(task: () => void): void {
 }
 
 if (root.getAttribute('data-motion') === 'on') {
-  const run = () => whenIdle(() => void startMotion());
+  const run = () =>
+    whenIdle(() => {
+      void startMotion();
+      void import('./effects');
+    });
   if (document.readyState === 'complete') run();
   else window.addEventListener('load', run, { once: true });
 }

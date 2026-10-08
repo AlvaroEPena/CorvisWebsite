@@ -14,11 +14,11 @@ const EMAIL = 'hello@corvis.example';
 
 describe('buildCheckoutRequest', () => {
   it('posts only the package id, never a price', () => {
-    const { url, init } = buildCheckoutRequest('launch');
+    const { url, init } = buildCheckoutRequest('launchpad');
     expect(url).toBe(CHECKOUT_ENDPOINT);
     expect(init.method).toBe('POST');
     const body = JSON.parse(String(init.body));
-    expect(body).toEqual({ package: 'launch' });
+    expect(body).toEqual({ package: 'launchpad' });
     expect(checkoutInputSchema.safeParse(body).success).toBe(true);
   });
 });
@@ -65,8 +65,10 @@ describe('describeCheckoutFailure', () => {
 
 describe('depositFor', () => {
   it('derives the label amount from the contract and skips care', () => {
-    expect(depositFor('launch')?.amountUsd).toBe(DEPOSIT_PACKAGES.launch.depositUsdCents / 100);
-    expect(depositFor('redesign')?.placeholder).toBe(true);
+    expect(depositFor('launchpad')?.amountUsd).toBe(
+      DEPOSIT_PACKAGES.launchpad.depositUsdCents / 100,
+    );
+    expect(depositFor('market-leader')?.placeholder).toBe(true);
     expect(depositFor('care')).toBeUndefined();
   });
   it('covers every deposit package that exists in pricing', () => {

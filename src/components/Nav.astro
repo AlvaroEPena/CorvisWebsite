@@ -25,7 +25,12 @@ const links = site.navigation.map((link) => ({ ...link, href: `${base}${link.hre
       ))}
     </ul>
 
-    <a class="btn btn-primary cta" href={`${base}${site.cta.href}`} data-testid="nav-cta">
+    <a
+      class="btn btn-primary btn-shine cta"
+      data-magnetic
+      href={`${base}${site.cta.href}`}
+      data-testid="nav-cta"
+    >
       {site.cta.label}
     </a>
 

@@ -1,5 +1,18 @@
 ---
+import type { ImageMetadata } from 'astro';
 import { projects } from '../content/projects';
+import ProjectShowcase from './ProjectShowcase.astro';
+
+// Resolves every portfolio photo once; keys look like "pool/pool-01".
+const modules = import.meta.glob<{ default: ImageMetadata }>('../assets/portfolio/**/*.avif', {
+  eager: true,
+});
+const images = Object.fromEntries(
+  Object.entries(modules).map(([path, module]) => [
+    path.replace('../assets/portfolio/', '').replace(/\.avif$/, ''),
+    module.default,
+  ]),
+);
 ---
 
 <section class="work section" id="work" aria-labelledby="work-title" data-testid="work">
@@ -8,166 +21,25 @@ import { projects } from '../content/projects';
     <div class="section-heading reveal">
       <h2 id="work-title">Sites that sound like the business behind them.</h2>
       <p>
-        Concept projects that show how we work. Real case studies will replace them as we publish
-        them.
+        {projects.length === 1
+          ? 'Our first sample project, shown as concept work while we publish real case studies.'
+          : 'Sample projects, shown as concept work while we publish real case studies.'}
       </p>
     </div>
 
-    <ul class="grid">
-      {projects.map((project) => (
-        <li class="project reveal" data-placeholder={project.placeholder}>
-          <div class={`art tone-${project.tone}`} aria-hidden="true">
-            <span class="shape one"></span>
-            <span class="shape two"></span>
-            <span class="shape three"></span>
-          </div>
-          <div class="meta">
-            <p class="category">{project.category}</p>
-            <h3>{project.name}</h3>
-            <p class="summary">{project.summary}</p>
-            <p class="outcome">{project.outcome}</p>
-          </div>
-        </li>
+    <div class="list" data-count={projects.length}>
+      {projects.map((project, index) => (
+        <div class="item reveal">
+          <ProjectShowcase project={project} images={images} index={index} />
+        </div>
       ))}
-    </ul>
+    </div>
   </div>
 </section>
 
 <style>
-  .grid {
+  .list {
     display: grid;
-    gap: 3rem 2rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .project {
-    display: grid;
-    gap: 1.25rem;
-  }
-
-  .art {
-    position: relative;
-    aspect-ratio: 4 / 3;
-    border-radius: 32px;
-    overflow: hidden;
-    border: 1px solid rgb(255 255 255 / 0.6);
-    box-shadow: 0 30px 60px -28px rgb(20 22 63 / 0.45);
-    transition: transform 0.5s var(--ease-out);
-  }
-
-  .project:hover .art {
-    transform: translateY(-6px);
-  }
-
-  .shape {
-    position: absolute;
-    display: block;
-  }
-
-  /* Abstract compositions in each project's palette: a big sphere, a slab and a bead. */
-  .one {
-    width: 54%;
-    aspect-ratio: 1;
-    left: 8%;
-    bottom: -18%;
-    border-radius: 50%;
-    background:
-      radial-gradient(circle at 32% 28%, rgb(255 255 255 / 0.85) 0 7%, transparent 28%),
-      radial-gradient(circle at 50% 55%, var(--a), var(--b));
-    box-shadow: 0 30px 50px -20px rgb(0 0 0 / 0.4);
-  }
-
-  .two {
-    width: 36%;
-    height: 46%;
-    right: 9%;
-    top: 14%;
-    border-radius: 24px;
-    background: linear-gradient(140deg, rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.2));
-    border: 1px solid rgb(255 255 255 / 0.8);
-    transform: rotate(8deg);
-  }
-
-  .three {
-    width: 11%;
-    aspect-ratio: 1;
-    left: 54%;
-    top: 12%;
-    border-radius: 50%;
-    background: radial-gradient(circle at 32% 28%, #fff, var(--a));
-    box-shadow: 0 12px 20px -8px rgb(0 0 0 / 0.4);
-  }
-
-  .tone-teal {
-    --a: #5be0cf;
-    --b: #0b5d55;
-    background:
-      radial-gradient(80% 80% at 100% 0%, rgb(255 192 131 / 0.7), transparent 60%),
-      linear-gradient(150deg, #19b5a5, #08272a);
-  }
-  .tone-indigo {
-    --a: #9a9aff;
-    --b: #14163f;
-    background:
-      radial-gradient(80% 80% at 0% 100%, rgb(255 138 43 / 0.55), transparent 60%),
-      linear-gradient(150deg, #5656ee, #14163f);
-  }
-  .tone-amber {
-    --a: #ffd9a8;
-    --b: #c2410a;
-    background:
-      radial-gradient(80% 80% at 0% 0%, rgb(255 255 255 / 0.6), transparent 60%),
-      linear-gradient(150deg, #ffc083, #ff8a2b 70%);
-  }
-  .tone-plum {
-    --a: #ffb3c8;
-    --b: #3a1650;
-    background:
-      radial-gradient(80% 80% at 100% 100%, rgb(124 124 255 / 0.6), transparent 60%),
-      linear-gradient(150deg, #7a2fa8, #230d3d);
-  }
-
-  .meta {
-    display: grid;
-    gap: 0.5rem;
-    padding-inline: 0.25rem;
-  }
-
-  .category {
-    color: var(--core-600);
-    font-size: 0.9rem;
-    font-weight: 600;
-  }
-
-  h3 {
-    font-size: clamp(1.5rem, 2.4vw, 1.9rem);
-  }
-
-  .summary {
-    color: var(--ink-soft);
-    max-width: 32rem;
-  }
-
-  .outcome {
-    font-weight: 600;
-    max-width: 32rem;
-  }
-
-  @media (min-width: 48rem) {
-    .grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    /* Staggered second column gives the grid a rhythm instead of a flat 2x2. */
-    .project:nth-child(even) {
-      margin-top: 5rem;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .art {
-      transition: none;
-    }
+    gap: clamp(4rem, 8vw, 7rem);
   }
 </style>

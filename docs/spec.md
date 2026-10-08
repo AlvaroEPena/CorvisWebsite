@@ -165,3 +165,31 @@ CMS, blog, real calendar embed, analytics, WebGL hero, i18n, real domain/email s
 
 - 2026-10-07: draft created from brief + research.
 - 2026-10-08: added Stripe deposit checkout + PandaDoc proposal (�6b, �8); new `/thanks` page; Turnstile secret must fail closed outside dev.
+
+## 14. Change request 2026-10-08 (owner): positioning, packages, animation, portfolio
+
+**Positioning:** target businesses with no web presence; sell a "digital growth partner" and
+"Done-For-You Digital Real Estate". Never use the words "template(s)", "framework(s)" or "AI" in
+public copy.
+**Packages (replace pricing.ts):**
+
+- **The Launchpad Foundation**, starting at $4,500 (id `launchpad`): fully branded, conversion-optimized
+  site live in 14 days (from kickoff, with approved content/assets); done-for-you industry-specific
+  copywriting included; mobile-first. Deposit checkout enabled (placeholder 50% = $2,250).
+- **The Market Leader**, starting at $6,800 (id `market-leader`): everything in Launchpad plus up to 10
+  dedicated service and location pages for local search, and lead-capture forms with spam protection
+  and instant email alerts. Deposit checkout enabled (placeholder 50% = $3,400). Featured.
+- **Fully Managed Digital Infrastructure (care plan)**, $149/mo, mandatory, presented as included
+  with both packages (not an optional add-on, no separate checkout): premium global hosting,
+  proactive security, versioned backups with one-click rollback, peace of mind.
+- Removed from packages by owner: "routes inquiries directly to your phone".
+- Claims must match what we can deliver. No ranking guarantees; "nightly backups" is reworded to
+  versioned backups + rollback (what Git + Cloudflare deployments actually provide).
+  **Animation:** add visible capability: a lightweight animated dot-field/wave background (canvas or CSS)
+  inspired by a sibling water-effect hero, button micro-interactions, scroll-linked effects; all lazy, paused
+  off-screen, honoring reduced-motion/Save-Data; Lighthouse mobile must stay >= 95 and LCP < 2.0 s.
+  **Portfolio:** single project for now, a sanitized remake of a real pool-builder site (owner
+  decision: remove identifying business details, keep their photos). Data-driven (`projects.ts`) so more can
+  be added later (Chad's site, Refined Celebrations). Alder & Finch landscaping stays as the concept
+  shown in the before/after "redesign" demo, made to look like a real landscaping redesign with a
+  scroll-through animation. A couple of sample testimonials stay, labeled as sample feedback.

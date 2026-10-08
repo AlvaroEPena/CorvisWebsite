@@ -15,7 +15,10 @@ function sessionForm(network: ReturnType<typeof createHarness>['network']): URLS
 describe('POST /api/checkout', () => {
   it('creates a hosted session and returns its url', async () => {
     const { handler, network } = createHarness();
-    const response = await handler(checkout({ package: 'launch', email: 'ada@example.com' }), ENV);
+    const response = await handler(
+      checkout({ package: 'launchpad', email: 'ada@example.com' }),
+      ENV,
+    );
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
@@ -32,7 +35,7 @@ describe('POST /api/checkout', () => {
     const form = sessionForm(network);
     expect(form.get('mode')).toBe('payment');
     expect(form.get('customer_email')).toBe('ada@example.com');
-    expect(form.get('metadata[package]')).toBe('launch');
+    expect(form.get('metadata[package]')).toBe('launchpad');
     expect(form.get('success_url')).toBe(`${SITE}/thanks?session_id={CHECKOUT_SESSION_ID}`);
     expect(form.get('cancel_url')).toBe(`${SITE}/#pricing`);
   });
@@ -54,23 +57,23 @@ describe('POST /api/checkout', () => {
 
   it('ignores a client-supplied amount', async () => {
     const { handler, network } = createHarness();
-    await handler(checkout({ package: 'launch', amount: 1, depositUsdCents: 1 }), ENV);
+    await handler(checkout({ package: 'launchpad', amount: 1, depositUsdCents: 1 }), ENV);
     expect(sessionForm(network).get('line_items[0][price_data][unit_amount]')).toBe(
-      String(DEPOSIT_PACKAGES.launch.depositUsdCents),
+      String(DEPOSIT_PACKAGES.launchpad.depositUsdCents),
     );
   });
 
   it('omits customer_email when none is given', async () => {
     const { handler, network } = createHarness();
-    await handler(checkout({ package: 'launch' }), ENV);
+    await handler(checkout({ package: 'launchpad' }), ENV);
     expect(sessionForm(network).has('customer_email')).toBe(false);
   });
 
   it('uses the same idempotency key for a repeated request within the window', async () => {
     const { handler, network } = createHarness({ now: () => 1_000_000 });
-    await handler(checkout({ package: 'launch' }), ENV);
-    await handler(checkout({ package: 'launch' }), ENV);
-    await handler(checkout({ package: 'redesign' }), ENV);
+    await handler(checkout({ package: 'launchpad' }), ENV);
+    await handler(checkout({ package: 'launchpad' }), ENV);
+    await handler(checkout({ package: 'market-leader' }), ENV);
     const keys = network
       .callsTo(STRIPE_SESSIONS_URL)
       .map((call) => (call.init.headers as Record<string, string>)['Idempotency-Key']);
@@ -82,7 +85,7 @@ describe('POST /api/checkout', () => {
     ['unknown package', { package: 'enterprise' }],
     ['care package (no checkout)', { package: 'care' }],
     ['missing package', {}],
-    ['bad email', { package: 'launch', email: 'nope' }],
+    ['bad email', { package: 'launchpad', email: 'nope' }],
   ])('rejects %s with 400 validation and no Stripe call', async (_name, body) => {
     const { handler, network } = createHarness();
     const response = await handler(checkout(body), ENV);
@@ -96,13 +99,13 @@ describe('POST /api/checkout', () => {
     expect((await handler(checkout('{oops'), ENV)).status).toBe(400);
     expect((await handler(checkout('x', { 'Content-Type': 'text/plain' }), ENV)).status).toBe(400);
     expect(
-      (await handler(checkout({ package: 'launch', pad: 'x'.repeat(2000) }), ENV)).status,
+      (await handler(checkout({ package: 'launchpad', pad: 'x'.repeat(2000) }), ENV)).status,
     ).toBe(413);
   });
 
   it('answers 503 checkout_unavailable when STRIPE_SECRET_KEY is unset', async () => {
     const { handler, network } = createHarness();
-    const response = await handler(checkout({ package: 'launch' }), {});
+    const response = await handler(checkout({ package: 'launchpad' }), {});
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({ ok: false, error: 'checkout_unavailable' });
     expect(network.calls).toHaveLength(0);
@@ -118,7 +121,7 @@ describe('POST /api/checkout', () => {
           ),
       },
     });
-    const response = await handler(checkout({ package: 'launch' }), ENV);
+    const response = await handler(checkout({ package: 'launchpad' }), ENV);
     const text = await response.text();
     expect(response.status).toBe(502);
     expect(JSON.parse(text)).toEqual({ ok: false, error: 'checkout_failed' });
@@ -133,13 +136,13 @@ describe('POST /api/checkout', () => {
     const { handler } = createHarness({
       responders: { [`POST ${STRIPE_SESSIONS_URL}`]: () => Response.json({ id: 'cs_1' }) },
     });
-    expect((await handler(checkout({ package: 'launch' }), ENV)).status).toBe(502);
+    expect((await handler(checkout({ package: 'launchpad' }), ENV)).status).toBe(502);
   });
 
   it('rejects cross-origin requests with 403', async () => {
     const { handler, network } = createHarness();
     const response = await handler(
-      checkout({ package: 'launch' }, { Origin: 'https://evil.example' }),
+      checkout({ package: 'launchpad' }, { Origin: 'https://evil.example' }),
       ENV,
     );
     expect(response.status).toBe(403);
@@ -150,7 +153,8 @@ describe('POST /api/checkout', () => {
     const { handler } = createHarness({
       checkoutRateLimiter: createRateLimiter({ limit: 1, windowMs: 60_000 }),
     });
-    const request = () => checkout({ package: 'launch' }, { 'CF-Connecting-IP': '198.51.100.9' });
+    const request = () =>
+      checkout({ package: 'launchpad' }, { 'CF-Connecting-IP': '198.51.100.9' });
     expect((await handler(request(), ENV)).status).toBe(200);
     const limited = await handler(request(), ENV);
     expect(limited.status).toBe(429);

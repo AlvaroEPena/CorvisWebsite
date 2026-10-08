@@ -9,39 +9,39 @@ export interface Service {
 
 export const services: readonly Service[] = [
   {
-    id: 'redesign',
-    title: 'Website Redesign',
+    id: 'new-build',
+    title: 'Done-For-You New Website',
     summary:
-      'Keep what already works, rebuild what does not. Same business, a site that finally looks and performs like it.',
+      'A fully branded, conversion-optimized site with the writing included. You run the business; we handle every word and pixel.',
     points: [
-      'Audit of content, speed and search',
-      'New design and structure',
-      'Redirects that protect your rankings',
+      'Industry-specific copywriting',
+      'Live 14 days from kickoff',
+      'Built for phones first',
     ],
     tone: 'core',
   },
   {
-    id: 'new-build',
-    title: 'New Website Build',
+    id: 'local-search',
+    title: 'Local Search Growth',
     summary:
-      'From a blank page to a live site, designed around how your customers actually decide.',
-    points: ['Strategy, copy direction and design', 'Hand-built, no page-builder bloat'],
+      'Dedicated service and location pages that put you in front of customers searching in your area, plus forms that alert you instantly.',
+    points: ['Up to 10 service and location pages', 'Instant email lead alerts'],
     tone: 'vision',
   },
   {
     id: 'care-plan',
-    title: 'Care & Growth plan',
+    title: 'Fully Managed Digital Infrastructure',
     summary:
-      'Hosting, security, updates and a steady stream of small improvements, handled monthly.',
-    points: ['Fixes within a working day', 'Monthly improvement sprint'],
+      'Premium hosting, proactive security and versioned backups, handled for you so the site never depreciates.',
+    points: ['Hosting included', 'One-click rollback'],
     tone: 'glass',
   },
   {
-    id: 'landing-pages',
-    title: 'Brand-aligned landing pages',
+    id: 'redesign',
+    title: 'Website Redesign',
     summary:
-      'Focused single pages for a launch, an offer or a campaign, built to match your brand exactly.',
-    points: ['Ready fast', 'Built to convert'],
+      'Already have a site that looks tired? We keep what works and rebuild the rest around your core idea.',
+    points: ['Content and speed audit', 'Redirects that protect your traffic'],
     tone: 'teal',
   },
 ];

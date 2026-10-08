@@ -3,9 +3,9 @@ export const site = {
   name: 'Corvis',
   slogan: 'The Core Vision',
   url: 'https://thecorvis.com',
-  title: 'Corvis | The Core Vision - Web design studio',
+  title: 'Corvis | The Core Vision - Done-For-You Digital Real Estate',
   description:
-    'Corvis is a web design studio. We redesign existing websites and build new ones around the single idea that makes your business different. Book a free consult.',
+    'Corvis is your done-for-you digital growth partner. We write, build, launch and manage a fast, branded website for local businesses in 14 days. Book a free consult.',
   email: 'aaron@thecorvis.com',
   phone: '+1 801-784-0475',
   /** E.164 form for tel: links and structured data. */
@@ -23,7 +23,7 @@ export const site = {
     { label: 'FAQ', href: '#faq' },
   ],
   hero: {
-    badge: 'Web design studio',
-    lead: 'Corvis designs and builds fast, striking websites around the one idea that makes your business different.',
+    badge: 'Done-For-You Digital Real Estate',
+    lead: 'We launch and manage your online presence in 14 days, so customers find you and you stay hands-off.',
   },
 } as const;

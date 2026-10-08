@@ -1,7 +1,7 @@
 ---
 import { depositFor } from '../content/deposits';
 import { formatPrice } from '../content/format';
-import { pricing } from '../content/pricing';
+import { managedPlan, pricing } from '../content/pricing';
 import { site } from '../content/site';
 ---
 
@@ -12,9 +12,10 @@ import { site } from '../content/site';
     <div class="container inner">
       <div class="section-heading reveal">
         <p class="eyebrow">Packages</p>
-        <h2 id="pricing-title">Clear prices before you commit to anything.</h2>
+        <h2 id="pricing-title">Hire a growth partner, not just a website.</h2>
         <p>
-          Starting points for the most common projects. Your fixed quote follows the free consult.
+          Two done-for-you packages, one managed foundation. Your fixed quote follows the free
+          consult.
         </p>
       </div>
 
@@ -25,23 +26,30 @@ import { site } from '../content/site';
             <li
               class:list={['card', pkg.featured ? 'featured' : 'glass-dark']}
               data-placeholder={pkg.placeholder}
+              data-testid={`package-${pkg.id}`}
             >
               {pkg.featured && <span class="badge">Most chosen</span>}
               <h3>{pkg.name}</h3>
-              <p class="blurb">{pkg.blurb}</p>
+              <p class="audience">{pkg.audience}</p>
+              <p class="pitch">{pkg.pitch}</p>
               <p class="price">
                 <span class="from">Starting at</span>
                 <span class="amount">{formatPrice(pkg.priceFrom)}</span>
                 {pkg.unit && <span class="unit">{pkg.unit}</span>}
               </p>
+              {pkg.featuresLead && <p class="lead-in">{pkg.featuresLead}</p>}
               <ul class="features">
                 {pkg.features.map((feature) => (
-                  <li>{feature}</li>
+                  <li>
+                    <strong>{feature.title}</strong>
+                    <span>{feature.text}</span>
+                    {feature.footnote && <small>{feature.footnote}</small>}
+                  </li>
                 ))}
               </ul>
               <div class="actions">
                 <a
-                  class:list={['btn', pkg.featured ? 'btn-primary' : 'btn-light']}
+                  class:list={['btn', 'btn-shine', pkg.featured ? 'btn-primary' : 'btn-light']}
                   href={site.cta.href}
                 >
                   {site.cta.label}
@@ -64,6 +72,7 @@ import { site } from '../content/site';
           );
         })}
       </ul>
+
       <p
         class="checkout-error"
         role="alert"
@@ -72,6 +81,34 @@ import { site } from '../content/site';
         data-email={site.email}
         hidden
       ></p>
+
+      <section
+        class="managed glass-dark reveal"
+        aria-labelledby="managed-title"
+        data-testid="managed-plan"
+        data-placeholder={managedPlan.placeholder}
+      >
+        <div class="managed-head">
+          <p class="included">Required with both packages</p>
+          <h3 id="managed-title">{managedPlan.name}</h3>
+          <p class="managed-summary">{managedPlan.summary}</p>
+          <p class="managed-price">
+            <span class="amount">{formatPrice(managedPlan.priceMonthly)}</span>
+            <span class="unit">/ month</span>
+          </p>
+          <a class="btn btn-light btn-shine" href={site.cta.href}>
+            {site.cta.label}
+          </a>
+        </div>
+        <ul class="managed-points">
+          {managedPlan.points.map((point) => (
+            <li>
+              <strong>{point.title}</strong>
+              <span>{point.text}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <p class="trust reveal">
         Secure payment by Stripe. Deposit is credited to your project. Not sure which fits? Book a
@@ -145,8 +182,8 @@ import { site } from '../content/site';
     position: relative;
     display: grid;
     align-content: start;
-    gap: 1.1rem;
-    padding: clamp(1.6rem, 3vw, 2.25rem);
+    gap: 1rem;
+    padding: clamp(1.6rem, 3vw, 2.4rem);
     border-radius: var(--radius-card);
   }
 
@@ -171,12 +208,21 @@ import { site } from '../content/site';
     font-weight: 600;
   }
 
-  .blurb {
-    color: #c9cbf0;
-    min-height: 3.2em;
+  .audience {
+    color: var(--vision-300);
+    font-size: 0.95rem;
+    font-weight: 600;
   }
 
-  .featured .blurb {
+  .featured .audience {
+    color: var(--vision-700);
+  }
+
+  .pitch {
+    color: #c9cbf0;
+  }
+
+  .featured .pitch {
     color: var(--ink-soft);
   }
 
@@ -207,15 +253,16 @@ import { site } from '../content/site';
     color: #c9cbf0;
   }
 
-  .featured .unit {
-    color: var(--ink-soft);
+  .lead-in {
+    margin-top: 0.25rem;
+    font-weight: 700;
   }
 
   .features {
     display: grid;
-    gap: 0.65rem;
-    margin: 0.5rem 0 0;
-    padding: 1.25rem 0 0;
+    gap: 0.9rem;
+    margin: 0;
+    padding: 1.1rem 0 0;
     border-top: 1px solid rgb(255 255 255 / 0.16);
     list-style: none;
   }
@@ -224,22 +271,44 @@ import { site } from '../content/site';
     border-top-color: var(--line);
   }
 
-  .features li {
+  .features li,
+  .managed-points li {
     position: relative;
-    padding-left: 1.6rem;
+    display: grid;
+    gap: 0.15rem;
+    padding-left: 1.7rem;
     font-size: 0.98rem;
   }
 
-  .features li::before {
+  .features li::before,
+  .managed-points li::before {
     content: '';
     position: absolute;
     left: 0.15rem;
-    top: 0.5em;
+    top: 0.4em;
     width: 0.7rem;
     height: 0.38rem;
     border: solid var(--vision-500);
     border-width: 0 0 2.5px 2.5px;
     transform: rotate(-45deg);
+  }
+
+  .features small {
+    color: #c9cbf0;
+    font-size: 0.82rem;
+  }
+
+  .featured .features small {
+    color: var(--ink-soft);
+  }
+
+  .features span,
+  .managed-points span {
+    color: #dcdef7;
+  }
+
+  .featured .features span {
+    color: var(--ink-soft);
   }
 
   .actions {
@@ -263,7 +332,6 @@ import { site } from '../content/site';
   }
 
   .btn-light:hover {
-    transform: translateY(-2px);
     box-shadow: 0 0 0 6px rgb(255 138 43 / 0.3);
   }
 
@@ -306,6 +374,49 @@ import { site } from '../content/site';
     font-weight: 600;
   }
 
+  .managed {
+    display: grid;
+    gap: 2rem;
+    margin-top: 1.25rem;
+    padding: clamp(1.6rem, 3vw, 2.4rem);
+    border-radius: var(--radius-card);
+  }
+
+  .managed-head {
+    display: grid;
+    gap: 0.8rem;
+    justify-items: start;
+  }
+
+  .included {
+    padding: 0.3rem 0.85rem;
+    border-radius: var(--radius-pill);
+    background: rgb(255 138 43 / 0.2);
+    color: var(--vision-300);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .managed-summary {
+    max-width: 30rem;
+    color: #dcdef7;
+  }
+
+  .managed-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+
+  .managed-points {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    align-content: center;
+  }
+
   .trust {
     margin-top: 2.5rem;
     color: #e6e7ff;
@@ -314,12 +425,11 @@ import { site } from '../content/site';
 
   @media (min-width: 64rem) {
     .cards {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      align-items: center;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    /* The featured package stands taller than its neighbours. */
-    .featured {
-      padding-block: clamp(2.4rem, 4vw, 3.2rem);
+    .managed {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 3rem;
     }
   }
 </style>

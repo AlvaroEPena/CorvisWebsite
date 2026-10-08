@@ -7,6 +7,10 @@ import FloatingObject from './FloatingObject.astro';
   <div class="aura" style="--aura-color:rgb(255 192 131 / .6);top:-14rem;right:-12rem"></div>
   <div class="aura" style="--aura-color:rgb(124 124 255 / .32);top:12rem;left:-26rem"></div>
 
+  <div class="dotfield" data-dotfield aria-hidden="true">
+    <canvas></canvas>
+  </div>
+
   <div class="container grid">
     <div class="copy">
       <p class="eyebrow hero-rise" style="--delay:0s">
@@ -21,7 +25,12 @@ import FloatingObject from './FloatingObject.astro';
         {site.hero.lead}
       </p>
       <div class="actions hero-rise" style="--delay:.22s">
-        <a class="btn btn-primary" href={site.cta.href} data-testid="hero-cta">
+        <a
+          class="btn btn-primary btn-shine"
+          href={site.cta.href}
+          data-testid="hero-cta"
+          data-magnetic
+        >
           {site.cta.label}
           <svg class="btn-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path
@@ -108,6 +117,28 @@ import FloatingObject from './FloatingObject.astro';
 </section>
 
 <style>
+  /* Dot-field layer: static dots until the canvas takes over (and for reduced-motion/Save-Data). */
+  .dotfield {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: radial-gradient(circle, rgb(59 59 214 / 0.2) 1.4px, transparent 1.8px);
+    background-size: 26px 26px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 60% 45%, #000 20%, transparent 75%);
+    mask-image: radial-gradient(ellipse 70% 70% at 60% 45%, #000 20%, transparent 75%);
+  }
+
+  .dotfield[data-dotfield-live] {
+    background: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .dotfield canvas {
+    display: block;
+  }
+
   .hero {
     padding-block: clamp(1.5rem, 4vw, 3rem) clamp(4rem, 8vw, 7rem);
   }

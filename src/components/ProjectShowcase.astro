@@ -1,0 +1,391 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import type { Project } from '../content/projects';
+
+interface Props {
+  project: Project;
+  /** Resolved image assets keyed by `<folder>/<file>`. */
+  images: Record<string, ImageMetadata>;
+  index: number;
+}
+
+const { project, images, index } = Astro.props;
+const image = (file: string) => {
+  const found = images[`${project.folder}/${file}`];
+  if (!found) throw new Error(`Missing portfolio image ${project.folder}/${file}`);
+  return found;
+};
+
+const [heroPhoto, ...rest] = project.photos;
+if (!heroPhoto) throw new Error(`Project ${project.id} has no photos`);
+const galleryPhotos = rest.slice(0, 4);
+const thumbs = rest.slice(0, 4);
+const isReversed = index % 2 === 1;
+---
+
+<article
+  class:list={['showcase', isReversed && 'reversed']}
+  data-testid="project-showcase"
+  data-placeholder={project.placeholder}
+  aria-labelledby={`project-${project.id}`}
+>
+  <div class="window browse-host" aria-hidden="true">
+    <div class="chrome">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="address">{project.site.domain}</span>
+    </div>
+    <div class="browse viewport" data-testid="project-browse">
+      <div class="browse-track">
+        <header class="m-nav">
+          <span class="m-logo">{project.name}</span>
+          <span class="m-links">
+            <b>Pools</b>
+            <b>Gallery</b>
+            <b>Contact</b>
+          </span>
+        </header>
+        <section class="m-hero">
+          <Image
+            class="m-hero-img"
+            src={image(heroPhoto.file)}
+            alt=""
+            width={900}
+            sizes="(min-width: 64rem) 640px, 92vw"
+            loading="lazy"
+          />
+          <div class="m-hero-copy">
+            <span class="m-title">{project.site.headline}</span>
+            <span class="m-sub">{project.site.subline}</span>
+            <span class="m-btn">{project.site.cta}</span>
+          </div>
+        </section>
+        <section class="m-services">
+          {project.site.services.map((service) => (
+            <span class="m-service">{service}</span>
+          ))}
+        </section>
+        <section class="m-gallery">
+          <span class="m-heading">{project.site.galleryTitle}</span>
+          <div class="m-grid">
+            {galleryPhotos.map((photo) => (
+              <Image
+                src={image(photo.file)}
+                alt=""
+                width={420}
+                sizes="(min-width: 64rem) 300px, 45vw"
+                loading="lazy"
+              />
+            ))}
+          </div>
+        </section>
+        <section class="m-quote">
+          <span class="m-heading">{project.site.quoteTitle}</span>
+          <span class="m-btn">{project.site.cta}</span>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary">
+    <p class="label">{project.label}</p>
+    <h3 id={`project-${project.id}`}>{project.name}</h3>
+    <p class="category">{project.category}</p>
+    <p>{project.summary}</p>
+    <div class="cols">
+      <div>
+        <h4>What we built</h4>
+        <ul>
+          {project.built.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h4>Why it works</h4>
+        <ul>
+          {project.whyItWorks.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+    <ul class="thumbs" aria-label="Project photography">
+      {thumbs.map((photo) => (
+        <li>
+          <Image
+            src={image(photo.file)}
+            alt={photo.alt}
+            width={240}
+            height={180}
+            sizes="120px"
+            loading="lazy"
+          />
+        </li>
+      ))}
+    </ul>
+  </div>
+</article>
+
+<style>
+  .showcase {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  .window {
+    border-radius: 24px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid rgb(255 255 255 / 0.8);
+    box-shadow: 0 40px 80px -36px rgb(20 22 63 / 0.55);
+  }
+
+  .chrome {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1rem;
+    background: #ecebf5;
+  }
+
+  .dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: #b9b8cf;
+  }
+
+  .address {
+    flex: 1;
+    margin-left: 0.6rem;
+    padding: 0.2rem 0.8rem;
+    border-radius: 99px;
+    background: #fff;
+    color: var(--ink-mute);
+    font-size: 0.78rem;
+  }
+
+  .viewport {
+    aspect-ratio: 16 / 11;
+    background: #f4f8fa;
+    font-family: var(--font-body);
+    color: #0e1024;
+  }
+
+  /* Mock page: every size is a container-query unit so it scales like a real screenshot. */
+  .m-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2cqw 4cqw;
+    background: #fff;
+  }
+
+  .m-logo {
+    font-family: var(--font-display);
+    font-size: 2.4cqw;
+    font-weight: 700;
+  }
+
+  .m-links {
+    display: flex;
+    gap: 3cqw;
+    font-size: 1.7cqw;
+    font-weight: 500;
+    color: #4a4d6b;
+  }
+
+  .m-hero {
+    position: relative;
+    height: 56cqw;
+    background: linear-gradient(160deg, #3f86a8, #a9d8ea);
+  }
+
+  .m-hero :global(.m-hero-img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .m-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgb(8 24 40 / 0.72), rgb(8 24 40 / 0) 70%);
+  }
+
+  .m-hero-copy {
+    position: absolute;
+    z-index: 1;
+    left: 4cqw;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    gap: 2cqw;
+    justify-items: start;
+    max-width: 52cqw;
+    color: #fff;
+  }
+
+  .m-title {
+    font-family: var(--font-display);
+    font-size: 6cqw;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .m-sub {
+    font-size: 2cqw;
+    line-height: 1.4;
+  }
+
+  .m-btn {
+    padding: 1.3cqw 3cqw;
+    border-radius: 99cqw;
+    background: #ff8a2b;
+    color: #0e1024;
+    font-size: 1.9cqw;
+    font-weight: 700;
+  }
+
+  .m-services {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2cqw;
+    padding: 4cqw;
+    background: #fff;
+  }
+
+  .m-service {
+    padding: 3cqw 2cqw;
+    border-radius: 2cqw;
+    background: #e6f4f8;
+    font-size: 2cqw;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .m-gallery {
+    display: grid;
+    gap: 2.4cqw;
+    padding: 4cqw;
+  }
+
+  .m-heading {
+    font-family: var(--font-display);
+    font-size: 3.6cqw;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .m-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2cqw;
+  }
+
+  .m-grid :global(img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 2cqw;
+  }
+
+  .m-quote {
+    display: grid;
+    gap: 2.4cqw;
+    justify-items: center;
+    padding: 6cqw 4cqw 8cqw;
+    background: #0b2b3a;
+    color: #fff;
+    text-align: center;
+  }
+
+  .summary {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+
+  .label {
+    padding: 0.3rem 0.85rem;
+    border-radius: var(--radius-pill);
+    background: rgb(25 181 165 / 0.14);
+    color: #0b5d55;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .category {
+    color: var(--core-600);
+    font-weight: 600;
+  }
+
+  .summary > p:not(.label, .category) {
+    max-width: 34rem;
+    color: var(--ink-soft);
+  }
+
+  .cols {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  h4 {
+    margin-bottom: 0.4rem;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+  }
+
+  .cols ul {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+    padding-left: 1.1rem;
+    list-style: disc;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
+  .thumbs {
+    display: flex;
+    gap: 0.6rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .thumbs :global(img) {
+    display: block;
+    width: 5.5rem;
+    height: 4.2rem;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+
+  @media (min-width: 40rem) {
+    .cols {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .showcase {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      gap: 4rem;
+    }
+    .reversed .window {
+      order: 2;
+    }
+    .cols {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

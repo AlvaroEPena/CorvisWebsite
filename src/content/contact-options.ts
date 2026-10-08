@@ -6,8 +6,8 @@ type Budget = (typeof BUDGETS)[number];
 /** Labels for the contract enums; `satisfies` makes the compiler flag any missing value. */
 const serviceLabels = {
   redesign: 'Website redesign',
-  'new-build': 'New website build',
-  'care-plan': 'Care & Growth plan',
+  'new-build': 'Done-for-you new website',
+  'care-plan': 'Managed infrastructure',
   'not-sure': 'Not sure yet',
 } satisfies Record<Service, string>;
 

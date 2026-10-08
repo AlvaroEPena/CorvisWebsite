@@ -62,3 +62,107 @@
 :root[data-motion='on']:not([data-motion-ready]) [data-hero-obj] {
   opacity: 0;
 }
+
+/*
+ * Browse-through: a slow automatic scroll inside decorative browser mocks, like someone reading the
+ * page. The viewport (.browse) is a size container so the track can stop exactly at its bottom.
+ * Pauses on hover or focus, and is removed entirely for reduced-motion and Save-Data.
+ */
+.browse {
+  position: relative;
+  overflow: hidden;
+  container-type: size;
+}
+
+.browse-track {
+  position: absolute;
+  inset: 0 0 auto 0;
+}
+
+@keyframes browse {
+  0%,
+  10% {
+    transform: translateY(0);
+  }
+  90%,
+  100% {
+    transform: translateY(calc(-100% + 100cqh));
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-save-data]) .browse-track {
+    animation: browse var(--browse-duration, 26s) ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  .browse-host:hover .browse-track,
+  .browse-host:focus-within .browse-track {
+    animation-play-state: paused;
+  }
+}
+
+/* ---- Scroll-linked effects (pure CSS, only where scroll-driven animations exist) ---- */
+
+.scroll-progress {
+  display: none;
+}
+
+@property --count {
+  syntax: '<integer>';
+  inherits: false;
+  initial-value: 0;
+}
+
+@keyframes progress-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes count-up {
+  from {
+    --count: 0;
+  }
+  to {
+    --count: var(--to);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    /* Thin page-progress bar under the nav: scaleX tied to the root scroll position. */
+    .scroll-progress {
+      display: block;
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 60;
+      height: 3px;
+      background: linear-gradient(90deg, var(--core-400), var(--vision-500));
+      transform-origin: 0 50%;
+      pointer-events: none;
+      animation: progress-grow linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    /* Proof-strip counters: the number counts up as the strip scrolls into view. The real text
+       stays in the DOM (and reads normally); the animated glyphs are presentation only. */
+    .count {
+      font-size: 0;
+      animation: count-up linear both;
+      animation-timeline: view();
+      animation-range: entry 5% entry 90%;
+      counter-reset: count var(--count);
+    }
+
+    .count::before {
+      content: counter(count) / '';
+      font-size: var(--count-size);
+    }
+  }
+}

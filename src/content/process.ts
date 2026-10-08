@@ -7,7 +7,7 @@ export const processSteps: readonly ProcessStep[] = [
   {
     title: 'Listen',
     description:
-      'A free consult. We learn what you sell, who buys it and what the current site is costing you.',
+      'A free consult. We learn what you sell, who buys it and where customers look for you today.',
   },
   {
     title: 'Agree the plan',
@@ -15,17 +15,18 @@ export const processSteps: readonly ProcessStep[] = [
       'We boil the business down to one clear idea, then send a plain-English proposal you can e-sign.',
   },
   {
-    title: 'Design',
-    description: 'Real screens, not mood boards. You react to your own content in your own brand.',
+    title: 'Write and design',
+    description:
+      'We write the copy and design real screens in your brand. You review and approve, nothing more.',
   },
   {
-    title: 'Build',
+    title: 'Build and launch',
     description:
-      'Hand-built, tested on real phones, tuned for speed and checked for accessibility.',
+      'Hand-built, tested on real phones and live 14 days from kickoff, once your content and approvals are in.',
   },
   {
-    title: 'Launch and grow',
+    title: 'Manage and grow',
     description:
-      'We handle the switch-over, then keep improving with data and, if you want it, a care plan.',
+      'Hosting, security and backups run in the background while we keep improving what brings you leads.',
   },
 ];

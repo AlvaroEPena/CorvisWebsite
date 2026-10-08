@@ -6,43 +6,43 @@ export interface FaqEntry {
 /** Single source for the visible FAQ and the FAQPage JSON-LD. Plain text answers only. */
 export const faq: readonly FaqEntry[] = [
   {
-    question: 'How long does a project take?',
+    question: 'How fast can my site be live?',
     answer:
-      'Most landing pages are ready in a couple of weeks, and full redesigns usually take between four and eight, depending on how fast content and feedback come back. We confirm a timeline after the free consult.',
+      'The Launchpad Foundation goes live 14 days from kickoff, once your content and approvals are in. The Market Leader has more pages, so we confirm its timeline at kickoff.',
   },
   {
-    question: 'How much does a website cost?',
+    question: 'What does it cost?',
     answer:
-      'Packages start at the prices shown above, and every quote is fixed after we agree the scope. There are no surprise hourly bills.',
+      'The Launchpad Foundation starts at $4,500 and The Market Leader at $6,800. Every build also includes our Fully Managed Digital Infrastructure at $149 per month. Your quote is fixed after the free consult.',
+  },
+  {
+    question: 'Who writes the content?',
+    answer:
+      'We do. Professional, industry-specific copywriting is included in every build. You review and approve it.',
+  },
+  {
+    question: 'What is Fully Managed Digital Infrastructure?',
+    answer:
+      'It is the care plan that keeps your site running: premium global hosting, proactive security and versioned backups with one-click rollback. It is required with both packages and billed at $149 a month, so you never manage a server.',
+  },
+  {
+    question: 'Will my site rank first on Google?',
+    answer:
+      'No one can honestly promise rankings. The Market Leader gives you up to 10 dedicated service and location pages built to capture local search traffic, and we measure what brings you leads.',
   },
   {
     question: 'Will I own the website?',
     answer:
-      'Yes. The design, code and content are yours when the project is paid. There is no lock-in and you can host it anywhere.',
+      'Yes. The design and content are yours once the project is paid, and we hand over everything if you ever want to move.',
   },
   {
-    question: 'Can you redesign without hurting my Google rankings?',
+    question: 'How will I know when someone contacts me?',
     answer:
-      'That is part of the job. We audit what ranks today, keep the pages and wording that earn traffic and set up redirects for anything that moves.',
-  },
-  {
-    question: 'Can I edit the site myself?',
-    answer:
-      'If you want to, yes. We can connect a simple editor for text and images, or you can send changes to us under a care plan.',
-  },
-  {
-    question: 'What happens after launch?',
-    answer:
-      'You get a support window with every package. After that, the Care & Growth plan covers hosting, updates and monthly improvements, or you can stop and keep everything.',
-  },
-  {
-    question: 'Do you work with an existing brand?',
-    answer:
-      'Yes. We build around your logo, colors and voice. If you have none yet, we can shape a simple visual direction as part of the project.',
+      'The Market Leader includes lead-capture forms with spam protection and instant email alerts, so every inquiry reaches your inbox the moment it is sent.',
   },
   {
     question: 'What do you need from me to start?',
     answer:
-      'A short chat, your current site if you have one, and anything that shows how you want to be seen. We handle the rest and tell you exactly what we need, when.',
+      'A short chat, your logo and photos if you have them, and a quick approval on the words and design. We handle the rest and tell you exactly what we need, when.',
   },
 ];

@@ -21,10 +21,10 @@ function event(overrides: Record<string, unknown> = {}, session: Record<string, 
       object: {
         id: 'cs_test_1',
         payment_status: 'paid',
-        amount_total: 120_000,
+        amount_total: 225_000,
         currency: 'usd',
         customer_details: { email: 'ada@example.com' },
-        metadata: { package: 'launch' },
+        metadata: { package: 'launchpad' },
         ...session,
       },
     },
@@ -63,7 +63,9 @@ describe('POST /api/stripe-webhook: signature', () => {
     expect(mail.to).toEqual(['owner@corvis.example']);
     expect(mail.from).toBe('Corvis <hello@corvis.example>');
     expect(mail.reply_to).toBe('ada@example.com');
-    expect(mail.subject).toBe('Corvis deposit paid: Launch: project deposit ($1,200.00)');
+    expect(mail.subject).toBe(
+      'Corvis deposit paid: The Launchpad Foundation: project deposit ($2,250.00)',
+    );
     expect(mail.text).toContain('Customer email: ada@example.com');
     expect(mail.text).toContain('Stripe session: cs_test_1');
   });

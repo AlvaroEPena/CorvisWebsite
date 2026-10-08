@@ -45,7 +45,7 @@ test.describe('axe WCAG 2.2 AA', () => {
     );
     await page.goto('/');
     await page.locator('#faq summary').first().click();
-    await page.getByTestId('deposit-button-launch').click();
+    await page.getByTestId('deposit-button-launchpad').click();
     await expect(page.getByTestId('checkout-error')).toBeVisible();
     expect(await axeViolations(page)).toEqual([]);
   });

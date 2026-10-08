@@ -3,30 +3,24 @@ export interface Testimonial {
   name: string;
   role: string;
   company: string;
+  /** Shown as "Sample feedback" until real client quotes exist. */
   placeholder: true;
 }
 
 export const testimonials: readonly Testimonial[] = [
   {
     quote:
-      'They asked better questions in one call than our last agency did in a month. The new site says exactly what we do.',
-    name: 'Marisol Okafor',
+      'I did not write a single word and the site still sounds exactly like how I talk to customers. It was live before I expected it.',
+    name: 'Dana Whitfield',
     role: 'Owner',
-    company: 'Alder & Finch Landscaping',
+    company: 'Sample Roofing Co.',
     placeholder: true,
   },
   {
-    quote: 'Fast, clear and calm to work with. We went from a site we hid to one we lead with.',
-    name: 'Tobias Lindqvist',
-    role: 'Clinic director',
-    company: 'Kestrel Physio',
-    placeholder: true,
-  },
-  {
-    quote: 'Pricing was plain, the timeline held, and the page loads before you can blink.',
-    name: 'Priya Venkataraman',
-    role: 'Founder',
-    company: 'Marlowe Coffee Roasters',
+    quote: 'Calm, clear and fast. Hosting and backups are simply handled, which is all I wanted.',
+    name: 'Marcus Delacroix',
+    role: 'Director',
+    company: 'Sample Dental Group',
     placeholder: true,
   },
 ];

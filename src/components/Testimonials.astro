@@ -30,6 +30,7 @@ const initials = (name: string) =>
           class:list={['quote', 'panel', 'reveal', index === 0 && 'lead', index === 2 && 'shift']}
           data-placeholder={item.placeholder}
         >
+          <p class="sample">Sample feedback</p>
           <blockquote>
             <p>&ldquo;{item.quote}&rdquo;</p>
           </blockquote>
@@ -73,6 +74,16 @@ const initials = (name: string) =>
 
   blockquote {
     margin: 0;
+  }
+
+  .sample {
+    width: fit-content;
+    padding: 0.2rem 0.7rem;
+    border-radius: var(--radius-pill);
+    background: rgb(59 59 214 / 0.09);
+    color: var(--core-900);
+    font-size: 0.78rem;
+    font-weight: 600;
   }
 
   blockquote p {
@@ -129,7 +140,6 @@ const initials = (name: string) =>
     }
     .lead {
       grid-column: 1 / span 7;
-      grid-row: span 2;
     }
     .quote:not(.lead) {
       grid-column: span 5;

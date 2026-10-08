@@ -9,7 +9,12 @@ import { proofChips, proofStats } from '../content/proof';
         {proofStats.map((stat) => (
           <div class="stat">
             <dt>{stat.label}</dt>
-            <dd>{stat.value}</dd>
+            <dd>
+              <span class="count" style={`--to:${stat.value}`}>
+                {stat.value}
+              </span>
+              {stat.suffix}
+            </dd>
           </div>
         ))}
       </dl>
@@ -48,6 +53,7 @@ import { proofChips, proofStats } from '../content/proof';
   }
 
   dd {
+    --count-size: clamp(2.4rem, 5vw, 3.6rem);
     margin: 0;
     font-family: var(--font-display);
     font-size: clamp(2.4rem, 5vw, 3.6rem);

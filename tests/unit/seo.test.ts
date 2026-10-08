@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { faq } from '../../src/content/faq';
 import { formatPrice } from '../../src/content/format';
-import { pricing } from '../../src/content/pricing';
+import { managedPlan, pricing } from '../../src/content/pricing';
+import { proofChips, proofStats } from '../../src/content/proof';
+import { processSteps } from '../../src/content/process';
 import { projects } from '../../src/content/projects';
 import { services } from '../../src/content/services';
 import { site } from '../../src/content/site';
@@ -46,13 +48,33 @@ describe('faqJsonLd', () => {
 
 describe('content invariants', () => {
   it('flags every placeholder price, testimonial and project', () => {
-    for (const item of [...pricing, ...testimonials, ...projects]) {
+    for (const item of [...pricing, managedPlan, ...testimonials, ...projects]) {
       expect(item.placeholder).toBe(true);
     }
   });
   it('keeps typography on plain hyphens (no em or en dashes in copy)', () => {
     const copy = JSON.stringify({ site, services, projects, pricing, testimonials, faq });
     expect(copy).not.toMatch(/[–—]/);
+  });
+  it('never uses the banned words in public copy', () => {
+    const copy = JSON.stringify({
+      site,
+      services,
+      projects,
+      pricing,
+      managedPlan,
+      testimonials,
+      faq,
+      processSteps,
+      proofStats,
+      proofChips,
+    });
+    expect(copy).not.toMatch(/template|framework|\bAI\b/i);
+  });
+  it('keeps package ids in step with the checkout contract and mentions no phone routing', () => {
+    expect(pricing.map((pkg) => pkg.id)).toEqual(['launchpad', 'market-leader']);
+    expect(managedPlan.priceMonthly).toBe(149);
+    expect(JSON.stringify({ pricing, faq, services })).not.toMatch(/routes|text message|nightly/i);
   });
   it('formats prices from data', () => {
     expect(formatPrice(5800)).toBe('$5,800');

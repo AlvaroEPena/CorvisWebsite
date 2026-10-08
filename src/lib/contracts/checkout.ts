@@ -6,8 +6,8 @@ import { z } from 'zod';
  * keep them in step with `src/content/pricing.ts` (package ids must match).
  */
 export const DEPOSIT_PACKAGES = {
-  launch: { name: 'Launch: project deposit', depositUsdCents: 120_000 },
-  redesign: { name: 'Full Redesign: project deposit', depositUsdCents: 290_000 },
+  launchpad: { name: 'The Launchpad Foundation: project deposit', depositUsdCents: 225_000 },
+  'market-leader': { name: 'The Market Leader: project deposit', depositUsdCents: 340_000 },
 } as const;
 
 export type DepositPackageId = keyof typeof DEPOSIT_PACKAGES;
