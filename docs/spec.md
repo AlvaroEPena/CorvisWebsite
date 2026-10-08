@@ -260,3 +260,11 @@ public copy.
 - Work lists Refined Celebrations and Mod Labs (real info, owner's sites). Poster photos: `src/assets/portfolio/{refined,modlabs}` (`scripts/optimize-refined.mjs`, `scripts/optimize-modlabs.mjs`).
 - Search: home title "Corvis | Web Design Studio for Local Businesses"; `WebSite` entity with alternate names; logo ImageObject; `serializeJsonLd` escaping fixed; optional `PUBLIC_GOOGLE_SITE_VERIFICATION` / `PUBLIC_BING_SITE_VERIFICATION`; `docs/seo-checklist.md`; e2e sweep `tests/e2e/seo.spec.ts`.
 - Sandbox picker: 1/2/3 columns by breakpoint.
+
+### 16.4 Round 9 delta (2026-10-09): smooth live previews
+
+- No CSS look-alike posters any more. Home slider, Work previews and the sandbox frame show a "Preview Loading" placeholder (glass panel, gradient wheel, browser chrome rendered from first paint, exact final box) that cross-fades (500 ms, opacity only) into the live iframe; failure or Save-Data shows "Preview unavailable".
+- Live previews: same-origin iframes of the registry builds at a fixed 1440 px layout, scaled with a transform. The driver is one time-based rAF loop: whole-pixel scrollTop plus a sub-pixel `translate3d` remainder (fixes the judder from integer scrolling). Scroll bar hidden inside previews. Timing: no initial hold, 0.3 s holds, 1.0 s cubic ease in/out, steady glide between, alternating; starts when fully visible; no pause on hover/focus; paused only when the tab is hidden or the host is off screen.
+- Demo contract: `?preview=1` (water one tier lighter) and the `corvis-preview` postMessage `{type, paused}` (same-origin, parent only) to stop and resume the water loop; no page parking.
+- Slider wipe: overflow-hidden window whose width changes (no clip-path). Work previews share one column width and a 16:10 aspect.
+- Removed: OldSiteMock, NewSiteMock, SitePreview, redesign-demo.ts, the CSS `browse` keyframes. `data-js` on `<html>` supports the no-script placeholder text.

@@ -10,7 +10,7 @@ test.describe('J4 before/after slider', () => {
     await slider.focus();
 
     await expect(slider).toHaveValue('50');
-    const startClip = await before.evaluate((el) => (el as HTMLElement).style.clipPath);
+    const startWidth = await before.evaluate((el) => (el as HTMLElement).style.width);
 
     await page.keyboard.press('ArrowRight');
     await expect(slider).toHaveValue('51');
@@ -22,8 +22,8 @@ test.describe('J4 before/after slider', () => {
     await page.keyboard.press('Home');
     await expect(slider).toHaveValue('0');
 
-    const endClip = await before.evaluate((el) => (el as HTMLElement).style.clipPath);
-    expect(endClip).not.toBe(startClip);
+    const endWidth = await before.evaluate((el) => (el as HTMLElement).style.width);
+    expect(endWidth).not.toBe(startWidth);
     await expect(slider).toHaveAttribute('aria-valuetext', /.+/);
   });
 
@@ -62,10 +62,10 @@ test.describe('J4 before/after slider', () => {
 
     const endValue = Number(await slider.inputValue());
     expect(endValue).toBeGreaterThan(startValue + 15);
-    const clip = await page
+    const width = await page
       .locator('[data-ba-before]')
-      .evaluate((el) => (el as HTMLElement).style.clipPath);
-    expect(clip).toContain(`${100 - endValue}`);
+      .evaluate((el) => (el as HTMLElement).style.width);
+    expect(width).toBe(`${endValue}%`);
   });
 
   test('tapping the track on a touch viewport moves the reveal', async ({ page, isMobile }) => {

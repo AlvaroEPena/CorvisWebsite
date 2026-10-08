@@ -5,13 +5,13 @@ import type { ImageMetadata } from 'astro';
  * build time so the recreated sites and the case-study cards share the same optimized assets.
  */
 const modules = import.meta.glob<{ default: ImageMetadata }>(
-  '../../assets/portfolio/**/*.{avif,webp}',
+  '../assets/portfolio/**/*.{avif,webp}',
   { eager: true },
 );
 
 export const portfolioImages: Record<string, ImageMetadata> = Object.fromEntries(
   Object.entries(modules).map(([path, module]) => [
-    path.replace('../../assets/portfolio/', '').replace(/\.(avif|webp)$/, ''),
+    path.replace('../assets/portfolio/', '').replace(/\.(avif|webp)$/, ''),
     module.default,
   ]),
 );

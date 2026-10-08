@@ -1,6 +1,6 @@
 /**
  * Marks elements with `data-in-view` while they should be animating. CSS only runs the long-lived
- * decorative animations (browser-mock scroll-through, water drift) while the mark is present, so
+ * decorative work (the live preview scroll-through, water drift) while the mark is present, so
  * off-screen work costs nothing.
  *
  * With `fullyVisible`, the mark is set only once (nearly) the whole element is on screen, so a

@@ -93,3 +93,8 @@
 - Scroll-through timing fixed (start when fully visible, ~1 s holds). Home slider and Work previews show the real demo builds with live water. Mod Labs added to sandbox, Work and demos. SEO structured data/title/verification hooks, `docs/seo-checklist.md`.
 - Verified: typecheck/lint/format clean, 245 unit, 533 e2e passed / 0 failed, Lighthouse `/` mobile 99 (desktop 100), `/sandbox` 100, A11y 100, SEO 100.
 - Owner steps pending: push; test a real /admin Save; Search Console sitemap shows "Couldn't fetch" at first (normal, retry in 1-3 days); add "Website by Corvis" footers to Mod Labs and Refined; replace fictional reviews with real ones before promoting.
+
+## 2026-10-09 — Round 9 (owner): smooth previews: done
+
+- Cause of choppiness: integer scroll quantization (per-frame step SD 0.53 px to 0.005 px after fix), plus hidden scroll bar, no hover pause, time-based holds/ramps, same-size Work previews, "Preview Loading" placeholder with cross-fade.
+- Verified: typecheck/lint/format clean, 253 unit, 550 e2e passed / 0 failed, Lighthouse `/` and `/sandbox` mobile 100/100/100/100.

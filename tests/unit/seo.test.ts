@@ -5,7 +5,6 @@ import { managedPlan, pricing } from '../../src/content/pricing';
 import { proofChips, proofStats } from '../../src/content/proof';
 import { processSteps } from '../../src/content/process';
 import { projects } from '../../src/content/projects';
-import { redesignSample } from '../../src/content/redesign-demo';
 import { sandboxProjects } from '../../src/content/sandbox';
 import { services } from '../../src/content/services';
 import { site } from '../../src/content/site';
@@ -142,8 +141,8 @@ describe('faqJsonLd', () => {
 });
 
 describe('content invariants', () => {
-  it('flags every placeholder price and the sample redesign', () => {
-    for (const item of [...pricing, managedPlan, redesignSample]) {
+  it('flags every placeholder price', () => {
+    for (const item of [...pricing, managedPlan]) {
       expect(item.placeholder).toBe(true);
     }
   });
@@ -157,7 +156,6 @@ describe('content invariants', () => {
       site,
       services,
       projects,
-      redesignSample,
       pricing,
       reviewsFile,
       faq,
@@ -169,7 +167,6 @@ describe('content invariants', () => {
       site,
       services,
       projects,
-      redesignSample,
       pricing,
       managedPlan,
       reviewsFile,

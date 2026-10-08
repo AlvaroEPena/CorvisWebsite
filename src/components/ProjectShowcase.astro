@@ -1,9 +1,9 @@
 ---
 import { Image } from 'astro:assets';
 import type { WorkProject } from '../content/projects';
+import { getSandboxProject } from '../content/sandbox';
+import { portfolioImage } from '../lib/portfolio-images';
 import LiveSiteStage from './LiveSiteStage.astro';
-import SitePreview from './mocks/SitePreview.astro';
-import { portfolioImage } from './mocks/portfolio-images';
 
 interface Props {
   project: WorkProject;
@@ -11,7 +11,7 @@ interface Props {
 }
 
 const { project, index } = Astro.props;
-const thumbs = project.photos.slice(0, 4);
+const displayUrl = getSandboxProject(project.sandboxId)?.displayUrl ?? '';
 const isReversed = index % 2 === 1;
 ---
 
@@ -23,25 +23,19 @@ const isReversed = index % 2 === 1;
   aria-labelledby={`project-${project.id}`}
 >
   <div
-    class="window browse-host"
+    class="window"
     aria-hidden="true"
+    data-testid="project-window"
     data-live-host
     data-browse-duration="26"
-    data-browse-tuning="browse"
   >
     <div class="chrome">
       <span class="dot"></span>
       <span class="dot"></span>
       <span class="dot"></span>
-      <span class="address">{project.preview.domain}</span>
+      <span class="address">{displayUrl}</span>
     </div>
-    <LiveSiteStage projectId={project.sandboxId} version="after">
-      <div class="browse viewport" data-testid="project-browse">
-        <div class="browse-track">
-          <SitePreview project={project} />
-        </div>
-      </div>
-    </LiveSiteStage>
+    <LiveSiteStage projectId={project.sandboxId} version="after" />
   </div>
 
   <div class="summary">
@@ -71,7 +65,7 @@ const isReversed = index % 2 === 1;
       </div>
     </div>
     <ul class="thumbs" aria-label="Project photography">
-      {thumbs.map((photo) => (
+      {project.photos.map((photo) => (
         <li>
           <Image
             src={portfolioImage(project.folder, photo.file)}
@@ -127,9 +121,9 @@ const isReversed = index % 2 === 1;
     font-size: 0.78rem;
   }
 
-  .viewport {
+  /* Every project's preview has the same box: one aspect ratio, and (below) the same column width. */
+  .window :global(.live-stage) {
     aspect-ratio: 16 / 10;
-    background: var(--core-900);
   }
 
   .summary {
@@ -200,6 +194,8 @@ const isReversed = index % 2 === 1;
     height: 4.2rem;
     border-radius: 12px;
     object-fit: cover;
+    /* A soft tint shows while a lazy photo arrives, so it does not pop in against the page. */
+    background: linear-gradient(145deg, rgb(228 228 255 / 0.9), rgb(255 236 214 / 0.9));
   }
 
   @media (min-width: 40rem) {
@@ -212,6 +208,10 @@ const isReversed = index % 2 === 1;
     .showcase {
       grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
       gap: 4rem;
+    }
+    /* Preview on the right: swap the columns too, so the preview keeps the same (wide) width. */
+    .reversed {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
     }
     .reversed .window {
       order: 2;

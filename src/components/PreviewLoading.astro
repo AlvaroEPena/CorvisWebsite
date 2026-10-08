@@ -1,0 +1,27 @@
+---
+interface Props {
+  /** False draws the panel without the wheel and words. */
+  status?: boolean;
+  /** False draws only the wheel and words, on no background (laid over other panels). */
+  panel?: boolean;
+}
+const { status = true, panel = true } = Astro.props;
+/**
+ * The "Preview Loading" placeholder: glass panel, slow sheen, gradient wheel and the words. Styles are
+ * in styles/preview-loading.css (shared with the sandbox frame). It fills its positioned parent, so the
+ * box is fixed from the first paint, and the parent fades it out while the real site fades in.
+ */
+---
+
+<div class:list={['preview-loading', !panel && 'preview-loading-bare']} data-preview-loading>
+  {panel && <span class="preview-sheen" aria-hidden="true" />}
+  {status && (
+    <span class="preview-status">
+      <span class="preview-wheel-wrap" aria-hidden="true">
+        <span class="preview-wheel"></span>
+      </span>
+      <span class="preview-text preview-text-loading">Preview Loading</span>
+      <span class="preview-text preview-text-unavailable">Preview unavailable</span>
+    </span>
+  )}
+</div>

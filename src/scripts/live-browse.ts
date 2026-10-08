@@ -1,47 +1,47 @@
-import {
-  BROWSE_TUNINGS,
-  isTuningName,
-  progress,
-  scaleFor,
-  scrollTopFor,
-  type BrowseTuning,
-} from './live-browse-math';
+import { BROWSE_TIMING, progress, scaleFor, scrollTopFor, splitScroll } from './live-browse-math';
 
 /**
- * Shows the REAL demo sites (the same builds as /sandbox) inside the home page's browser mocks.
+ * Shows the REAL demo sites (the same builds as /sandbox) inside the home page's browser frames.
  *
- * Markup contract (components/LiveSiteStage.astro): a host `[data-live-host]` (also `.browse-host`,
- * so in-view.ts marks it `data-in-view` once fully visible) holding one or two stages
- * `[data-live-stage]` with `data-src` and `data-title`. Each stage already contains its CSS poster.
+ * Markup contract (components/LiveSiteStage.astro): a host `[data-live-host]` (also marked
+ * `data-in-view` by in-view.ts once fully visible) holding one or two stages `[data-live-stage]` with
+ * `data-src` and `data-title`. Each stage already holds the "Preview Loading" placeholder, in its final
+ * box, from the first paint.
  *
  *  - Nothing loads until a host is near the viewport, and never under Save-Data or reduced data.
- *  - The demo is probed first (a missing demo keeps the poster). The iframe is decorative: inert,
- *    aria-hidden, not focusable, no pointer events, so the slider on top keeps working.
- *  - The page is a fixed 1440px wide desktop layout, scaled to the stage width with a CSS transform;
- *    it fades in over the poster once loaded (and, for the water hero, once it reports ready).
- *  - The scroll-through drives the iframe's own scroll position from here, so lazy images in the demo
- *    load as they come into view. All stages in a host share one progress value, so the Before and
- *    After pages stay aligned.
- *  - The demo's water hero stops itself when it scrolls out of ITS viewport, not ours, so while a host
- *    is off screen its pages are parked at the bottom (hero out of view = no rendering).
- *  - Phones get the live pages too: measured smooth enough (see docs/progress notes in the report).
- *    The only fallbacks are Save-Data / reduced data (poster only) and reduced motion (live, but no
- *    scrolling, so the pages stay at the top).
+ *  - The demo is probed first (a missing demo leaves the calm "Preview unavailable" placeholder). The
+ *    iframe is decorative: inert, aria-hidden, not focusable, no pointer events, so the slider on top
+ *    keeps working. It is mounted hidden in the same box and only ever changes opacity: it cross-fades
+ *    in over the placeholder once the page (and, for the water hero, the water) is ready.
+ *  - The page is a fixed 1440px wide desktop layout scaled to the stage width with a CSS transform.
+ *  - The scroll-through drives the iframe's own scroll position, so lazy images in the demo load as
+ *    they come into view and the demo's own scroll effects run. Browsers scroll documents in whole
+ *    pixels, which at a slow glide makes the motion step unevenly; the leftover fraction of a pixel is
+ *    drawn as a tiny transform instead, so the picture moves smoothly. Both stages in a host share one
+ *    progress value, so Before and After stay aligned.
+ *  - It does NOT pause on hover or focus. It pauses only when the tab is hidden, and the water hero is
+ *    paused (by message, ?preview=1 mode of the demo) while the host is off screen.
+ *  - Phones get the live pages too: measured smooth with a real GPU. The only fallbacks are Save-Data and
+ *    reduced data (placeholder only) and reduced motion (live, but no scrolling).
  */
 const LAYOUT_WIDTH = 1440;
 const NEAR_VIEWPORT = '300px 0px';
 /** Longest wait for the water hero to report ready before fading the page in anyway. */
 const READY_TIMEOUT_MS = 2500;
 const READY_POLL_MS = 100;
-/** Settling time after load when there is nothing to wait for (images start decoding, fonts apply). */
+/** Settling time after load: images start decoding, fonts apply. */
 const READY_GRACE_MS = 300;
 const LOAD_TIMEOUT_MS = 12000;
 /** Re-measure the demo's height now and then: lazy images change it as they load. */
 const MEASURE_EVERY_FRAMES = 30;
+/** Extra layout pixels so the sub-pixel shift never shows a gap at the bottom edge. */
+const BLEED = 2;
+const PREVIEW_QUERY = '?preview=1';
+const HIDE_SCROLLBAR = 'html{scrollbar-width:none}::-webkit-scrollbar{display:none}';
 
 const root = document.documentElement;
 
-const wantsPosterOnly = (): boolean =>
+const wantsPlaceholderOnly = (): boolean =>
   root.hasAttribute('data-save-data') || matchMedia('(prefers-reduced-data: reduce)').matches;
 
 async function responds(src: string): Promise<boolean> {
@@ -73,7 +73,6 @@ async function whenWaterReady(doc: Document): Promise<void> {
 }
 
 class Stage {
-  readonly element: HTMLElement;
   private readonly src: string;
   private readonly title: string;
   private iframe?: HTMLIFrameElement;
@@ -82,14 +81,13 @@ class Stage {
   private viewportHeight = 0;
   private scale = 1;
   private measuredAt = 0;
-  /** Where the demo was last scrolled to, so sub-pixel steps can be skipped. */
-  private lastTop = Number.NaN;
+  private lastWhole = Number.NaN;
+  private lastFraction = Number.NaN;
 
   constructor(
-    element: HTMLElement,
+    private readonly element: HTMLElement,
     private readonly onReady: () => void,
   ) {
-    this.element = element;
     this.src = element.dataset.src ?? '';
     this.title = element.dataset.title ?? '';
   }
@@ -124,20 +122,20 @@ class Stage {
       },
       { once: true },
     );
-    iframe.src = this.src;
+    // ?preview=1 asks the demo for its lighter preview mode (cheaper water, pausable by message).
+    iframe.src = `${this.src}${PREVIEW_QUERY}`;
     this.element.append(iframe);
-    this.element.setAttribute('data-live-state', 'loading');
   }
 
-  /** Scales the 1440px layout to the stage width and gives it the stage's height in layout pixels. */
+  /** Sizes the 1440px layout to the stage: the scale, and the height that fills the box. */
   private fit(): void {
     const { width, height } = this.element.getBoundingClientRect();
-    if (width === 0) return;
-    const scale = scaleFor(width, LAYOUT_WIDTH);
-    this.element.style.setProperty('--live-scale', String(scale));
-    this.element.style.setProperty('--live-height', `${height / scale}px`);
-    this.viewportHeight = height / scale;
-    this.scale = scale;
+    if (width === 0 || !this.iframe) return;
+    this.scale = scaleFor(width, LAYOUT_WIDTH);
+    this.viewportHeight = height / this.scale;
+    this.iframe.style.setProperty('--live-height', `${this.viewportHeight + BLEED}px`);
+    this.lastFraction = Number.NaN; // redraw the transform with the new scale
+    this.draw(Number.isNaN(this.lastWhole) ? 0 : this.lastWhole, 0);
   }
 
   private fail(): void {
@@ -149,6 +147,9 @@ class Stage {
   private async becomeReady(): Promise<void> {
     const doc = this.document();
     if (!doc) return this.fail();
+    const style = doc.createElement('style');
+    style.textContent = HIDE_SCROLLBAR;
+    doc.head.append(style);
     await whenWaterReady(doc);
     this.ready = true;
     this.element.setAttribute('data-live-state', 'ready');
@@ -164,7 +165,21 @@ class Stage {
     }
   }
 
-  /** Scrolls the demo; `value` is progress (0 to 1) through its scrollable height. */
+  /** Scrolls to `whole` pixels and draws the `fraction` of a pixel left over as a transform. */
+  private draw(whole: number, fraction: number): void {
+    const iframe = this.iframe;
+    if (!iframe) return;
+    if (whole !== this.lastWhole) {
+      this.lastWhole = whole;
+      iframe.contentWindow?.scrollTo({ top: whole, behavior: 'instant' });
+    }
+    if (fraction !== this.lastFraction) {
+      this.lastFraction = fraction;
+      iframe.style.transform = `translate3d(0, ${-fraction * this.scale}px, 0) scale(${this.scale})`;
+    }
+  }
+
+  /** `value` is progress (0 to 1) through the demo's scrollable height. */
   scrollToProgress(value: number, frame: number): void {
     const doc = this.document();
     if (!doc || !this.ready) return;
@@ -172,34 +187,34 @@ class Stage {
       this.scrollHeight = doc.documentElement.scrollHeight;
       this.measuredAt = frame;
     }
-    const top = scrollTopFor(value, this.scrollHeight, this.viewportHeight);
-    // The slow glide moves well under a device pixel per frame: skip updates that cannot be seen,
-    // which halves the work on phones (a page this size is scaled to about a quarter).
-    const onePixel = 1 / (this.scale * devicePixelRatio);
-    if (Math.abs(top - this.lastTop) < onePixel) return;
-    this.lastTop = top;
-    doc.defaultView?.scrollTo({ top, behavior: 'instant' });
+    const { whole, fraction } = splitScroll(
+      scrollTopFor(value, this.scrollHeight, this.viewportHeight),
+    );
+    this.draw(whole, fraction);
   }
 
-  /** Puts the demo at its very top or very bottom (the hero is only drawn while it is in its viewport). */
-  park(edge: 'top' | 'bottom'): void {
-    const doc = this.document();
-    if (!doc || !this.ready) return;
-    this.scrollHeight = doc.documentElement.scrollHeight;
-    this.lastTop = edge === 'top' ? 0 : this.scrollHeight;
-    doc.defaultView?.scrollTo({ top: this.lastTop, behavior: 'instant' });
+  /** Back to the very top, with no leftover fraction. */
+  reset(): void {
+    if (this.ready) this.draw(0, 0);
+  }
+
+  /** Tells the demo whether it is on screen, so it can stop its water and other heavy work. */
+  setPaused(paused: boolean): void {
+    try {
+      this.iframe?.contentWindow?.postMessage({ type: 'corvis-preview', paused }, location.origin);
+    } catch {
+      // The demo is gone; nothing to pause.
+    }
   }
 }
 
-type Mode = 'top' | 'bottom' | 'running' | 'paused';
+/** What the stages are doing: still (at the top), moving, or paused with the tab hidden. */
+type Mode = 'off' | 'still' | 'running' | 'paused';
 
 class LiveHost {
   private readonly stages: Stage[];
   private mounted = false;
   private isVisible = false;
-  private isHovered = false;
-  private hasFocus = false;
-  /** What the stages currently show; undefined until the first sync (or after a stage becomes ready). */
   private mode: Mode | undefined;
   private elapsed = 0;
   private lastTime = 0;
@@ -229,25 +244,17 @@ class LiveHost {
       this.sync();
     }).observe(this.host);
 
+    // in-view.ts sets this once the whole frame is on screen: that is when the scroll-through starts.
     new MutationObserver(() => this.sync()).observe(this.host, {
       attributes: true,
       attributeFilter: ['data-in-view'],
     });
-    this.host.addEventListener('pointerenter', () => this.setHover(true));
-    this.host.addEventListener('pointerleave', () => this.setHover(false));
-    this.host.addEventListener('focusin', () => this.setFocus(true));
-    this.host.addEventListener('focusout', () => this.setFocus(false));
     document.addEventListener('visibilitychange', () => this.sync());
   }
 
-  private setHover(value: boolean): void {
-    this.isHovered = value;
-    this.sync();
-  }
-
-  private setFocus(value: boolean): void {
-    this.hasFocus = value;
-    this.sync();
+  /** Seconds a duration of one pass lasts; read when needed, so the markup (or a test) can change it. */
+  private get duration(): number {
+    return Number(this.host.dataset.browseDuration) || 26;
   }
 
   private onStageReady(): void {
@@ -256,29 +263,21 @@ class LiveHost {
     this.sync();
   }
 
-  /** Seconds for one pass; read when needed, so the markup (or a test) can change it. */
-  private get duration(): number {
-    return Number(this.host.dataset.browseDuration) || 26;
-  }
-
-  private get tuning(): BrowseTuning {
-    const name = this.host.dataset.browseTuning;
-    return BROWSE_TUNINGS[isTuningName(name) ? name : 'browse'];
-  }
-
   private get hasLiveStage(): boolean {
     return this.stages.some((stage) => stage.isReady);
   }
 
   private nextMode(): Mode {
-    if (!this.isVisible) return 'bottom';
+    if (!this.isVisible) return 'off';
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const inView = this.host.hasAttribute('data-in-view');
-    if (reducedMotion || !inView) return 'top';
-    return this.isHovered || this.hasFocus || document.hidden ? 'paused' : 'running';
+    // Once the whole frame has been seen it keeps going until the frame has left the screen.
+    const hasStarted = this.mode === 'running' || this.mode === 'paused';
+    const shouldRun = this.host.hasAttribute('data-in-view') || (hasStarted && this.isVisible);
+    if (reducedMotion || !shouldRun) return 'still';
+    return document.hidden ? 'paused' : 'running';
   }
 
-  /** Reconciles what the stages show with visibility, hover, focus and the tab state. */
+  /** Reconciles what the stages show with visibility and the tab state. */
   private sync(): void {
     if (!this.hasLiveStage) return;
     const next = this.nextMode();
@@ -286,30 +285,41 @@ class LiveHost {
     this.mode = next;
     cancelAnimationFrame(this.raf);
 
+    // The demo only works (water, scroll effects) while it can be seen.
+    const demoPaused = next === 'off' || next === 'paused';
+    for (const stage of this.stages) stage.setPaused(demoPaused);
+
     if (next === 'running') {
       this.lastTime = performance.now();
       this.raf = requestAnimationFrame(this.tick);
       return;
     }
     if (next === 'paused') return;
-    // Leaving the view resets the loop, like the CSS animation it replaces.
+    // Off screen or not started: rest at the top, out of sight or exactly where it began.
     this.elapsed = 0;
-    for (const stage of this.stages) stage.park(next);
+    for (const stage of this.stages) stage.reset();
   }
 
   private readonly tick = (now: number): void => {
-    // Time based, like the CSS animation it replaces: a slow frame skips ahead instead of dragging the loop.
+    // Time based, like a CSS animation: a slow frame skips ahead instead of dragging the loop.
     this.elapsed += (now - this.lastTime) / 1000;
     this.lastTime = now;
     this.frame += 1;
-    const value = progress(this.elapsed, this.duration, this.tuning);
+    // The first hold is skipped: the scroll-through starts moving as soon as the frame is in view.
+    const value = progress(this.elapsed + BROWSE_TIMING.holdSeconds, this.duration, BROWSE_TIMING);
     for (const stage of this.stages) stage.scrollToProgress(value, this.frame);
     this.raf = requestAnimationFrame(this.tick);
   };
 }
 
 function initLiveSites(): void {
-  if (wantsPosterOnly()) return;
+  if (wantsPlaceholderOnly()) {
+    // Calm, honest state: no demo is loaded for Save-Data visitors.
+    document
+      .querySelectorAll<HTMLElement>('[data-live-stage]')
+      .forEach((stage) => stage.setAttribute('data-live-state', 'unavailable'));
+    return;
+  }
   document.querySelectorAll<HTMLElement>('[data-live-host]').forEach((host) => {
     new LiveHost(host).start();
   });

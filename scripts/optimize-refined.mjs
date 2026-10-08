@@ -19,7 +19,6 @@ const picks = [
   { file: 'wedding-gown-window.jpg', width: 1100, quality: 66 },
   { file: 'wedding-flatlay.jpg', width: 1100, quality: 66 },
   { file: 'wedding-gown-back.jpg', width: 1100, quality: 66 },
-  { file: 'gift-basket.jpg', width: 1000, quality: 66 },
 ];
 
 const outDir = new URL('../src/assets/portfolio/refined/', import.meta.url);

@@ -1,81 +1,76 @@
 /**
- * Pure math for the live "scroll-through" of the real demo sites on the home page. It reproduces the
- * CSS `browse` / `browse-slow` keyframes (src/styles/motion.css) so a live site is read at the same
- * pace as the poster mock: a short hold at each end, an eased start and finish, a steady glide in
- * between, and the direction alternating on every pass.
+ * Pure math for the live "scroll-through" of the real demo sites on the home page.
+ *
+ * The motion is defined in TIME, not as shares of the loop, so a long loop never sits still at the
+ * ends: a short hold, an eased start, a steady glide, an eased stop and a short hold, then the
+ * direction flips. The ease is a cubic (position grows with the cube of time), and the steady speed is
+ * worked out so the speed is continuous where the ease meets the glide.
  */
-export interface BrowseTuning {
-  /** Share of one pass spent holding still at each end. */
-  hold: number;
-  /** Share of one pass spent easing in (and out). */
-  ramp: number;
-  /** Share of the distance covered while easing in (and, mirrored, out). */
-  rampDistance: number;
+export interface BrowseTiming {
+  /** Seconds held still at each end. */
+  holdSeconds: number;
+  /** Seconds easing in at the start of a pass, and easing out at its end. */
+  rampSeconds: number;
 }
 
-/** The numbers behind the two CSS keyframes. */
-export const BROWSE_TUNINGS = {
-  browse: { hold: 0.04, ramp: 0.08, rampDistance: 0.0476 },
-  'browse-slow': { hold: 0.015, ramp: 0.03, rampDistance: 0.016 },
-} as const satisfies Record<string, BrowseTuning>;
+export const BROWSE_TIMING: BrowseTiming = { holdSeconds: 0.3, rampSeconds: 1 };
 
-export type TuningName = keyof typeof BROWSE_TUNINGS;
+/** Shortest pass the timing fits in: both holds, both ramps and a moment of glide. */
+export const minimumPassSeconds = ({ holdSeconds, rampSeconds }: BrowseTiming): number =>
+  2 * holdSeconds + 2 * rampSeconds + 0.1;
 
-export const isTuningName = (value: string | undefined): value is TuningName =>
-  value !== undefined && value in BROWSE_TUNINGS;
+/**
+ * Position (0 to 1) `seconds` into one forward pass of `duration` seconds.
+ *
+ * Ease-in covers `v * ramp / 3` of the distance (a cubic: speed reaches the glide speed `v` exactly
+ * at the end of the ramp); the glide covers `v * glideSeconds`; ease-out mirrors ease-in.
+ */
+export function forwardPass(seconds: number, duration: number, timing: BrowseTiming): number {
+  const hold = timing.holdSeconds;
+  const ramp = Math.min(timing.rampSeconds, Math.max(0, (duration - 2 * hold) / 2.2));
+  const glide = duration - 2 * hold - 2 * ramp;
+  const speed = 1 / (glide + (2 * ramp) / 3);
+  const rampDistance = (speed * ramp) / 3;
 
-/** CSS `cubic-bezier(x1, y1, x2, y2)` as a function of time (x) returning progress (y). */
-export function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
-  const coordinate = (a: number, b: number, t: number) =>
-    3 * a * (1 - t) ** 2 * t + 3 * b * (1 - t) * t ** 2 + t ** 3;
-  return (x: number): number => {
-    if (x <= 0) return 0;
-    if (x >= 1) return 1;
-    let low = 0;
-    let high = 1;
-    let t = x;
-    for (let step = 0; step < 32; step += 1) {
-      const current = coordinate(x1, x2, t);
-      if (Math.abs(current - x) < 1e-7) break;
-      if (current < x) low = t;
-      else high = t;
-      t = (low + high) / 2;
-    }
-    return coordinate(y1, y2, t);
-  };
-}
-
-const easeIn = cubicBezier(0.42, 0, 1, 1);
-const easeOut = cubicBezier(0, 0, 0.58, 1);
-
-/** Position (0 to 1) within one forward pass, `u` being the share of the pass elapsed. */
-export function forwardPass(u: number, { hold, ramp, rampDistance }: BrowseTuning): number {
-  const rampEnd = hold + ramp;
-  const outStart = 1 - hold - ramp;
-  if (u <= hold) return 0;
-  if (u < rampEnd) return rampDistance * easeIn((u - hold) / ramp);
-  if (u <= outStart) {
-    return rampDistance + ((u - rampEnd) / (outStart - rampEnd)) * (1 - 2 * rampDistance);
-  }
-  if (u < 1 - hold) return 1 - rampDistance + rampDistance * easeOut((u - outStart) / ramp);
+  if (seconds <= hold) return 0;
+  const afterHold = seconds - hold;
+  if (afterHold < ramp) return rampDistance * (afterHold / ramp) ** 3;
+  const afterRamp = afterHold - ramp;
+  if (afterRamp <= glide) return rampDistance + speed * afterRamp;
+  const intoOut = afterRamp - glide;
+  if (intoOut < ramp) return 1 - rampDistance * ((ramp - intoOut) / ramp) ** 3;
   return 1;
 }
 
 /**
  * How far through the page the scroll-through is, `seconds` after it started, for passes of
- * `durationSeconds`. Even passes go down, odd passes come back up (CSS `alternate`).
+ * `durationSeconds`. Even passes go down, odd passes come back up. Add `timing.holdSeconds` to
+ * `seconds` to start moving at once instead of holding first.
  */
-export function progress(seconds: number, durationSeconds: number, tuning: BrowseTuning): number {
+export function progress(
+  seconds: number,
+  durationSeconds: number,
+  timing: BrowseTiming = BROWSE_TIMING,
+): number {
   if (!(durationSeconds > 0) || !(seconds > 0)) return 0;
-  const passes = seconds / durationSeconds;
-  const pass = Math.floor(passes);
-  const shape = forwardPass(passes - pass, tuning);
+  const pass = Math.floor(seconds / durationSeconds);
+  const shape = forwardPass(seconds - pass * durationSeconds, durationSeconds, timing);
   return pass % 2 === 0 ? shape : 1 - shape;
 }
 
 /** The scroll offset for a progress value; a page shorter than its window does not scroll. */
 export function scrollTopFor(value: number, scrollHeight: number, viewportHeight: number): number {
   return Math.max(0, scrollHeight - viewportHeight) * value;
+}
+
+/**
+ * Splits a scroll offset into the whole pixels the document is scrolled to and the leftover
+ * fraction, which is drawn as a tiny transform so the motion stays smooth even though a document
+ * can only scroll in whole pixels.
+ */
+export function splitScroll(top: number): { whole: number; fraction: number } {
+  const whole = Math.floor(top);
+  return { whole, fraction: top - whole };
 }
 
 /** Horizontal scale that fits the fixed desktop layout width into a container. */

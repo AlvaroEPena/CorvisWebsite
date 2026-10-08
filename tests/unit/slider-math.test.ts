@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { beforeClipPath, describePosition, toPercent } from '../../src/scripts/slider-math';
+import { beforeWidth, describePosition, toPercent } from '../../src/scripts/slider-math';
 
 describe('toPercent', () => {
   it('rounds and clamps to 0..100', () => {
@@ -13,12 +13,12 @@ describe('toPercent', () => {
   });
 });
 
-describe('beforeClipPath', () => {
-  it('clips the right side by the complement of the value', () => {
-    expect(beforeClipPath(50)).toBe('inset(0 50% 0 0)');
-    expect(beforeClipPath(0)).toBe('inset(0 100% 0 0)');
-    expect(beforeClipPath(100)).toBe('inset(0 0% 0 0)');
-    expect(beforeClipPath(250)).toBe('inset(0 0% 0 0)');
+describe('beforeWidth', () => {
+  it('is the left share of the stage, clamped', () => {
+    expect(beforeWidth(50)).toBe('50%');
+    expect(beforeWidth(0)).toBe('0%');
+    expect(beforeWidth(100)).toBe('100%');
+    expect(beforeWidth(250)).toBe('100%');
   });
 });
 

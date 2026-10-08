@@ -1,96 +1,121 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  BROWSE_TUNINGS,
-  cubicBezier,
+  BROWSE_TIMING,
   forwardPass,
-  isTuningName,
+  minimumPassSeconds,
   progress,
   scaleFor,
   scrollTopFor,
+  splitScroll,
 } from '../../src/scripts/live-browse-math';
 
-describe('cubicBezier', () => {
-  it('matches the CSS easings at the ends and is monotonic', () => {
-    const easeIn = cubicBezier(0.42, 0, 1, 1);
-    expect(easeIn(0)).toBe(0);
-    expect(easeIn(1)).toBe(1);
-    expect(easeIn(0.5)).toBeLessThan(0.5);
-    const easeOut = cubicBezier(0, 0, 0.58, 1);
-    expect(easeOut(0.5)).toBeGreaterThan(0.5);
-    let previous = -1;
-    for (let x = 0; x <= 1; x += 0.05) {
-      const y = easeIn(x);
-      expect(y).toBeGreaterThanOrEqual(previous);
-      previous = y;
-    }
-  });
-  it('is linear for a linear curve', () => {
-    expect(cubicBezier(0, 0, 1, 1)(0.3)).toBeCloseTo(0.3, 5);
+const { holdSeconds, rampSeconds } = BROWSE_TIMING;
+
+describe('timing', () => {
+  it('holds 0.3 s at each end and eases for 1 s', () => {
+    expect(BROWSE_TIMING).toEqual({ holdSeconds: 0.3, rampSeconds: 1 });
   });
 });
 
-describe('tunings match the CSS keyframes', () => {
-  // motion.css: browse = hold 4%, ramp to 12%, steady to 88%, ramp to 96%, hold; ramp distance 0.0476.
-  it('browse', () => {
-    expect(BROWSE_TUNINGS.browse).toEqual({ hold: 0.04, ramp: 0.08, rampDistance: 0.0476 });
-    const pass = (u: number) => forwardPass(u, BROWSE_TUNINGS.browse);
-    expect(pass(0)).toBe(0);
-    expect(pass(0.04)).toBe(0);
-    expect(pass(0.12)).toBeCloseTo(0.0476, 6);
-    expect(pass(0.5)).toBeCloseTo(0.5, 6);
-    expect(pass(0.88)).toBeCloseTo(0.9524, 6);
-    expect(pass(0.96)).toBe(1);
-    expect(pass(1)).toBe(1);
+describe('forwardPass', () => {
+  for (const duration of [26, 80]) {
+    describe(`a ${duration} s pass`, () => {
+      const at = (seconds: number) => forwardPass(seconds, duration, BROWSE_TIMING);
+
+      it('holds still for 0.3 s at both ends', () => {
+        expect(at(0)).toBe(0);
+        expect(at(holdSeconds)).toBe(0);
+        expect(at(duration - holdSeconds)).toBe(1);
+        expect(at(duration)).toBe(1);
+        expect(at(holdSeconds + 0.05)).toBeGreaterThan(0);
+        expect(at(duration - holdSeconds - 0.05)).toBeLessThan(1);
+      });
+
+      it('rises monotonically from 0 to 1 and joins up with no jumps', () => {
+        let previous = 0;
+        for (let seconds = 0; seconds <= duration; seconds += 0.01) {
+          const value = at(seconds);
+          expect(value).toBeGreaterThanOrEqual(previous - 1e-12);
+          // No step larger than the glide speed allows (plus a little for the ease).
+          expect(value - previous).toBeLessThan(0.01 * (2 / duration) + 1e-9);
+          previous = value;
+        }
+      });
+
+      it('eases in over 1 s: slow at first, then reaching the glide speed', () => {
+        const start = holdSeconds;
+        const early = at(start + 0.1) - at(start);
+        const late = at(start + rampSeconds) - at(start + rampSeconds - 0.1);
+        expect(late).toBeGreaterThan(early * 10);
+        // Cubic ease: a tenth of the way in covers a thousandth of the ramp distance.
+        const rampDistance = at(start + rampSeconds);
+        expect(at(start + rampSeconds / 10) / rampDistance).toBeCloseTo(0.001, 6);
+      });
+
+      it('glides at one steady speed between the ramps', () => {
+        const glideStart = holdSeconds + rampSeconds;
+        const glideEnd = duration - holdSeconds - rampSeconds;
+        const speed = (at(glideStart + 1) - at(glideStart)) / 1;
+        for (const seconds of [glideStart + 2, (glideStart + glideEnd) / 2, glideEnd - 2]) {
+          expect(at(seconds + 0.5) - at(seconds)).toBeCloseTo(speed * 0.5, 9);
+        }
+        // The speed at the end of the ease-in equals the glide speed (no jolt).
+        const justBefore = (at(glideStart) - at(glideStart - 0.001)) / 0.001;
+        expect(justBefore).toBeCloseTo(speed, 2);
+      });
+
+      it('is symmetric: the end mirrors the start', () => {
+        for (const seconds of [0.2, 0.5, 1, 1.3, duration / 3]) {
+          expect(at(duration - seconds)).toBeCloseTo(1 - at(seconds), 9);
+        }
+      });
+    });
+  }
+
+  it('has no long stall: even an 80 s loop moves within 0.4 s of the start', () => {
+    expect(forwardPass(0.7, 80, BROWSE_TIMING)).toBeGreaterThan(0);
   });
-  // motion.css: browse-slow = hold 1.5%, ramp to 4.5%, steady to 95.5%, ramp to 98.5%; distance 0.016.
-  it('browse-slow', () => {
-    expect(BROWSE_TUNINGS['browse-slow']).toEqual({ hold: 0.015, ramp: 0.03, rampDistance: 0.016 });
-    const pass = (u: number) => forwardPass(u, BROWSE_TUNINGS['browse-slow']);
-    expect(pass(0.015)).toBe(0);
-    expect(pass(0.045)).toBeCloseTo(0.016, 6);
-    expect(pass(0.955)).toBeCloseTo(0.984, 6);
-    expect(pass(0.985)).toBe(1);
-  });
-  it('rises monotonically through the pass', () => {
-    for (const tuning of Object.values(BROWSE_TUNINGS)) {
-      let previous = 0;
-      for (let u = 0; u <= 1; u += 0.005) {
-        const value = forwardPass(u, tuning);
-        expect(value).toBeGreaterThanOrEqual(previous - 1e-9);
-        previous = value;
-      }
-    }
+
+  it('copes with a pass barely longer than the holds and ramps', () => {
+    const duration = minimumPassSeconds(BROWSE_TIMING);
+    expect(forwardPass(duration / 2, duration, BROWSE_TIMING)).toBeGreaterThan(0.3);
+    expect(forwardPass(duration, duration, BROWSE_TIMING)).toBe(1);
+    expect(forwardPass(1, 1, BROWSE_TIMING)).toBe(1); // shorter than the holds: just done
   });
 });
 
 describe('progress', () => {
-  const tuning = BROWSE_TUNINGS.browse;
-  it('holds at the start, then moves', () => {
-    expect(progress(0, 26, tuning)).toBe(0);
-    expect(progress(1, 26, tuning)).toBe(0); // inside the 4% hold (1.04 s)
-    expect(progress(5, 26, tuning)).toBeGreaterThan(0);
+  const duration = 26;
+  it('starts at zero and is safe for bad input', () => {
+    expect(progress(0, duration)).toBe(0);
+    expect(progress(-3, duration)).toBe(0);
+    expect(progress(5, 0)).toBe(0);
+    expect(progress(Number.NaN, duration)).toBe(0);
   });
-  it('alternates direction on every pass and holds at the far end', () => {
-    expect(progress(26 * 0.5, 26, tuning)).toBeCloseTo(0.5, 6);
-    expect(progress(26 * 0.98, 26, tuning)).toBe(1);
-    expect(progress(26 * 1.02, 26, tuning)).toBe(1); // start of the way back: still holding
-    expect(progress(26 * 1.5, 26, tuning)).toBeCloseTo(0.5, 6);
-    expect(progress(26 * 1.98, 26, tuning)).toBe(0);
-    expect(progress(26 * 2.5, 26, tuning)).toBeCloseTo(0.5, 6);
+  it('alternates direction on every pass', () => {
+    expect(progress(duration * 0.5, duration)).toBeCloseTo(0.5, 6);
+    expect(progress(duration * 1, duration)).toBe(1);
+    expect(progress(duration * 1.5, duration)).toBeCloseTo(0.5, 6);
+    expect(progress(duration * 2, duration)).toBe(0);
+    expect(progress(duration * 2.5, duration)).toBeCloseTo(0.5, 6);
   });
   it('the way back mirrors the way down', () => {
-    for (const u of [0.1, 0.2, 0.7, 0.9]) {
-      expect(progress(26 * (1 + u), 26, tuning)).toBeCloseTo(1 - progress(26 * u, 26, tuning), 9);
+    for (const seconds of [0.5, 1.2, 5, 20, 25.5]) {
+      expect(progress(duration + seconds, duration)).toBeCloseTo(
+        1 - progress(seconds, duration),
+        9,
+      );
     }
   });
-  it('holds about a second at each end of the 26 s loop', () => {
-    expect(26 * tuning.hold).toBeCloseTo(1.04, 2);
+  it('turns around within 0.6 s: it holds 0.3 s at the end, then eases away', () => {
+    const turn = duration - holdSeconds; // reaches the end here, then the next pass holds 0.3 s
+    expect(progress(turn, duration)).toBe(1);
+    expect(progress(duration + holdSeconds, duration)).toBe(1);
+    expect(progress(duration + holdSeconds + 0.3, duration)).toBeLessThan(1);
   });
-  it('is safe for bad input', () => {
-    expect(progress(-3, 26, tuning)).toBe(0);
-    expect(progress(5, 0, tuning)).toBe(0);
-    expect(progress(Number.NaN, 26, tuning)).toBe(0);
+  it('starting with the first hold skipped begins moving at once', () => {
+    expect(progress(0 + holdSeconds + 0.05, duration)).toBeGreaterThan(0);
   });
 });
 
@@ -100,13 +125,13 @@ describe('helpers', () => {
     expect(scrollTopFor(1, 4000, 900)).toBe(3100);
     expect(scrollTopFor(0.7, 500, 900)).toBe(0);
   });
+  it('splits an offset into whole pixels and a fraction', () => {
+    expect(splitScroll(12.25)).toEqual({ whole: 12, fraction: 0.25 });
+    expect(splitScroll(7)).toEqual({ whole: 7, fraction: 0 });
+    const { whole, fraction } = splitScroll(1550.7);
+    expect(whole + fraction).toBeCloseTo(1550.7, 9);
+  });
   it('scales the layout width into the container', () => {
     expect(scaleFor(720, 1440)).toBe(0.5);
-  });
-  it('recognises tuning names', () => {
-    expect(isTuningName('browse')).toBe(true);
-    expect(isTuningName('browse-slow')).toBe(true);
-    expect(isTuningName('x')).toBe(false);
-    expect(isTuningName(undefined)).toBe(false);
   });
 });

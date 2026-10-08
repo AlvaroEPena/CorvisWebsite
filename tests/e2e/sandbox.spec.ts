@@ -352,20 +352,28 @@ test.describe('sandbox frame', () => {
     await expect(page.locator('[data-browser]')).not.toHaveAttribute('data-expanded', '');
   });
 
-  test('honors reduced motion: no spinner, wipe or width transition', async ({ page }) => {
+  test('honors reduced motion: no wheel spin, wipe or width transition', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.route('**/demos/**', (route) => route.fulfill({ status: 404, body: '' }));
     await page.goto('/sandbox');
-    await expect(page.locator('.spinner')).toHaveCSS('animation-name', 'none');
+    await expect(page.locator('[data-viewport] .preview-wheel')).toHaveCSS(
+      'animation-name',
+      'none',
+    );
     await expect(page.locator('[data-browser]')).toHaveCSS('transition-duration', '0s');
     await expect(page.locator('.pick').first()).toHaveCSS('transition-duration', '0s');
   });
 
-  test('plays the glass wipe and keeps the spinner animated with full motion', async ({ page }) => {
+  test('plays the glass wipe and keeps the loading wheel turning with full motion', async ({
+    page,
+  }) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.route('**/demos/**', (route) => route.fulfill({ status: 404, body: '' }));
     await page.goto('/sandbox');
-    await expect(page.locator('.spinner')).toHaveCSS('animation-name', /spin/);
+    await expect(page.locator('[data-viewport] .preview-wheel')).toHaveCSS(
+      'animation-name',
+      'preview-wheel',
+    );
     await tab(page, 'refined-celebrations').click();
     await expect(page.locator('[data-sweep]')).toHaveAttribute('data-play', '');
   });

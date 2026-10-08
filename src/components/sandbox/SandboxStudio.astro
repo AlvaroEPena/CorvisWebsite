@@ -5,6 +5,7 @@
  * project fact comes from src/content/sandbox.ts.
  */
 import { sandboxProjects } from '../../content/sandbox';
+import PreviewLoading from '../PreviewLoading.astro';
 import { sandboxPage } from '../../content/sandbox-copy';
 
 const first = sandboxProjects[0];
@@ -129,10 +130,7 @@ if (!first) throw new Error('The sandbox needs at least one project');
         data-viewport
         data-state="loading"
       >
-        <div class="poster" aria-hidden="true">
-          <span class="spinner"></span>
-          <span class="poster-text">Loading the site</span>
-        </div>
+        <PreviewLoading />
         <div class="unavailable" data-unavailable>
           <p class="unavailable-title">{sandboxPage.unavailableTitle}</p>
           <p>{sandboxPage.unavailableText}</p>
@@ -442,24 +440,23 @@ if (!first) throw new Error('The sandbox needs at least one project');
     opacity: 0;
     visibility: hidden;
     transition:
-      opacity 0.4s var(--ease-out),
-      visibility 0s 0.4s;
+      opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s 0.5s;
   }
 
   .viewport :global(iframe[data-active]) {
     z-index: 1;
     opacity: 1;
     visibility: visible;
-    transition: opacity 0.4s var(--ease-out);
+    transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* While the active version loads, its iframe stays hidden behind the poster. */
+  /* While the active version loads, its iframe stays hidden behind the "Preview Loading" placeholder, which fades out as it fades in. */
   .viewport[data-state='loading'] :global(iframe[data-active]),
   .viewport[data-state='unavailable'] :global(iframe[data-active]) {
     opacity: 0;
   }
 
-  .poster,
   .unavailable {
     position: absolute;
     inset: 0;
@@ -477,8 +474,21 @@ if (!first) throw new Error('The sandbox needs at least one project');
     color: var(--ink-soft);
   }
 
-  .viewport[data-state='loading'] .poster {
-    display: grid;
+  /* The shared placeholder (styles/preview-loading.css) fills the frame; it fades out once the site is ready. */
+  .viewport > :global(.preview-loading) {
+    z-index: 3;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s 0.5s;
+  }
+
+  .viewport[data-state='loading'] > :global(.preview-loading) {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .viewport[data-state='unavailable'] .unavailable {
@@ -495,19 +505,6 @@ if (!first) throw new Error('The sandbox needs at least one project');
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-  }
-
-  .spinner {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    border: 3px solid rgb(59 59 214 / 0.18);
-    border-top-color: var(--core-600);
-    animation: spin 0.9s linear infinite;
-  }
-
-  .poster-text {
-    font-weight: 600;
   }
 
   /* Glass wipe played when the version or project changes. Transform only. */
@@ -537,12 +534,6 @@ if (!first) throw new Error('The sandbox needs at least one project');
     background: #fff;
   }
 
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
   @keyframes sweep {
     from {
       opacity: 1;
@@ -562,7 +553,6 @@ if (!first) throw new Error('The sandbox needs at least one project');
       transition: none;
     }
 
-    .spinner,
     .sweep[data-play] {
       animation: none;
     }

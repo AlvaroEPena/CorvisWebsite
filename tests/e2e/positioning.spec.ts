@@ -49,7 +49,7 @@ test.describe('portfolio', () => {
     await expect(work).toContainText('Refined Celebrations & Co.');
     await expect(work).toContainText('Indianapolis');
     await expect(work).toContainText('Mod Labs');
-    await expect(work).toContainText('Console modding, done right.');
+    await expect(work).toContainText('from $100');
     await expect(work).toContainText('Seattle');
     const origins = work.getByTestId('project-origin');
     await expect(origins).toHaveCount(2);
@@ -81,41 +81,6 @@ test.describe('portfolio', () => {
 });
 
 test.describe('motion fallbacks', () => {
-  test('poster mocks animate normally and stop under reduced motion', async ({ page }) => {
-    // This checks the CSS poster animation, which runs when no live demo replaces it (here: missing
-    // demos). The live pages have their own tests in live-sites.spec.ts.
-    await page.route('**/demos/**', (route) => route.fulfill({ status: 404, body: 'missing' }));
-    await page.emulateMedia({ reducedMotion: 'no-preference' });
-    await page.goto('/');
-    const animationOf = (selector: string) =>
-      page
-        .locator(selector)
-        .first()
-        .evaluate((el) => getComputedStyle(el).animationName);
-
-    // Off-screen mocks stay idle; each one starts once it is on screen.
-    expect(await animationOf('#redesign .browse-track')).toBe('none');
-    for (const [section, expectedAnimation] of [
-      ['#redesign', 'browse-slow'],
-      ['#work', 'browse'],
-    ] as const) {
-      // A scroll-through starts once the whole mock is on screen, so centre it before checking.
-      await page
-        .locator(section + ' .browse-host')
-        .first()
-        .evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
-      await expect(page.locator(section + ' .browse-host').first()).toHaveAttribute(
-        'data-in-view',
-        '',
-      );
-      expect(await animationOf(section + ' .browse-track')).toBe(expectedAnimation);
-    }
-
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    expect(await animationOf('#redesign .browse-track')).toBe('none');
-    expect(await animationOf('#work .browse-track')).toBe('none');
-  });
-
   test('the dot-field starts after paint, and never under reduced motion', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');

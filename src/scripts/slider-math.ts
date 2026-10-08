@@ -11,9 +11,9 @@ export function toPercent(value: number | string): number {
   return Math.round(Math.min(MAX_PERCENT, Math.max(MIN_PERCENT, parsed)));
 }
 
-/** `clip-path` for the "before" layer: shows the left `percent` of the stage. */
-export function beforeClipPath(percent: number): string {
-  return `inset(0 ${MAX_PERCENT - toPercent(percent)}% 0 0)`;
+/** Width of the "before" window: the left `percent` of the stage. */
+export function beforeWidth(percent: number): string {
+  return `${toPercent(percent)}%`;
 }
 
 /** Screen-reader text for `aria-valuetext`, so the number means something. */

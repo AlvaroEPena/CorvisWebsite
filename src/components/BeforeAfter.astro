@@ -1,14 +1,11 @@
 ---
-import { redesignSample } from '../content/redesign-demo';
 import { sandboxCta } from '../content/sandbox-copy';
 import { describePosition } from '../scripts/slider-math';
 import LiveSiteStage from './LiveSiteStage.astro';
-import NewSiteMock from './mocks/NewSiteMock.astro';
-import OldSiteMock from './mocks/OldSiteMock.astro';
+import PreviewLoading from './PreviewLoading.astro';
 
 const START = 50;
-const project = redesignSample;
-/** The registry project whose real builds replace the mocks once loaded (same as /sandbox). */
+/** The registry project whose real builds are shown live (the same as /sandbox). */
 const LIVE_PROJECT = 'saltwater-row';
 ---
 
@@ -26,35 +23,28 @@ const LIVE_PROJECT = 'saltwater-row';
     </div>
 
     <div
-      class="frame panel browse-host"
+      class="frame panel"
       data-live-host
       data-browse-duration="80"
-      data-browse-tuning="browse-slow"
       data-ba
       data-testid="redesign-slider"
-      style={`--ba-pos:${START}%;--browse-duration:80s;--browse-keyframes:browse-slow`}
+      style={`--ba-pos:${START}%`}
     >
       <div class="stage" aria-hidden="true">
         <!-- AFTER: the rebuilt site, always underneath. -->
         <div class="layer after">
-          <LiveSiteStage projectId={LIVE_PROJECT} version="after" fill>
-            <div class="browse">
-              <div class="browse-track">
-                <NewSiteMock project={project} />
-              </div>
-            </div>
-          </LiveSiteStage>
+          <LiveSiteStage projectId={LIVE_PROJECT} version="after" fill status={false} />
         </div>
 
-        <!-- BEFORE: the dated site, clipped to the left of the handle. -->
-        <div class="layer before" data-ba-before style={`clip-path:inset(0 ${100 - START}% 0 0)`}>
-          <LiveSiteStage projectId={LIVE_PROJECT} version="before" fill>
-            <div class="browse">
-              <div class="browse-track">
-                <OldSiteMock project={project} />
-              </div>
-            </div>
-          </LiveSiteStage>
+        <!-- BEFORE: the dated site, in a box as wide as the left of the handle. Its page is as wide
+             as the whole stage (100cqw) and never changes size; only the window onto it does. -->
+        <div class="layer before" data-ba-before style={`width:${START}%`}>
+          <LiveSiteStage projectId={LIVE_PROJECT} version="before" fill status={false} />
+        </div>
+
+        <!-- One "Preview Loading" for the whole stage, above both panels and clear of the handle's knob. -->
+        <div class="stage-status">
+          <PreviewLoading panel={false} />
         </div>
 
         <span class="tag tag-before">Before</span>
@@ -142,15 +132,76 @@ const LIVE_PROJECT = 'saltwater-row';
     position: absolute;
     inset: 0;
     overflow: hidden;
+    contain: paint;
   }
 
-  .layer :global(.live-stage) > .browse {
-    position: absolute;
-    inset: 0;
-  }
-
+  /* The wipe changes the width of this window only; the page inside keeps its full size. */
   .before {
     z-index: 1;
+    right: auto;
+    width: var(--ba-pos);
+  }
+
+  /* While loading, the wheel and words sit in the upper part of the stage, clear of the handle's knob. */
+  .stage-status {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 1;
+    transition:
+      opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s 0s;
+  }
+
+  .stage-status :global(.preview-loading) {
+    place-content: start center;
+    padding-top: 14cqw;
+  }
+
+  /* It fades out with the After page fading in, with the same timing. */
+  .stage:has(.after [data-live-ready]) .stage-status {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s 0.5s;
+  }
+
+  /* If the demo cannot load, say so calmly (no wheel). */
+  .stage:has(.after [data-live-state='unavailable']) .stage-status :global(.preview-text-loading),
+  .stage:has(.after [data-live-state='unavailable']) .stage-status :global(.preview-wheel-wrap) {
+    display: none;
+  }
+
+  .stage:has(.after [data-live-state='unavailable'])
+    .stage-status
+    :global(.preview-text-unavailable) {
+    display: block;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 47.99rem) {
+    .stage-status :global(.preview-loading) {
+      padding-top: 5cqw;
+    }
+    .stage-status :global(.preview-wheel-wrap) {
+      width: 3rem;
+    }
+    .stage-status :global(.preview-wheel) {
+      width: 2.4rem;
+    }
+    .stage-status :global(.preview-status) {
+      gap: 0.5rem;
+    }
+    .stage-status :global(.preview-text) {
+      font-size: 0.85rem;
+    }
+  }
+
+  .before :global(.live-stage) {
+    right: auto;
+    width: 100cqw;
   }
 
   /* ---------- Controls ---------- */

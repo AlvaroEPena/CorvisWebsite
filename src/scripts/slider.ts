@@ -1,6 +1,6 @@
-import { beforeClipPath, describePosition, toPercent } from './slider-math';
+import { beforeWidth, describePosition, toPercent } from './slider-math';
 
-/** Wires every `[data-ba]` slider: a native range input drives the clip of the "before" layer. */
+/** Wires every `[data-ba]` slider: a native range input drives the width of the "before" layer. */
 function initSlider(root: HTMLElement): void {
   const input = root.querySelector<HTMLInputElement>('[data-ba-input]');
   const before = root.querySelector<HTMLElement>('[data-ba-before]');
@@ -8,7 +8,7 @@ function initSlider(root: HTMLElement): void {
 
   const update = () => {
     const percent = toPercent(input.value);
-    before.style.clipPath = beforeClipPath(percent);
+    before.style.width = beforeWidth(percent);
     root.style.setProperty('--ba-pos', `${percent}%`);
     input.setAttribute('aria-valuetext', describePosition(percent));
   };

@@ -79,6 +79,7 @@ const verification = verificationTags({
     <script is:inline>
       (function () {
         const root = document.documentElement;
+        root.setAttribute('data-js', '');
         const connection = navigator.connection;
         if (connection && connection.saveData) root.setAttribute('data-save-data', '');
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;

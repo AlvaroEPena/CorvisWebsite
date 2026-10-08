@@ -1,7 +1,7 @@
 /**
  * Portfolio entries for the Work section. Add a project by appending to `projects`: the section
- * stacks each entry as a showcase (a browser-window preview built from `preview` and `photos`, plus
- * the case summary). `sandboxId` must match an entry in src/content/sandbox.ts so the same project
+ * stacks each entry as a showcase (a live browser-window preview of the real build, plus the case
+ * summary and photo thumbnails). `sandboxId` must match an entry in src/content/sandbox.ts so the same project
  * can be test driven on /sandbox.
  *
  * DATA NOTE: Refined Celebrations & Co. is a site we designed and built from scratch. The owner
@@ -14,38 +14,6 @@ export interface WorkPhoto {
   /** File name (without extension) inside the project's folder in src/assets/portfolio. */
   file: string;
   alt: string;
-}
-
-export interface PreviewService {
-  title: string;
-  text: string;
-}
-
-/** Real copy of the finished site, laid out top to bottom by components/mocks/SitePreview.astro. */
-export interface SitePreviewContent {
-  domain: string;
-  brand: string;
-  nav: readonly string[];
-  eyebrow: string;
-  headline: string;
-  subline: string;
-  primaryCta: string;
-  secondaryCta: string;
-  /** Photo file names from `photos`. */
-  heroPhoto: string;
-  strip: readonly string[];
-  aboutTitle: string;
-  aboutText: string;
-  aboutPhoto: string;
-  servicesTitle: string;
-  services: readonly PreviewService[];
-  galleryTitle: string;
-  galleryPhotos: readonly string[];
-  ctaTitle: string;
-  ctaText: string;
-  ctaLabel: string;
-  /** Brand colors of the finished site, so the preview looks like the real thing. */
-  theme: { ink: string; paper: string; accent: string; accentSoft: string };
 }
 
 export interface WorkProject {
@@ -64,8 +32,8 @@ export interface WorkProject {
   whyItWorks: readonly string[];
   /** One line saying whether this replaced an older site. */
   originNote: string;
+  /** Four photographs shown as thumbnails under the case summary, in order. */
   photos: readonly WorkPhoto[];
-  preview: SitePreviewContent;
 }
 
 export const projects: readonly WorkProject[] = [
@@ -107,58 +75,7 @@ export const projects: readonly WorkProject[] = [
         file: 'wedding-gown-back',
         alt: 'The back of a lace wedding gown with a long train, in a bridal salon',
       },
-      {
-        file: 'gift-basket',
-        alt: 'A curated gift basket tied with a navy ribbon, sitting on a black side table',
-      },
     ],
-    preview: {
-      domain: 'refinedcelebrations.co',
-      brand: 'Refined Celebrations & Co.',
-      nav: ['Home', 'Our Team', 'Our Offerings', 'Portfolios', 'Reach Out'],
-      eyebrow: 'Indianapolis and Salt Lake City',
-      headline: 'Thoughtful design, unforgettable moments.',
-      subline: 'Boutique Wedding, Corporate & Event Planning and Photography',
-      primaryCta: 'Explore Services',
-      secondaryCta: 'View Portfolio',
-      heroPhoto: 'reception-toast',
-      strip: [
-        'Wedding Planning',
-        'Corporate & Non-Profit',
-        'Birthdays & Celebrations',
-        'Photography',
-      ],
-      aboutTitle: 'Every detail, with intention.',
-      aboutText:
-        'Refined Celebrations & Co. is a boutique wedding, corporate, and event planning company serving Indianapolis and Salt Lake City. We offer comprehensive event planning and professional photography services for weddings, events, families, and couples.',
-      aboutPhoto: 'wedding-flatlay',
-      servicesTitle: 'Our Services',
-      services: [
-        {
-          title: 'Weddings',
-          text: 'We plan and manage weddings from start to finish, handling logistics, design, and vendor coordination so you can fully enjoy your day.',
-        },
-        {
-          title: 'Events',
-          text: 'We handle every aspect of your event so you can focus on hosting, from corporate gatherings to private celebrations.',
-        },
-        {
-          title: 'Invitations',
-          text: "We design, assemble, and ship custom invitations that reflect your event's style and story.",
-        },
-        {
-          title: 'Gift Sets',
-          text: 'We craft personalized gift sets for weddings, holidays, and special occasions, curated with care and ready to impress.',
-        },
-      ],
-      galleryTitle: 'A glimpse into celebrated moments.',
-      galleryPhotos: ['wedding-gown-window', 'wedding-gown-back', 'gift-basket'],
-      ctaTitle: 'Begin Your Celebration',
-      ctaText:
-        "Every great event starts with a conversation. Whether you're planning a wedding, a corporate gathering, or a milestone celebration, we'd love to hear your vision.",
-      ctaLabel: 'Get In Touch',
-      theme: { ink: '#1a1714', paper: '#faf8f4', accent: '#c9a96e', accentSoft: '#f7f0e3' },
-    },
   },
   {
     id: 'mod-labs',
@@ -198,56 +115,6 @@ export const projects: readonly WorkProject[] = [
         file: 'switch-oled-kamikaze',
         alt: 'A red clear-shell Nintendo Switch OLED standing on its dock after a modchip install',
       },
-      {
-        file: 'xbox-360-matrix-install',
-        alt: 'A modchip wired onto an Xbox 360 motherboard during an install',
-      },
-      {
-        file: 'gwii-handheld-hero',
-        alt: 'A purple portable handheld Wii running a Zelda game',
-      },
     ],
-    preview: {
-      domain: 'modlabs.store',
-      brand: 'Mod Labs',
-      nav: ['Services', 'Builds', 'Gallery', 'FAQ', 'Book'],
-      eyebrow: 'Seattle, WA',
-      headline: 'Console modding, done right.',
-      subline: 'Console modding & electronics repair',
-      primaryCta: 'Get a quote',
-      secondaryCta: 'Book a mod',
-      heroPhoto: 'gwii-handheld-hero',
-      strip: ['Xbox 360 RGH', 'Switch modchips', 'Custom builds', 'Repairs'],
-      aboutTitle: 'Precision work under the microscope.',
-      aboutText:
-        'Mod Labs is run by Alvaro in Seattle. Drop your console off locally for a fast turnaround, often the same or next day, or mail it in and we will work out shipping together.',
-      aboutPhoto: 'wii-miicro-deluxe',
-      servicesTitle: 'Straightforward prices.',
-      services: [
-        {
-          title: 'Xbox 360 RGH - $100',
-          text: 'Modchip where needed, a deep clean with fresh thermal paste, and full software setup.',
-        },
-        {
-          title: 'Switch OLED (Kamikaze) - $160',
-          text: 'A modchip install using a direct point that will not come undone.',
-        },
-        {
-          title: 'Switch V1 / V2 - $120',
-          text: 'Precision install under the microscope, then a clean reassembly.',
-        },
-        {
-          title: 'Switch Lite - $140',
-          text: 'The same careful install for the compact model.',
-        },
-      ],
-      galleryTitle: 'Real jobs from the bench.',
-      galleryPhotos: ['halo-xbox-360', 'switch-oled-kamikaze', 'xbox-360-matrix-install'],
-      ctaTitle: 'Ready to mod your console?',
-      ctaText:
-        'Ask for a quote or book a slot. Electronics repair and custom shells with RGB are priced by quote.',
-      ctaLabel: 'Get a quote',
-      theme: { ink: '#070815', paper: '#eef1ff', accent: '#00d4f0', accentSoft: '#dfe6ff' },
-    },
   },
 ];
