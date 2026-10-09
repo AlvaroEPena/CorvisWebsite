@@ -43,9 +43,9 @@ describe('team data', () => {
     expect(photoAltOf(site.team[0])).toBe('Alvaro Peña, Founder and Tech Lead');
     expect(photoAltOf(site.team[1])).toBe('Aaron Peña-Diamond, Co-Founder');
   });
-  it('ships a real photo for Alvaro and a placeholder for Aaron until a photo is added', () => {
+  it('ships a real photo for both founders', () => {
     expect(teamImages('alvaro')?.isPlaceholder).toBe(false);
-    expect(teamImages('aaron')?.isPlaceholder).toBe(true);
+    expect(teamImages('aaron')?.isPlaceholder).toBe(false);
   });
   it('shows both founders in the home call to action, linking to /team', () => {
     expect(teamTeaser.href).toBe('/team');

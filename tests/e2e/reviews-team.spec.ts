@@ -244,9 +244,7 @@ test.describe('/team and founders', () => {
     ).toHaveAttribute('href', '/#contact');
   });
 
-  test('shows Alvaro photo with alt text and a decorative placeholder for Aaron, both 4:5', async ({
-    page,
-  }) => {
+  test('shows both founders photos with alt text, both 4:5', async ({ page }) => {
     await page.goto('/team');
     const photos = page.getByTestId('team-photo').locator('img');
     await expect(photos).toHaveCount(2);
@@ -264,9 +262,10 @@ test.describe('/team and founders', () => {
     const [alvaro, aaron] = [photos.nth(0), photos.nth(1)];
     await expect(alvaro).toHaveAttribute('alt', 'Alvaro Peña, Founder and Tech Lead');
     await expect(alvaro).toHaveAttribute('src', /alvaro-card.*\.avif/);
-    await expect(aaron).toHaveAttribute('alt', '');
-    await expect(aaron).toHaveAttribute('aria-hidden', 'true');
-    // Real photo sits above the fold: eager. Placeholder further down: lazy.
+    await expect(aaron).toHaveAttribute('alt', 'Aaron Peña-Diamond, Co-Founder');
+    await expect(aaron).toHaveAttribute('src', /aaron-card.*\.avif/);
+    await expect(aaron).not.toHaveAttribute('aria-hidden', 'true');
+    // The first photo sits above the fold: eager. The second loads lazily.
     await expect(alvaro).toHaveAttribute('loading', 'eager');
     await expect(aaron).toHaveAttribute('loading', 'lazy');
   });

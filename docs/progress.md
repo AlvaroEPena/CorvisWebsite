@@ -116,3 +116,7 @@
 ## 2026-10-09 — Headshot from Alvaro-Fixed.jpg
 
 - Switched the source to `C:\Users\Alvaro\Desktop\Alvaro-Fixed.jpg` (2528x1686, already colour-corrected, about 2.5x the pixels of the old TIF). Same crop fractions; tonal polish switched off for it (`polish: false` in `scripts/make-team-photos.mjs`); masters 1000x1250 card and 384x384 avatar; delivered widths 320 to 1000. `/team` mobile LCP 1.7 s, Performance 99 to 100. The previous master is in git history (commit feb5f1f) if needed.
+
+## 2026-10-09 — Aaron's headshot
+
+- Added from `C:\Users\Alvaro\Desktop\Aaron_Pena-Diamond_Headshot.jpeg` (2528x1684) with `node scripts/make-team-photos.mjs aaron <path>`; crops in the CROPS table (card 4:5 centred on the face, square avatar around the head), polish off. The designed placeholder stays in `src/assets/team/aaron-placeholder.svg` as the fallback for any founder without photos. Tests updated for two real photos.

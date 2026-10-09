@@ -37,6 +37,13 @@ const CROPS = {
     card: { left: 0.29, top: 0, width: 0.534, height: 1 },
     avatar: { left: 0.33, top: 0.1, width: 0.46, height: 0.69 },
   },
+  // Aaron's supplied headshot is a 2528x1684 landscape, face centred, little headroom: the card takes
+  // the full height at 4:5 centred on the face, the avatar is a square around the head.
+  aaron: {
+    polish: false,
+    card: { left: 0.25, top: 0, width: 0.533, height: 1 },
+    avatar: { left: 0.31, top: 0.02, width: 0.413, height: 0.62 },
+  },
 };
 
 const CARD = { width: 1000, height: 1250 }; // 4:5, shown at about 272 CSS pixels (3x covers it, 4x nearly)
