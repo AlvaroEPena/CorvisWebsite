@@ -82,12 +82,44 @@ test.describe('desktop process timeline', () => {
 });
 
 test.describe('process timeline without the pin', () => {
-  test('is a normal section on phones and shows every step', async ({ page, isMobile }) => {
+  test('on phones each stop waits for the middle of the screen, then stays lit', async ({
+    page,
+    isMobile,
+  }) => {
     test.skip(!isMobile, 'Phone project only.');
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
     const { height, viewport } = await geometry(page);
-    expect(height).toBeLessThan(viewport * 3);
+    expect(height).toBeLessThan(viewport * 4);
     await expect(page.locator('#process .step')).toHaveCount(5);
+    expect(await lit(page)).toBe(0);
+
+    // First stop just coming into view at the bottom of the screen: still waiting.
+    const firstTop = () =>
+      page
+        .locator('#process .step')
+        .first()
+        .evaluate((n) => n.getBoundingClientRect().top);
+    const to = (y: number) =>
+      page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), y);
+    await to((await page.evaluate(() => window.scrollY)) + (await firstTop()) - viewport * 0.8);
+    await page.waitForTimeout(200);
+    expect(await lit(page)).toBe(0);
+
+    // Its top reaches the middle: it lights, the rest wait.
+    await to((await page.evaluate(() => window.scrollY)) + (await firstTop()) - viewport * 0.45);
+    await expect.poll(() => lit(page)).toBe(1);
+
+    // Scroll to the end: all lit. Back to the top: they all stay lit.
+    await to(await page.evaluate(() => document.documentElement.scrollHeight));
+    await expect.poll(() => lit(page)).toBe(5);
+    await to(0);
+    await page.waitForTimeout(200);
+    expect(await lit(page)).toBe(5);
+
+    // A refresh starts over.
+    await page.reload();
+    expect(await lit(page)).toBe(0);
   });
 
   test('is a normal section with reduced motion', async ({ page, isMobile }) => {

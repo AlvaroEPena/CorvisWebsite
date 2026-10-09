@@ -13,7 +13,13 @@ const desktop = window.matchMedia(
   '(min-width: 64rem) and (hover: hover) and (prefers-reduced-motion: no-preference)',
 );
 
+/** Phones and touch screens (and no reduced motion): stops light up as they reach the middle of the screen. */
+const touch = window.matchMedia(
+  '(prefers-reduced-motion: no-preference) and (not ((min-width: 64rem) and (hover: hover)))',
+);
+
 let done = false;
+let litSoFar = 0;
 let queued = false;
 let idleTimer: number | undefined;
 /** The release waits for scrolling to stop, so it can never cut a smooth scroll (nav links) short. */
@@ -47,11 +53,34 @@ function finish(): void {
   });
 }
 
+/**
+ * Lights every stop whose top has reached the middle of the screen, in order. A stop never goes dark
+ * again during the page load, whichever way the reader scrolls, and a stop skipped by a fast scroll is
+ * lit on the way past.
+ */
+function updateTouch(): void {
+  if (!section) return;
+  const middle = window.innerHeight / 2;
+  let reached = litSoFar;
+  steps.forEach((step, index) => {
+    if (index >= reached && step.getBoundingClientRect().top <= middle) reached = index + 1;
+  });
+  if (reached === litSoFar) return;
+  litSoFar = reached;
+  const list = section.querySelector<HTMLElement>('.steps');
+  const last = steps[reached - 1];
+  const thread =
+    reached >= steps.length || !list || !last ? 1 : (last.offsetTop + 16) / list.offsetHeight;
+  section.style.setProperty('--p', Math.min(1, thread).toFixed(4));
+  steps.forEach((step, index) => step.toggleAttribute('data-lit', index < reached));
+}
+
 function update(): void {
   queued = false;
   if (!section || !pin || done) return;
   if (!desktop.matches) {
-    render(1);
+    if (touch.matches) updateTouch();
+    else render(1);
     return;
   }
   const sectionTop = section.getBoundingClientRect().top + window.scrollY;
@@ -72,5 +101,6 @@ if (section && pin) {
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule, { passive: true });
   desktop.addEventListener('change', schedule);
+  touch.addEventListener('change', schedule);
   update();
 }

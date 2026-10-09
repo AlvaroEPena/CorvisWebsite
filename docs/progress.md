@@ -152,3 +152,8 @@
 
 - `src/content/reviews-settings.json` (`showReviews`, default false) edited in /admin under Website settings. Off: no Reviews nav/footer links, no `/reviews` page (`src/pages/[slug].astro` builds it only when on, so it leaves the sitemap too), and the button beside Meet the team is **View Sandbox**. On: those return and the button is **More reviews**. Reviews and home quotes are untouched.
 - Tests adapt to the setting (`reviewsOn` in tests/e2e/support.ts); verified both states in e2e, plus an admin test that Save writes `{ "showReviews": true }`.
+
+## 2026-10-09 - Touch fixes: Work previews and the phone timeline
+
+- Work/slider previews: a see-through shield (`.live-stage::after`, `touch-action: pan-y pinch-zoom`) now takes every touch, the demo iframe is `scrolling="no"` and its page is `overflow: hidden`, so a finger across a preview just scrolls the page and only the animation moves the demo.
+- Phone timeline (touch, no reduced motion): each stop lights when its top reaches the middle of the screen, then stays lit for the page load (`updateTouch` in `process-pin.ts`; thread length from the last lit stop). Replaces the scroll-driven scrub. A refresh starts over; no JS or reduced motion shows the finished route.

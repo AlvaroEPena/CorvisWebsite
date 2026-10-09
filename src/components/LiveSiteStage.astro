@@ -47,6 +47,19 @@ if (!entry) throw new Error(`No ${version} demo registered for "${projectId}"`);
     contain: paint;
   }
 
+  /*
+   * A see-through shield over the demo. Some phones let a finger drag the iframe's own page even with
+   * pointer-events: none on it, so the preview never takes a touch: this layer does, and it only allows
+   * normal page scrolling and pinch zoom. Swiping across a preview just scrolls the page.
+   */
+  .live-stage::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    touch-action: pan-y pinch-zoom;
+  }
+
   .live-fill {
     position: absolute;
     inset: 0;

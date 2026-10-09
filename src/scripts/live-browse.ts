@@ -37,7 +37,9 @@ const MEASURE_EVERY_FRAMES = 30;
 /** Extra layout pixels so the sub-pixel shift never shows a gap at the bottom edge. */
 const BLEED = 2;
 const PREVIEW_QUERY = '?preview=1';
-const HIDE_SCROLLBAR = 'html{scrollbar-width:none}::-webkit-scrollbar{display:none}';
+/** Hides the scrollbar and stops the visitor from scrolling the demo themselves: only our animation moves it. */
+const HIDE_SCROLLBAR =
+  'html{scrollbar-width:none;overflow:hidden;overscroll-behavior:none}::-webkit-scrollbar{display:none}';
 
 const root = document.documentElement;
 
@@ -107,6 +109,7 @@ class Stage {
     iframe.tabIndex = -1;
     iframe.setAttribute('aria-hidden', 'true');
     iframe.setAttribute('inert', '');
+    iframe.setAttribute('scrolling', 'no');
     iframe.setAttribute('loading', 'eager');
     iframe.setAttribute('referrerpolicy', 'no-referrer');
     this.iframe = iframe;
