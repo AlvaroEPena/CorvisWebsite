@@ -2,24 +2,36 @@
 import { processSteps } from '../content/process';
 ---
 
-<section class="process section" id="process" aria-labelledby="process-title" data-testid="process">
-  <div class="container">
-    <div class="section-heading reveal">
-      <h2 id="process-title">How a project moves, from hello to live.</h2>
-      <p>Five clear stages, one point of contact and no mystery about what happens next.</p>
-    </div>
+<section
+  class="process section"
+  id="process"
+  aria-labelledby="process-title"
+  data-testid="process"
+  data-process-pin
+>
+  <div class="pin">
+    <div class="container">
+      <div class="section-heading reveal">
+        <h2 id="process-title">How a project moves, from hello to live.</h2>
+        <p>Five clear stages, one point of contact and no mystery about what happens next.</p>
+      </div>
 
-    <ol class="steps">
-      {processSteps.map((step) => (
-        <li class="step">
-          <span class="orb" aria-hidden="true"></span>
-          <h3>{step.title}</h3>
-          <p>{step.description}</p>
-        </li>
-      ))}
-    </ol>
+      <ol class="steps">
+        {processSteps.map((step) => (
+          <li class="step">
+            <span class="orb" aria-hidden="true"></span>
+            <h3>{step.title}</h3>
+            <p>{step.description}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
   </div>
 </section>
+
+<script>
+  import '../scripts/process-pin';
+</script>
 
 <style>
   .steps {
@@ -156,30 +168,49 @@ import { processSteps } from '../content/process';
     }
   }
 
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {
-      .steps::before {
-        transform-origin: left;
-        animation-name: thread-across;
-        animation-range: entry 40% cover 55%;
-      }
+  /*
+   * Desktop with a pointer: the section is pinned in the middle of the screen and scroll fills the
+   * timeline (scripts/process-pin.ts sets --p and marks each lit stop). After one pass the extra
+   * height goes away (data-pin-done). Without JS, or on touch and small screens, the finished route
+   * is shown (or drawn by the scroll-driven animation above), and the text is always there.
+   */
+  @media (min-width: 64rem) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+    :global(:root[data-js]) .process {
+      --pin-extra: 110svh;
+      height: calc(100svh + var(--pin-extra));
+      padding-block: 0;
+    }
 
-      /* The five stops share one row here, so they appear one after another along the route. */
-      .step:nth-child(1) .orb {
-        animation-range: entry 15% entry 45%;
-      }
-      .step:nth-child(2) .orb {
-        animation-range: entry 30% entry 60%;
-      }
-      .step:nth-child(3) .orb {
-        animation-range: entry 45% entry 75%;
-      }
-      .step:nth-child(4) .orb {
-        animation-range: entry 60% entry 90%;
-      }
-      .step:nth-child(5) .orb {
-        animation-range: entry 70% entry 100%;
-      }
+    :global(:root[data-js]) .process[data-pin-done] {
+      height: 100svh;
+    }
+
+    :global(:root[data-js]) .pin {
+      position: sticky;
+      top: 0;
+      display: grid;
+      align-content: center;
+      min-height: 100svh;
+    }
+
+    :global(:root[data-js]) .steps::before {
+      animation: none;
+      transform: scaleX(var(--p, 0));
+      transform-origin: left;
+    }
+
+    :global(:root[data-js]) .orb {
+      animation: none;
+      opacity: 0;
+      transform: scale(0);
+      transition:
+        transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.3s ease;
+    }
+
+    :global(:root[data-js]) .step[data-lit] .orb {
+      opacity: 1;
+      transform: scale(1);
     }
   }
 </style>

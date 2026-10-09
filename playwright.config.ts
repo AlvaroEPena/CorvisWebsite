@@ -13,6 +13,8 @@ export default defineConfig({
     url: 'http://localhost:4329',
     reuseExistingServer: !process.env.CI,
     timeout: 300_000,
+    // Tests always build with Cloudflare's test Turnstile key, whatever real keys sit in the local .env.
+    env: { PUBLIC_TURNSTILE_SITE_KEY: '' },
   },
   projects: [
     { name: 'mobile', use: { ...devices['Pixel 7'] } },

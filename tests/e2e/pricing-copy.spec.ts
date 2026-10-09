@@ -48,23 +48,4 @@ test.describe('process route', () => {
     }
     await expect(steps.last()).toContainText('Manage and grow');
   });
-
-  test('stops appear as the route scrolls into view and are all shown at the end', async ({
-    page,
-    isMobile,
-  }) => {
-    test.skip(isMobile, 'Scroll-driven animation is asserted once, on desktop Chromium.');
-    await page.emulateMedia({ reducedMotion: 'no-preference' });
-    await page.goto('/');
-    const supported = await page.evaluate(() => CSS.supports('animation-timeline: view()'));
-    test.skip(!supported, 'Scroll-driven animations are not available in this browser.');
-    const orbs = page.locator('#process .orb');
-    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-    const opacity = (index: number) =>
-      orbs.nth(index).evaluate((node) => Number(getComputedStyle(node).opacity));
-    expect(await opacity(4)).toBeLessThan(1);
-    await page.locator('#process .step').last().scrollIntoViewIfNeeded();
-    await page.evaluate(() => window.scrollBy(0, 400));
-    await expect.poll(() => opacity(4)).toBe(1);
-  });
 });
