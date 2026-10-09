@@ -10,6 +10,7 @@ export const TURNSTILE_URL = 'https://challenges.cloudflare.com/turnstile/v0/sit
 export const RESEND_URL = 'https://api.resend.com/emails';
 
 export const LIVE_ENV: Env = {
+  ENVIRONMENT: 'production',
   RESEND_API_KEY: 're_test_key',
   CONTACT_TO_EMAIL: 'owner@corvis.example',
   CONTACT_FROM_EMAIL: 'Corvis <hello@corvis.example>',

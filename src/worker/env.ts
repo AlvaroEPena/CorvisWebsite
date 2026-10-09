@@ -1,6 +1,6 @@
 /** Worker bindings. All are optional; each feature resolves its own config and degrades safely. */
 export interface Env {
-  /** `development` (set only via .dev.vars) unlocks the Turnstile test secret. */
+  /** `production` or `development`. Unset means development: test Turnstile secret, no email sent. */
   ENVIRONMENT?: string;
   RESEND_API_KEY?: string;
   CONTACT_TO_EMAIL?: string;
@@ -17,20 +17,28 @@ export function optionalValue(value: string | undefined): string | undefined {
   return trimmed ? trimmed : undefined;
 }
 
-export function isDevelopment(env: Env): boolean {
-  return optionalValue(env.ENVIRONMENT) === 'development';
+/** `production` uses the real services; anything else, including unset, is `development`. */
+export type Mode = 'production' | 'development';
+
+export function resolveMode(env: Env): Mode {
+  return optionalValue(env.ENVIRONMENT)?.toLowerCase() === 'production'
+    ? 'production'
+    : 'development';
 }
 
 export type TurnstileConfig = { secret: string; isTestSecret: boolean };
 
 /**
- * Fails closed: without a real secret the check only runs in explicit development mode,
- * where Cloudflare's always-pass test secret is used. Returns undefined otherwise.
+ * Development always uses Cloudflare's always-pass test secret, even when a real one is present, so
+ * local testing never depends on (or spends) real keys. Production needs the real secret and fails
+ * closed without it. Returns undefined in that case.
  */
 export function resolveTurnstileConfig(env: Env): TurnstileConfig | undefined {
+  if (resolveMode(env) === 'development') {
+    return { secret: TURNSTILE_TEST_SECRET, isTestSecret: true };
+  }
   const secret = optionalValue(env.TURNSTILE_SECRET_KEY);
-  if (secret !== undefined) return { secret, isTestSecret: false };
-  return isDevelopment(env) ? { secret: TURNSTILE_TEST_SECRET, isTestSecret: true } : undefined;
+  return secret === undefined ? undefined : { secret, isTestSecret: false };
 }
 
 export type MailConfig =
@@ -41,19 +49,23 @@ export type MailConfigResult = { ok: true; mail: MailConfig } | { ok: false; pro
 const SIMPLE_ADDRESS = /^[^\s<>@,;]+@[^\s<>@,;]+\.[^\s<>@,;]+$/;
 const NAMED_ADDRESS = /^[^<>\r\n]+<[^\s<>@,;]+@[^\s<>@,;]+\.[^\s<>@,;]+>$/;
 
-/** Demo mode when no Resend key is set. Returns variable names only, never values. */
+/**
+ * Development logs the lead and sends nothing (demo mode). Production sends through Resend and
+ * reports every missing or invalid variable by name only, never by value.
+ */
 export function resolveMailConfig(env: Env): MailConfigResult {
-  const apiKey = optionalValue(env.RESEND_API_KEY);
-  if (apiKey === undefined) return { ok: true, mail: { mode: 'demo' } };
+  if (resolveMode(env) === 'development') return { ok: true, mail: { mode: 'demo' } };
 
+  const apiKey = optionalValue(env.RESEND_API_KEY);
   const to = optionalValue(env.CONTACT_TO_EMAIL);
   const from = optionalValue(env.CONTACT_FROM_EMAIL);
   const problems: string[] = [];
+  if (apiKey === undefined) problems.push('RESEND_API_KEY');
   if (to === undefined || !SIMPLE_ADDRESS.test(to)) problems.push('CONTACT_TO_EMAIL');
   if (from === undefined || !(SIMPLE_ADDRESS.test(from) || NAMED_ADDRESS.test(from))) {
     problems.push('CONTACT_FROM_EMAIL');
   }
-  if (problems.length > 0 || to === undefined || from === undefined) {
+  if (problems.length > 0 || apiKey === undefined || to === undefined || from === undefined) {
     return { ok: false, problems };
   }
   return { ok: true, mail: { mode: 'live', apiKey, to, from } };

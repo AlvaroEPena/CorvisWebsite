@@ -39,7 +39,10 @@ For the Worker locally create `.dev.vars` (git-ignored) from the Worker section 
 
 ## Accounts and secrets (owner creates; never commit)
 
-Set Worker secrets with `wrangler secret put <NAME>`:
+Copy `.env.example` to `.env` for local work (wrangler and Astro both read it). `ENVIRONMENT` picks the mode:
+`production` uses the real Turnstile secret and sends real email; `development` (also the default when unset)
+uses Cloudflare's test secret and only logs leads. On Cloudflare set `ENVIRONMENT=production`.
+Set Worker secrets with `wrangler secret put <NAME>` or in the dashboard:
 
 - **Resend:** `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL` (verified sending domain).
 - **Turnstile:** widget with your domain + `localhost`; `PUBLIC_TURNSTILE_SITE_KEY` (build) and

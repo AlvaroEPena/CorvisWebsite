@@ -224,12 +224,11 @@ describe('Resend failures', () => {
   });
 });
 
-describe('Turnstile fails closed', () => {
+describe('production fails closed', () => {
   it.each([
     ['unset', {}],
     ['blank', { TURNSTILE_SECRET_KEY: '  ' }],
-    ['ENVIRONMENT is not "development"', { ENVIRONMENT: 'production' }],
-  ])('rejects leads and calls no service when the secret is %s', async (_name, env) => {
+  ])('rejects leads and calls no service when the Turnstile secret is %s', async (_name, env) => {
     const { handler, network, logger } = createHarness();
     const response = await handler(post(validPayload()), {
       ...LIVE_ENV,
@@ -241,52 +240,61 @@ describe('Turnstile fails closed', () => {
     expect(network.calls).toHaveLength(0);
     expect(logger.error.mock.calls.flat().join(' ')).toContain('TURNSTILE_SECRET_KEY');
   });
+
+  it('rejects leads when RESEND_API_KEY is missing, naming the variable only', async () => {
+    const { handler, network, logger } = createHarness();
+    const response = await handler(post(validPayload()), { ...LIVE_ENV, RESEND_API_KEY: '' });
+    expect(response.status).toBe(500);
+    expect(network.calls).toHaveLength(0);
+    expect(logger.error.mock.calls.flat().join(' ')).toContain('RESEND_API_KEY');
+  });
 });
 
-describe('demo / dev mode', () => {
-  it('returns ok without sending when RESEND_API_KEY is unset, logging a redacted summary', async () => {
-    const { handler, network, logger } = createHarness();
-    const response = await handler(post(validPayload()), { TURNSTILE_SECRET_KEY: 'real' });
+describe('development mode (the default)', () => {
+  const REAL_KEYS = { ...LIVE_ENV, ENVIRONMENT: undefined };
 
-    expect(response.status).toBe(200);
-    expect(await bodyOf(response)).toEqual({ ok: true });
-    expect(network.callsTo(RESEND_URL)).toHaveLength(0);
+  it.each([
+    ['unset', REAL_KEYS],
+    ['"development"', { ...REAL_KEYS, ENVIRONMENT: 'development' }],
+    ['anything that is not "production"', { ...REAL_KEYS, ENVIRONMENT: 'staging' }],
+  ])(
+    'uses the test secret and sends nothing when ENVIRONMENT is %s, even with real keys',
+    async (_name, env) => {
+      const { handler, network, logger } = createHarness();
+      const response = await handler(post(validPayload()), env);
 
-    const logged = JSON.stringify(logger.warn.mock.calls);
-    expect(logged).toContain('DEMO MODE');
-    expect(logged).toContain('example.com');
-    expect(logged).not.toContain('ada@example.com');
-    expect(logged).not.toContain('Ada Lovelace');
-    expect(logged).not.toContain('calm, fast new site');
-  });
+      expect(response.status).toBe(200);
+      expect(await bodyOf(response)).toEqual({ ok: true });
+      const form = network.callsTo(TURNSTILE_URL)[0]?.init.body as URLSearchParams;
+      expect(form.get('secret')).toBe('1x0000000000000000000000000000000AA');
+      expect(network.callsTo(RESEND_URL)).toHaveLength(0);
 
-  it('uses the Turnstile test secret only when ENVIRONMENT=development, and warns', async () => {
-    const { handler, network, logger } = createHarness();
-    await handler(post(validPayload()), { ENVIRONMENT: 'development' });
-    const form = network.callsTo(TURNSTILE_URL)[0]?.init.body as URLSearchParams;
-    expect(form.get('secret')).toBe('1x0000000000000000000000000000000AA');
-    expect(JSON.stringify(logger.warn.mock.calls)).toContain('Turnstile test secret');
-  });
+      const logged = JSON.stringify(logger.warn.mock.calls);
+      expect(logged).toContain('DEVELOPMENT mode');
+      expect(logged).toContain('example.com');
+      expect(logged).not.toContain('ada@example.com');
+      expect(logged).not.toContain('Ada Lovelace');
+      expect(logged).not.toContain('calm, fast new site');
+    },
+  );
 
-  it('prefers a configured secret over the test secret even in development', async () => {
+  it('works with no configuration at all', async () => {
     const { handler, network } = createHarness();
-    await handler(post(validPayload()), {
-      ENVIRONMENT: 'development',
-      TURNSTILE_SECRET_KEY: 'real',
-    });
-    const form = network.callsTo(TURNSTILE_URL)[0]?.init.body as URLSearchParams;
-    expect(form.get('secret')).toBe('real');
+    const response = await handler(post(validPayload()), {});
+    expect(response.status).toBe(200);
+    expect(network.callsTo(RESEND_URL)).toHaveLength(0);
   });
 
-  it('treats blank env values as unset', async () => {
+  it('uses the real secret and sends email when ENVIRONMENT is "production" (any case)', async () => {
     const { handler, network } = createHarness();
     const response = await handler(post(validPayload()), {
-      ENVIRONMENT: 'development',
-      RESEND_API_KEY: '  ',
-      TURNSTILE_SECRET_KEY: '',
+      ...LIVE_ENV,
+      ENVIRONMENT: 'Production',
     });
     expect(response.status).toBe(200);
-    expect(network.callsTo(RESEND_URL)).toHaveLength(0);
+    const form = network.callsTo(TURNSTILE_URL)[0]?.init.body as URLSearchParams;
+    expect(form.get('secret')).toBe('turnstile-secret');
+    expect(network.callsTo(RESEND_URL)).toHaveLength(1);
   });
 });
 

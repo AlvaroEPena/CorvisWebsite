@@ -63,7 +63,7 @@ function redactedSummary(lead: ContactInput): Record<string, unknown> {
 async function deliverLead(lead: ContactInput, mail: MailConfig, deps: ContactDeps) {
   if (mail.mode === 'demo') {
     deps.logger.warn(
-      `${LOG_PREFIX} DEMO MODE: RESEND_API_KEY is not set, so this lead was NOT emailed.`,
+      `${LOG_PREFIX} DEVELOPMENT mode: this lead was NOT emailed (set ENVIRONMENT=production to send).`,
       redactedSummary(lead),
     );
     return true;
@@ -122,7 +122,7 @@ export function createContactHandler(deps: ContactDeps): RouteHandler {
     }
     if (turnstile.isTestSecret) {
       deps.logger.warn(
-        `${LOG_PREFIX} DEV: using the Turnstile test secret (ENVIRONMENT=development)`,
+        `${LOG_PREFIX} DEVELOPMENT mode: using the Turnstile test secret (set ENVIRONMENT=production for real checks)`,
       );
     }
 
