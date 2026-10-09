@@ -4,6 +4,15 @@ import ReviewCard from '../components/ReviewCard.astro';
 import { reviewsPage } from '../content/reviews-copy';
 import Layout from '../layouts/Layout.astro';
 import { getReviewsPageReviews } from '../lib/reviews';
+import { reviewsVisible } from '../lib/reviews-settings';
+
+/**
+ * The /reviews page. It only exists while reviews are switched on (admin, Website settings); when
+ * they are off no page is built, so there is nothing to find or index.
+ */
+export function getStaticPaths() {
+  return reviewsVisible ? [{ params: { slug: 'reviews' } }] : [];
+}
 
 const reviews = getReviewsPageReviews();
 ---

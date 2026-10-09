@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { reviewsOn } from './support';
+
 /**
  * Search basics on every public page (the ones in the sitemap), checked on the built site:
  * a unique title, a sensible description, one h1, language, a self-referencing canonical, a social
@@ -30,6 +32,8 @@ test.describe('search basics on every public page', () => {
   test('the sitemap lists the public pages and nothing private', async ({ request }) => {
     const paths = await sitemapPaths(request);
     expect(paths).toEqual(expect.arrayContaining(['/', '/sandbox', '/team']));
+    // The reviews page is only built, and only listed, while reviews are switched on.
+    expect(paths.includes('/reviews')).toBe(reviewsOn);
     for (const path of paths) {
       expect(path).not.toMatch(/^\/(admin|demos|thanks|404)/);
     }

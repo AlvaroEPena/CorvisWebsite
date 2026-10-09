@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 
 import { expect, test } from '@playwright/test';
 
-import { structuredData } from './support';
+import { reviewsOn, structuredData } from './support';
 
 // Read as files: the test runner cannot use the site's import.meta.glob loader.
 interface ReviewRecord {
@@ -36,7 +36,22 @@ const featured = sortedBy(
   allReviews.filter((review) => review.featured),
   'homeOrder',
 ).slice(0, 6);
-const NAV_LABELS = ['Services', 'Work', 'Process', 'Pricing', 'FAQ', 'Meet the team', 'Sandbox'];
+const NAV_LABELS = [
+  'Services',
+  'Work',
+  'Process',
+  'Pricing',
+  'FAQ',
+  'Meet the team',
+  'Sandbox',
+  ...(reviewsOn ? ['Reviews'] : []),
+];
+/** /reviews lists the ones with "Show on the reviews page" (a missing key counts as shown). */
+const reviews = allReviews.filter((review) => review.showOnReviewsPage !== false);
+/** The second button under the quotes: More reviews when switched on, otherwise View Sandbox. */
+const secondButton = reviewsOn
+  ? { name: 'More reviews', href: '/reviews', testId: 'more-reviews' }
+  : { name: 'View Sandbox', href: '/sandbox', testId: 'view-sandbox' };
 
 test.describe('home testimonials', () => {
   test('list the featured reviews in order, with no sample or preview wording', async ({
@@ -50,12 +65,18 @@ test.describe('home testimonials', () => {
     await expect(page.getByTestId('testimonials-sample-note')).toHaveCount(0);
   });
 
-  test('has a "More reviews" button to /reviews', async ({ page }) => {
+  test('has the second button next to "Meet the team": More reviews or View Sandbox', async ({
+    page,
+  }) => {
     await page.goto('/');
-    const button = page.getByTestId('testimonials').getByRole('link', { name: 'More reviews' });
-    await expect(button).toHaveAttribute('href', '/reviews');
+    const button = page.getByTestId('testimonials').getByRole('link', { name: secondButton.name });
+    await expect(button).toHaveCount(1);
+    await expect(button).toHaveAttribute('href', secondButton.href);
+    await expect(
+      page.getByTestId('testimonials').getByRole('link', { name: 'More reviews' }),
+    ).toHaveCount(reviewsOn ? 1 : 0);
     await button.click();
-    await expect(page).toHaveURL(/\/reviews$/);
+    await expect(page).toHaveURL(new RegExp(`${secondButton.href}$`));
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   });
 
@@ -67,13 +88,18 @@ test.describe('home testimonials', () => {
     expect(captions.join(' ')).not.toMatch(/Bluewater|Kettle|Halvorsen|Harborview|Ironcrest/);
   });
 
-  test('the navbar and footer do not list Reviews', async ({ page }) => {
+  test('Reviews links and the page exist only while reviews are switched on', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('header a[href="/reviews"]')).toHaveCount(0);
-    await expect(page.locator('body > footer a[href="/reviews"]')).toHaveCount(0);
+    const expected = reviewsOn ? 1 : 0;
+    await expect(page.locator('body > footer a[href="/reviews"]')).toHaveCount(expected);
+    await expect(page.locator('body > header a[href="/reviews"]')).not.toHaveCount(
+      reviewsOn ? 0 : 1,
+    );
+    const response = await page.goto('/reviews');
+    expect(response?.status()).toBe(reviewsOn ? 200 : 404);
   });
 
-  test('has a "Meet the team" call to action to /team, more prominent than "More reviews"', async ({
+  test('has a "Meet the team" call to action to /team, more prominent than the second button', async ({
     page,
   }) => {
     await page.goto('/');
@@ -88,7 +114,7 @@ test.describe('home testimonials', () => {
     }
     const [teamBox, moreBox] = await Promise.all([
       team.boundingBox(),
-      section.getByTestId('more-reviews').boundingBox(),
+      section.getByTestId(secondButton.testId).boundingBox(),
     ]);
     expect(teamBox && moreBox).toBeTruthy();
     expect((teamBox?.width ?? 0) * (teamBox?.height ?? 0)).toBeGreaterThan(
@@ -106,7 +132,7 @@ test.describe('home testimonials', () => {
     const section = page.getByTestId('testimonials');
     const [teamBox, moreBox] = await Promise.all([
       section.getByTestId('meet-the-team').boundingBox(),
-      section.getByTestId('more-reviews').boundingBox(),
+      section.getByTestId(secondButton.testId).boundingBox(),
     ]);
     if (isMobile)
       expect(moreBox?.y ?? 0).toBeGreaterThan((teamBox?.y ?? 0) + (teamBox?.height ?? 0));
@@ -132,6 +158,100 @@ test.describe('home testimonials', () => {
     await expect(origins.nth(2)).toHaveText(
       'A concept design, built from scratch. Company details are placeholders.',
     );
+  });
+});
+
+test.describe('/reviews (when switched on)', () => {
+  test.skip(!reviewsOn, 'Reviews are switched off in the admin: there is no page to test.');
+
+  test('renders inside the Corvis chrome, indexable, with every review', async ({ page }) => {
+    await page.goto('/reviews');
+    await expect(page).toHaveTitle(/reviews/i);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('What clients say.');
+    await expect(page.getByTestId('nav')).toBeVisible();
+    await expect(page.getByRole('contentinfo')).toBeVisible();
+    await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/reviews$/);
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', /.+/);
+    await expect(page.getByTestId('reviews-count')).toHaveText(
+      `${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'}`,
+    );
+
+    const cards = page.getByTestId('review-card');
+    await expect(cards).toHaveCount(reviews.length);
+    const names = await cards.locator('figcaption strong').allInnerTexts();
+    expect(names).toEqual(reviews.map((review) => review.name));
+  });
+
+  test('"View their new site" is a link only when siteHref is set', async ({ page }) => {
+    await page.goto('/reviews');
+    for (const review of reviews) {
+      const card = page.locator(`[data-review-id="${review.id}"]`);
+      if (review.siteHref) {
+        const link = card.getByRole('link', { name: 'View their new site' });
+        await expect(link).toHaveAttribute('href', review.siteHref);
+        await expect(card.getByTestId('review-site-disabled')).toHaveCount(0);
+      } else {
+        const disabled = card.getByTestId('review-site-disabled');
+        await expect(disabled).toBeDisabled();
+        await expect(card.getByRole('link', { name: 'View their new site' })).toHaveCount(0);
+        await expect(card.locator('[title="Coming soon"]')).toHaveCount(1);
+      }
+    }
+  });
+
+  test('disabled buttons are skipped by the keyboard', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Keyboard interaction is a desktop concern.');
+    await page.goto('/reviews');
+    const focusable = await page
+      .locator('[data-testid="review-card"]')
+      .first()
+      .evaluate((card) => card.querySelectorAll('a[href], button:not([disabled])').length);
+    const expectedLinks = reviews[0]?.siteHref ? 1 : 0;
+    expect(focusable).toBe(expectedLinks);
+  });
+
+  test('content is visible without scroll-driven animation changing any text', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/reviews');
+    for (const card of await page.getByTestId('review-card').all()) {
+      await expect(card).toHaveCSS('opacity', '1');
+    }
+  });
+
+  test('links back to the home reviews and to the consult form', async ({ page }) => {
+    await page.goto('/reviews');
+    await expect(page.getByRole('link', { name: /Back to the reviews/ })).toHaveAttribute(
+      'href',
+      '/#testimonials',
+    );
+    await expect(
+      page.locator('main').getByRole('link', { name: 'Book a free consult' }),
+    ).toHaveAttribute('href', '/#contact');
+  });
+
+  test('has three columns on desktop, two on tablet and one on phones', async ({ page }) => {
+    const columnsAt = async (width: number) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/reviews');
+      return page.locator('.wall').evaluate((node) => getComputedStyle(node).columnCount);
+    };
+    expect(await columnsAt(1280)).toBe('3');
+    expect(await columnsAt(768)).toBe('2');
+    expect(await columnsAt(390)).toBe('1');
+  });
+
+  test('is linked from the footer and the navbar, and highlighted there when open', async ({
+    page,
+    isMobile,
+  }) => {
+    await page.goto('/');
+    await expect(page.locator('body > footer a[href="/reviews"]')).toHaveCount(1);
+    await expect(page.locator('body > header a[href="/reviews"]').first()).toBeAttached();
+    await page.goto('/reviews');
+    if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click();
+    const active = page.locator('body > header a[aria-current="page"]').filter({ visible: true });
+    await expect(active.first()).toHaveText('Reviews');
   });
 });
 

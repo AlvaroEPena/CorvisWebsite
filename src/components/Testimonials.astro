@@ -2,11 +2,16 @@
 import { site } from '../content/site';
 import { teamProfiles, teamTeaser } from '../content/team';
 import { getHomeReviews, initialsOf } from '../lib/reviews';
+import { reviewsVisible } from '../lib/reviews-settings';
 import { teamImages } from '../lib/team-photos';
 import AvatarStack from './AvatarStack.astro';
 import Monogram from './Monogram.astro';
 
 const reviews = getHomeReviews();
+/** Next to "Meet the team": more reviews when they are switched on, otherwise the finished sites. */
+const more = reviewsVisible
+  ? { label: 'More reviews', href: '/reviews', testId: 'more-reviews' }
+  : { label: 'View Sandbox', href: '/sandbox', testId: 'view-sandbox' };
 const founders = site.team.map(({ id }) => ({
   id,
   images: teamImages(id),
@@ -67,8 +72,8 @@ const founders = site.team.map(({ id }) => ({
           ></path>
         </svg>
       </a>
-      <a class="btn btn-glass btn-shine" href="/reviews" data-magnetic data-testid="more-reviews">
-        More reviews
+      <a class="btn btn-glass btn-shine" href={more.href} data-magnetic data-testid={more.testId}>
+        {more.label}
         <svg class="btn-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
           <path
             d="M4 10h11m-4-5 5 5-5 5"
@@ -131,7 +136,7 @@ const founders = site.team.map(({ id }) => ({
     font-size: 0.9rem;
   }
 
-  /* Two calls to action: the team banner is the main one, "More reviews" the quieter pill. */
+  /* Two calls to action: the team banner is the main one, the second button the quieter pill. */
   .more {
     display: flex;
     flex-direction: column;

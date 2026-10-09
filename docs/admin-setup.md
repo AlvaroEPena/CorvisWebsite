@@ -100,3 +100,12 @@ To add Aaron's photo: run `node scripts/make-team-photos.mjs aaron path/to/his-p
 (`aaron-placeholder.svg`) with no other change; the alt text is built from his name and role in
 `src/content/site.ts`. Look at `/team` afterwards; if the crop is off, add a crop for `aaron` in the
 `CROPS` table at the top of the script and run it again.
+
+## Reviews on or off (Website settings)
+
+One switch controls every public mention of reviews. In `/admin`, open **Website settings**, then **Reviews on the website**, and use **Show reviews buttons and the Reviews page**, then **Save** (the site rebuilds in about a minute).
+
+- **ON:** "Reviews" appears in the top menu and the footer, the `/reviews` page is live (and in the sitemap), and the button next to "Meet the team" says **More reviews**.
+- **OFF (the current state):** the menu and footer links, the `/reviews` page and the "More reviews" button are all gone, and the button next to "Meet the team" says **View Sandbox** and goes to `/sandbox`.
+
+Your reviews are kept either way, and the quotes on the home page still show. The switch is the file `src/content/reviews-settings.json`.

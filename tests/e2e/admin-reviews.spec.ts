@@ -5,6 +5,7 @@ import { expect, type Page, test } from '@playwright/test';
 import { GithubMock } from './support/github-mock';
 
 const DIR = 'src/content/reviews';
+const SETTINGS = 'src/content/reviews-settings.json';
 const SHOTS = process.env.ADMIN_SHOTS_DIR;
 
 type Record_ = Record<string, unknown>;
@@ -20,6 +21,7 @@ function seededRepo(): Map<string, string> {
     const record = JSON.parse(files.get(path) ?? '{}') as Record_;
     files.set(path, `${JSON.stringify({ ...record, ...changes }, null, 2)}\n`);
   };
+  files.set(SETTINGS, readFileSync(SETTINGS, 'utf8'));
   patch('copper-kettle', { homeOrder: 1 });
   patch('ridgeline-landscape', { homeOrder: 2 });
   patch('harbor-physio', { homeOrder: 3 });
@@ -284,5 +286,24 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
     expect(changedKeys('copper-kettle', mock.commits[1]?.[0]?.text)).toEqual(['showOnReviewsPage']);
     // Hidden from the Reviews page, still on the home screen.
     await expect(rows(page)).toHaveCount(4);
+  });
+
+  test('Website settings: one switch turns the reviews buttons and page on or off', async ({
+    page,
+  }) => {
+    const mock = await openEditor(page);
+    await page.getByText('Website settings', { exact: true }).first().click();
+    await page.getByText('Reviews on the website', { exact: true }).first().click();
+    const toggle = page.getByRole('switch', { name: /Show reviews buttons and the Reviews page/ });
+    await expect(toggle).toBeVisible();
+    await expect(toggle).not.toBeChecked();
+    await toggle.click();
+    await page.getByRole('button', { name: 'Save' }).first().click();
+    await expect.poll(() => mock.commits.length).toBe(1);
+
+    expect(mock.commits[0]).toHaveLength(1);
+    const [change] = mock.commits[0] ?? [];
+    expect(change?.path).toBe(SETTINGS);
+    expect(JSON.parse(change?.text ?? '{}')).toEqual({ showReviews: true });
   });
 });

@@ -1,8 +1,16 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, type Request } from '@playwright/test';
+
+/** Whether the owner has reviews switched on (admin, Website settings): the build then has /reviews. */
+export const reviewsOn: boolean =
+  (
+    JSON.parse(readFileSync('src/content/reviews-settings.json', 'utf8')) as {
+      showReviews?: boolean;
+    }
+  ).showReviews === true;
 
 /** Pages that exist in the production build (spec sections 3, 6b and 15). */
 export const PAGES = [
@@ -10,6 +18,7 @@ export const PAGES = [
   { name: 'privacy', path: '/privacy' },
   { name: 'sandbox', path: '/sandbox' },
   { name: 'team', path: '/team' },
+  ...(reviewsOn ? [{ name: 'reviews', path: '/reviews' }] : []),
   { name: '404', path: '/this-page-does-not-exist' },
 ] as const;
 

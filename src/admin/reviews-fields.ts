@@ -19,6 +19,19 @@ import { MAX_HOME_REVIEWS, QUOTE_MAX_LENGTH, QUOTE_MIN_LENGTH } from '../lib/rev
  */
 export const REVIEWS_FOLDER = 'src/content/reviews';
 
+/** The on/off switch for every public mention of reviews (read by src/lib/reviews-settings.ts). */
+export const REVIEWS_SETTINGS_FILE = 'src/content/reviews-settings.json';
+
+export const reviewsSettingsFields: Field[] = [
+  {
+    name: 'showReviews',
+    label: 'Show reviews buttons and the Reviews page',
+    widget: 'boolean',
+    default: false,
+    hint: 'ON: Reviews appears in the top menu and footer, the Reviews page is live, and the button next to "Meet the team" says "More reviews". OFF: all of that is hidden and the button says "View Sandbox" instead. Your reviews are kept either way. Changes go live after Save and the site rebuilds (about a minute).',
+  },
+];
+
 /** Name of the custom field type that renders the confirm-gated "Remove from home screen" button. */
 export const HOME_MEMBERSHIP_WIDGET = 'home-membership';
 

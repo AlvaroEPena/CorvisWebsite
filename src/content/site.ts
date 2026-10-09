@@ -1,3 +1,8 @@
+import { reviewsVisible } from '../lib/reviews-settings';
+
+/** Shown in the navbar and footer only while reviews are switched on (admin, Website settings). */
+const reviewsLinks = reviewsVisible ? [{ label: 'Reviews', href: '/reviews' }] : [];
+
 /** Business facts and global copy. Edit here; components never hard-code these. */
 export const site = {
   name: 'Corvis',
@@ -29,6 +34,7 @@ export const site = {
     { label: 'FAQ', href: '#faq' },
     { label: 'Meet the team', href: '/team' },
     { label: 'Sandbox', href: '/sandbox' },
+    ...reviewsLinks,
   ],
   /** Footer keeps the Sandbox link next to the work it shows, ahead of Process. */
   footerNavigation: [
@@ -39,6 +45,7 @@ export const site = {
     { label: 'Pricing', href: '#pricing' },
     { label: 'FAQ', href: '#faq' },
     { label: 'Meet the team', href: '/team' },
+    ...reviewsLinks,
   ],
   hero: {
     badge: 'Done-For-You Digital Real Estate',

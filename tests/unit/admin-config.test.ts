@@ -11,6 +11,8 @@ import {
   removalMessage,
   REVIEW_KEYS,
   REVIEWS_FOLDER,
+  REVIEWS_SETTINGS_FILE,
+  reviewsSettingsFields,
 } from '../../src/admin/reviews-fields';
 import { getAllReviews } from '../../src/lib/reviews';
 import { parseHeaderRules } from './helpers/headers';
@@ -33,7 +35,10 @@ interface FolderCollection {
   reorder?: { key: string };
   delete?: boolean;
 }
-const collections = (config.collections ?? []) as unknown as FolderCollection[];
+const allCollections = (config.collections ?? []) as unknown as (FolderCollection & {
+  files?: { name: string; file: string; format: string; fields: Field[] }[];
+})[];
+const collections = allCollections.filter((collection) => collection.folder !== undefined);
 const collectionNamed = (name: string) => {
   const found = collections.find((collection) => collection.name === name);
   if (!found) throw new Error(`No collection "${name}"`);
@@ -84,6 +89,32 @@ describe('admin config', () => {
         extension: 'json',
       });
     }
+  });
+
+  it('adds a "Website settings" file with the reviews on/off switch, off by default', () => {
+    expect(allCollections.map((collection) => collection.label)).toEqual([
+      'All reviews',
+      'Home reviews',
+      'Website settings',
+    ]);
+    const settings = allCollections.find((collection) => collection.name === 'settings');
+    expect(settings?.files).toHaveLength(1);
+    expect(settings?.files?.[0]).toMatchObject({
+      file: REVIEWS_SETTINGS_FILE,
+      format: 'json',
+      fields: reviewsSettingsFields,
+    });
+    expect(reviewsSettingsFields).toEqual([
+      expect.objectContaining({ name: 'showReviews', widget: 'boolean', default: false }),
+    ]);
+  });
+
+  it('saves the real settings file exactly as it is on disk', () => {
+    const text = readFileSync(REVIEWS_SETTINGS_FILE, 'utf8')
+      .split(String.fromCharCode(13))
+      .join('');
+    expect(text.trim()).toBe(JSON.stringify(JSON.parse(text), null, 2));
+    expect(Object.keys(JSON.parse(text))).toEqual(['showReviews']);
   });
 
   it('keeps one record per review: both editors share the fields and differ only where intended', () => {

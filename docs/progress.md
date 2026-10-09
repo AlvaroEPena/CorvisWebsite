@@ -147,3 +147,8 @@
 
 - Desktop with a pointer (min 64rem, hover, no reduced motion): the Process section is pinned (CSS `position: sticky`, native scrolling) with the timeline centred; scroll position fills the thread and lights each stop (`src/scripts/process-pin.ts`, maths in `process-pin-math.ts`). When full, and scrolling has paused (so nav smooth scrolls are never cut short), the extra pinned length is removed with a compensating scroll so nothing jumps; it never pins again that page load. Phones, touch and reduced motion keep the scroll-drawn version / finished route. Text is always visible.
 - Playwright now builds with Cloudflare's test Turnstile key regardless of the local `.env`.
+
+## 2026-10-09 - Reviews on/off switch
+
+- `src/content/reviews-settings.json` (`showReviews`, default false) edited in /admin under Website settings. Off: no Reviews nav/footer links, no `/reviews` page (`src/pages/[slug].astro` builds it only when on, so it leaves the sitemap too), and the button beside Meet the team is **View Sandbox**. On: those return and the button is **More reviews**. Reviews and home quotes are untouched.
+- Tests adapt to the setting (`reviewsOn` in tests/e2e/support.ts); verified both states in e2e, plus an admin test that Save writes `{ "showReviews": true }`.

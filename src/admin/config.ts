@@ -6,6 +6,8 @@ import {
   HOME_REVIEWS_HINT,
   homeReviewFields,
   REVIEWS_FOLDER,
+  REVIEWS_SETTINGS_FILE,
+  reviewsSettingsFields,
 } from './reviews-fields';
 
 const SITE_URL = 'https://thecorvis.com';
@@ -68,6 +70,20 @@ export const config: CmsConfig = {
       // Deleting a review removes it everywhere, so that only happens in "All reviews".
       delete: false,
       fields: homeReviewFields,
+    },
+    {
+      name: 'settings',
+      label: 'Website settings',
+      icon: 'tune',
+      files: [
+        {
+          name: 'reviews-visibility',
+          label: 'Reviews on the website',
+          file: REVIEWS_SETTINGS_FILE,
+          format: 'json',
+          fields: reviewsSettingsFields,
+        },
+      ],
     },
   ],
 };
