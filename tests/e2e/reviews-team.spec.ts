@@ -107,11 +107,15 @@ test.describe('home testimonials', () => {
     const team = section.getByRole('link', { name: /^Meet the team/ });
     await expect(team).toHaveAttribute('href', '/team');
     await expect(team).toContainText('Meet Alvaro and Aaron');
-    // The avatars are decorative: the link's name is its text.
+    // The avatars have real alt text for crawlers but are hidden from screen readers (aria-hidden),
+    // so the link's accessible name is still just its text.
     await expect(team.locator('img')).toHaveCount(2);
-    for (const image of await team.locator('img').all()) {
-      await expect(image).toHaveAttribute('alt', '');
-    }
+    await expect(team.locator('img').nth(0)).toHaveAttribute('alt', /^Alvaro Peña, Co-Founder/);
+    await expect(team.locator('img').nth(1)).toHaveAttribute(
+      'alt',
+      /^Aaron Peña-Diamond, Co-Founder/,
+    );
+    await expect(team.locator('.stack')).toHaveAttribute('aria-hidden', 'true');
     const [teamBox, moreBox] = await Promise.all([
       team.boundingBox(),
       section.getByTestId(secondButton.testId).boundingBox(),

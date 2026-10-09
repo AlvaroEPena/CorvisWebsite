@@ -4,22 +4,23 @@ import { Image } from 'astro:assets';
 import type { TeamImages } from '../lib/team-photos';
 
 /**
- * Overlapping round avatars of the founders. Purely decorative: the link or sentence next to it says
- * who they are, so every image has an empty alt.
+ * Overlapping round avatars of the founders. The whole stack is aria-hidden because the link or sentence
+ * next to it already says who they are, so screen readers skip it; each image still carries real alt
+ * text, which is what search engines and crawlers read.
  */
 interface Props {
-  people: readonly { id: string; images: TeamImages | undefined; monogram: string }[];
+  people: readonly { id: string; alt: string; images: TeamImages | undefined; monogram: string }[];
 }
 const { people } = Astro.props;
 ---
 
 <span class="stack" aria-hidden="true">
-  {people.map(({ id, images, monogram }) => (
+  {people.map(({ id, alt, images, monogram }) => (
     <span class="avatar" data-avatar={id}>
       {images?.isPlaceholder ? (
         <img
           src={images.avatar.src}
-          alt=""
+          alt={alt}
           width={80}
           height={80}
           loading="lazy"
@@ -29,7 +30,7 @@ const { people } = Astro.props;
       ) : images ? (
         <Image
           src={images.avatar}
-          alt=""
+          alt={alt}
           width={80}
           height={80}
           format="avif"

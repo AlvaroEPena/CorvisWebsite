@@ -1,6 +1,6 @@
 ---
 import { site } from '../content/site';
-import { teamProfiles, teamTeaser } from '../content/team';
+import { photoAltOf, teamProfiles, teamTeaser } from '../content/team';
 import { getHomeReviews, initialsOf } from '../lib/reviews';
 import { reviewsVisible } from '../lib/reviews-settings';
 import { teamImages } from '../lib/team-photos';
@@ -12,10 +12,11 @@ const reviews = getHomeReviews();
 const more = reviewsVisible
   ? { label: 'More reviews', href: '/reviews', testId: 'more-reviews' }
   : { label: 'View Sandbox', href: '/sandbox', testId: 'view-sandbox' };
-const founders = site.team.map(({ id }) => ({
-  id,
-  images: teamImages(id),
-  monogram: teamProfiles.find((profile) => profile.id === id)?.monogram ?? '',
+const founders = site.team.map((member) => ({
+  id: member.id,
+  alt: photoAltOf(member),
+  images: teamImages(member.id),
+  monogram: teamProfiles.find((profile) => profile.id === member.id)?.monogram ?? '',
 }));
 ---
 
