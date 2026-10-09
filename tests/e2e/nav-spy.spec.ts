@@ -106,7 +106,10 @@ test.describe('navbar section highlight', () => {
   });
 
   test('is still and visible under reduced motion', async ({ page }) => {
+    // Reload under reduced motion so the page lays out without the pinned timeline from the start.
     await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.reload();
+    await expect(page.locator('[data-nav-links]')).toHaveAttribute('data-ready', '');
     await readSection(page, 'process');
     await expect(activeLink(page)).toHaveText('Process');
     const transition = await page
