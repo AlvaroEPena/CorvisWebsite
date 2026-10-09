@@ -10,4 +10,11 @@
     "html_handling": "auto-trailing-slash",
     "run_worker_first": ["/api/*"],
   },
+  // Non-secret settings, applied on every deploy so the dashboard cannot drift from the repo. Secrets
+  // (RESEND_API_KEY, TURNSTILE_SECRET_KEY) stay in the dashboard. A local .env or .dev.vars overrides these.
+  "vars": {
+    "ENVIRONMENT": "production",
+    "CONTACT_TO_EMAIL": "thecorvisllc@gmail.com",
+    "CONTACT_FROM_EMAIL": "Corvis <aaron@thecorvis.com>",
+  },
 }
