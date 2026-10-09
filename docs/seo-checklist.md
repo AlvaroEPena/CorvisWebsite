@@ -82,3 +82,18 @@ Google ranks a site partly on who else mentions it. The cheap, honest ways to st
 | Titles and descriptions of other pages   | `src/content/*-copy.ts`, `src/content/team.ts`, the page files                            |
 | Verification variables                   | `.env.example`                                                                            |
 | Automatic checks                         | `tests/e2e/seo.spec.ts`, `tests/unit/seo.test.ts`, `tests/unit/verification-meta.test.ts` |
+
+## Round 2 (2026-10-09): audit follow-up
+
+Done from the SEO/GEO/AEO audit (the audit tool could not see our JSON-LD; the live site already served WebSite, ProfessionalService with both founders and the four services, and FAQPage):
+
+- **Where we work:** the title and description say "across the US"; a visible definition sentence sits under the hero ("Corvis is a web design studio for local businesses, based on the West Coast and serving businesses across the United States"); the footer and /team name the six cities; `areaServed` is the United States plus those cities (the owner confirmed the cities). No street address is published (remote studio). Edit in `site.coverage` (src/content/site.ts).
+- **Service pages:** /services/web-design, /services/local-search, /services/managed-hosting, /services/website-redesign (500+ words each, copy in `src/content/service-pages.ts`, every claim traced to the packages), linked from the home Services cards, the footer and each other; each has Service and BreadcrumbList JSON-LD and is in the sitemap.
+- **Schema:** Person (both founders, tied to the business with `worksFor`, no invented profile links) on /team; BreadcrumbList on /team, /sandbox and service pages.
+- **Proof:** "A real before and after" is now "See a redesign, before and after" and says it is a sample, not a client. The two live client sites (refinedcelebrations.co, modlabs.store) are linked from Work; the Grit concept is never linked.
+- **AI crawlers:** `/llms.txt`, generated from the content modules so prices and services cannot drift.
+- **Sitemap:** every URL has a `lastmod` (date of the latest commit).
+
+Deliberately not done: Review/AggregateRating markup (the testimonials are illustrative), HowTo markup (Google dropped HowTo rich results in 2023), a price table with dollar signs (prices are plain numbers by design), alt text on the home page founder avatars (decorative, next to text that names them).
+
+Still to do by the owner: add LinkedIn / Google Business Profile / social links to `site.socials` when they exist (they flow into `sameAs`); in Search Console, resubmit `sitemap-index.xml` and use URL Inspection, then Request indexing, on the four service pages; replace the illustrative reviews with real ones before adding any review markup.

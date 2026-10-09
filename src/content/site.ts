@@ -11,9 +11,17 @@ export const site = {
   alternateNames: ['The Corvis', 'Corvis Web Design', 'thecorvis'],
   url: 'https://thecorvis.com',
   /** Home page <title>: the studio's name and what it is, under 60 characters. */
-  title: 'Corvis | Web Design Studio for Local Businesses',
+  title: 'Corvis | Web Design for Local Businesses Across the US',
   description:
-    'Corvis is a web design studio for local businesses. We write, build, launch and manage a fast, branded website in 14 days. Book a free consult.',
+    'Corvis is a web design studio for local businesses across the US. We write, build, launch and manage a fast, branded website in 14 days.',
+  /** Where we work. A remote studio: no street address is published. */
+  coverage: {
+    /** The one-line definition shown near the top of the home page and used in structured data. */
+    definition:
+      'Corvis is a web design studio for local businesses, based on the West Coast and serving businesses across the United States.',
+    summary: 'Based on the West Coast, serving local businesses across the United States.',
+    cities: ['Seattle', 'Los Angeles', 'Salt Lake City', 'New Orleans', 'Indianapolis', 'Chicago'],
+  },
   email: 'aaron@thecorvis.com',
   phone: '+1 801-784-0475',
   /** E.164 form for tel: links and structured data. */

@@ -109,7 +109,7 @@ test.describe('search basics on every public page', () => {
 
   test('the home page names the studio and carries the search entities', async ({ page }) => {
     await page.goto('/');
-    await expect(page).toHaveTitle('Corvis | Web Design Studio for Local Businesses');
+    await expect(page).toHaveTitle('Corvis | Web Design for Local Businesses Across the US');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/^The Core\s?Vision\.$/);
     const description =
       (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';

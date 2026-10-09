@@ -2,9 +2,17 @@
 import SandboxStudio from '../components/sandbox/SandboxStudio.astro';
 import { sandboxPage } from '../content/sandbox-copy';
 import Layout from '../layouts/Layout.astro';
+import { breadcrumbJsonLd } from '../layouts/seo';
+import { site } from '../content/site';
+
+const origin = (Astro.site ?? new URL(site.url)).toString();
 ---
 
-<Layout title={sandboxPage.title} description={sandboxPage.description}>
+<Layout
+  title={sandboxPage.title}
+  description={sandboxPage.description}
+  structuredData={[breadcrumbJsonLd([{ name: 'Sandbox', path: '/sandbox' }], origin)]}
+>
   <section class="sandbox section" aria-labelledby="sandbox-title" data-testid="sandbox">
     <div class="aura" style="--aura-color:rgb(124 124 255 / .3);top:-12rem;left:-22rem"></div>
     <div class="aura" style="--aura-color:rgb(255 192 131 / .45);top:8rem;right:-24rem"></div>

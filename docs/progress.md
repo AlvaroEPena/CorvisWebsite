@@ -157,3 +157,8 @@
 
 - Work/slider previews: a see-through shield (`.live-stage::after`, `touch-action: pan-y pinch-zoom`) now takes every touch, the demo iframe is `scrolling="no"` and its page is `overflow: hidden`, so a finger across a preview just scrolls the page and only the animation moves the demo.
 - Phone timeline (touch, no reduced motion): each stop lights when its top reaches the middle of the screen, then stays lit for the page load (`updateTouch` in `process-pin.ts`; thread length from the last lit stop). Replaces the scroll-driven scrub. A refresh starts over; no JS or reduced motion shows the finished route.
+
+## 2026-10-09 - SEO round 2 (audit follow-up)
+
+- See docs/seo-checklist.md "Round 2". New: location/definition copy, four service pages, Person and BreadcrumbList schema, llms.txt, sitemap lastmod, live client links, redesign section retitled.
+- Verified: typecheck 0 errors, lint/format clean, 222 unit, e2e green after fixing the tests the changes touched (title, Work outbound links), Lighthouse `/` and `/services/web-design` 100 on all categories, `/team` 99.

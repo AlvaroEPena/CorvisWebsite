@@ -5,8 +5,10 @@ import TeamPhoto from '../components/TeamPhoto.astro';
 import { site } from '../content/site';
 import { photoAltOf, teamPage, teamProfiles } from '../content/team';
 import Layout from '../layouts/Layout.astro';
+import { breadcrumbJsonLd, personJsonLd } from '../layouts/seo';
 import { teamImages } from '../lib/team-photos';
 
+const origin = (Astro.site ?? new URL(site.url)).toString();
 const members = site.team.map((member) => {
   const profile = teamProfiles.find((candidate) => candidate.id === member.id);
   if (!profile) throw new Error(`Missing team profile for ${member.id}`);
@@ -14,7 +16,14 @@ const members = site.team.map((member) => {
 });
 ---
 
-<Layout title={teamPage.title} description={teamPage.description}>
+<Layout
+  title={teamPage.title}
+  description={teamPage.description}
+  structuredData={[
+    ...site.team.map((member) => personJsonLd(member, origin)),
+    breadcrumbJsonLd([{ name: 'Meet the team', path: '/team' }], origin),
+  ]}
+>
   <section class="team section" aria-labelledby="team-title" data-testid="team">
     <div class="aura" style="--aura-color:rgb(124 124 255 / .3);top:-10rem;left:-20rem"></div>
     <div class="aura" style="--aura-color:rgb(255 192 131 / .5);top:10rem;right:-22rem"></div>
@@ -23,6 +32,9 @@ const members = site.team.map((member) => {
       <header class="intro">
         <h1 id="team-title">{teamPage.heading}</h1>
         <p>{teamPage.lead}</p>
+        <p data-testid="team-coverage">
+          {site.coverage.summary} Recent work: {site.coverage.cities.join(', ')}.
+        </p>
         <FloatingObject
           kind="bead"
           tone="indigo"

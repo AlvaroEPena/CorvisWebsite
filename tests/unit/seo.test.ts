@@ -10,14 +10,18 @@ import { services } from '../../src/content/services';
 import { site } from '../../src/content/site';
 import {
   absoluteUrl,
+  breadcrumbJsonLd,
   canonicalPath,
   faqJsonLd,
+  personJsonLd,
   professionalServiceJsonLd,
   serializeJsonLd,
+  serviceJsonLd,
   verificationTags,
   websiteJsonLd,
 } from '../../src/layouts/seo';
 import { getAllReviews } from '../../src/lib/reviews';
+import { servicePages } from '../../src/content/service-pages';
 
 const reviewsFile = getAllReviews();
 
@@ -89,7 +93,7 @@ describe('websiteJsonLd', () => {
 
 describe('home page title and description', () => {
   it('names the studio in under 60 characters', () => {
-    expect(site.title).toBe('Corvis | Web Design Studio for Local Businesses');
+    expect(site.title).toBe('Corvis | Web Design for Local Businesses Across the US');
     expect(site.title.length).toBeLessThanOrEqual(60);
   });
   it('is 70 to 160 characters and mentions web design and local businesses', () => {
@@ -159,6 +163,7 @@ describe('content invariants', () => {
       pricing,
       reviewsFile,
       faq,
+      servicePages,
     });
     expect(copy).not.toMatch(/[–—]/);
   });
@@ -184,5 +189,101 @@ describe('content invariants', () => {
   });
   it('formats prices from data', () => {
     expect(formatPrice(5800)).toBe('5,800');
+  });
+});
+
+describe('location and service-area facts', () => {
+  const data = professionalServiceJsonLd(site, services, ORIGIN) as {
+    areaServed: { '@type': string; name: string }[];
+  };
+  it('serves the United States and names each city, with no street address', () => {
+    expect(data.areaServed[0]).toEqual({ '@type': 'Country', name: 'United States' });
+    expect(data.areaServed.slice(1).map((place) => place.name)).toEqual([
+      'Seattle',
+      'Los Angeles',
+      'Salt Lake City',
+      'New Orleans',
+      'Indianapolis',
+      'Chicago',
+    ]);
+    expect(JSON.stringify(data)).not.toMatch(/Worldwide|streetAddress|PostalAddress/);
+  });
+  it('defines the business in one visible sentence', () => {
+    expect(site.coverage.definition).toBe(
+      'Corvis is a web design studio for local businesses, based on the West Coast and serving businesses across the United States.',
+    );
+  });
+});
+
+describe('personJsonLd, breadcrumbJsonLd and serviceJsonLd', () => {
+  it('ties each founder to the business and invents no profile links', () => {
+    const person = personJsonLd(site.team[0], ORIGIN);
+    expect(person).toMatchObject({
+      '@type': 'Person',
+      '@id': 'https://corvis.example/team#alvaro',
+      name: 'Alvaro Peña',
+      worksFor: { '@id': 'https://corvis.example/#business' },
+    });
+    expect(JSON.stringify(person)).not.toMatch(/sameAs|linkedin/i);
+  });
+  it('builds a numbered trail starting at Home', () => {
+    const trail = breadcrumbJsonLd([{ name: 'Meet the team', path: '/team' }], ORIGIN) as {
+      itemListElement: { position: number; name: string; item: string }[];
+    };
+    expect(trail.itemListElement).toEqual([
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://corvis.example/' },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Meet the team',
+        item: 'https://corvis.example/team',
+      },
+    ]);
+  });
+  it('describes a service as offered by the business', () => {
+    const page = servicePages[0];
+    expect(serviceJsonLd(page, site, ORIGIN)).toMatchObject({
+      '@type': 'Service',
+      url: `https://corvis.example/services/${page.slug}`,
+      provider: { '@id': 'https://corvis.example/#business' },
+    });
+  });
+});
+
+describe('service pages', () => {
+  const words = (page: (typeof servicePages)[number]) =>
+    [
+      page.heading,
+      page.lead,
+      ...page.sections.flatMap((s) => [s.title, ...s.paragraphs, ...(s.list ?? [])]),
+    ]
+      .join(' ')
+      .split(/\s+/)
+      .filter(Boolean).length;
+  it('covers the four services, each at /services/<slug> with a service in services.ts', () => {
+    expect(servicePages.map((page) => page.slug)).toEqual([
+      'web-design',
+      'local-search',
+      'managed-hosting',
+      'website-redesign',
+    ]);
+    for (const page of servicePages) {
+      expect(services.map((service) => service.id)).toContain(page.serviceId);
+      for (const related of page.related) {
+        expect(servicePages.map((entry) => entry.slug)).toContain(related);
+      }
+    }
+  });
+  it('has at least 500 words each, a short title and a good description', () => {
+    for (const page of servicePages) {
+      expect(words(page), page.slug).toBeGreaterThanOrEqual(500);
+      expect(page.metaTitle.length).toBeLessThanOrEqual(65);
+      expect(page.description.length).toBeGreaterThanOrEqual(70);
+      expect(page.description.length).toBeLessThanOrEqual(160);
+    }
+  });
+  it('never promises rankings, ratings or results', () => {
+    const copy = JSON.stringify(servicePages);
+    expect(copy).not.toMatch(/we guarantee|guaranteed (rank|result)|rank (first|#1)|5-star|rated/i);
   });
 });

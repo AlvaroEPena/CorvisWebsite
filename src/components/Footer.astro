@@ -1,4 +1,5 @@
 ---
+import { servicePages } from '../content/service-pages';
 import { site } from '../content/site';
 import { resolveHref } from '../lib/links';
 import Logo from './Logo.astro';
@@ -28,6 +29,9 @@ const year = new Date().getFullYear();
         <a class="mail" href={`tel:${site.phoneE164}`}>
           {site.phone}
         </a>
+        <p class="coverage" data-testid="footer-coverage">
+          {site.coverage.summary} Recent work: {site.coverage.cities.join(', ')}.
+        </p>
         <p class="owner">
           {site.team.map((member, index) => (
             <>
@@ -49,6 +53,15 @@ const year = new Date().getFullYear();
           <li>
             <a href={resolveHref(site.cta.href, isHome)}>Contact</a>
           </li>
+        </ul>
+      </nav>
+      <nav aria-label="Services">
+        <ul>
+          {servicePages.map((page) => (
+            <li>
+              <a href={`/services/${page.slug}`}>{page.name}</a>
+            </li>
+          ))}
         </ul>
       </nav>
     </div>
@@ -85,6 +98,11 @@ const year = new Date().getFullYear();
     width: fit-content;
     text-decoration: none;
     border-radius: var(--radius-pill);
+  }
+
+  .coverage {
+    margin: 0;
+    font-size: 0.875rem;
   }
 
   .owner {

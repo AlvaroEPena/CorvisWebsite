@@ -48,6 +48,12 @@ const isReversed = index % 2 === 1;
     <p class="origin" data-testid="project-origin">
       {project.originNote}
     </p>
+    {project.status === 'live' && displayUrl && (
+      <a class="visit" href={`https://${displayUrl}`} rel="noopener" data-testid="project-visit">
+        Visit {displayUrl}
+        <span class="sr-only"> (opens the live site)</span>
+      </a>
+    )}
     <div class="cols">
       <div>
         <h4>What we built</h4>
@@ -162,6 +168,13 @@ const isReversed = index % 2 === 1;
   .category {
     color: var(--core-600);
     font-weight: 600;
+  }
+
+  .visit {
+    width: fit-content;
+    color: var(--core-600);
+    font-weight: 600;
+    text-underline-offset: 0.2em;
   }
 
   .origin {

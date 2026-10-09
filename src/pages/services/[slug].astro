@@ -1,0 +1,229 @@
+---
+import FloatingObject from '../../components/FloatingObject.astro';
+import { getServicePage, servicePages } from '../../content/service-pages';
+import { site } from '../../content/site';
+import Layout from '../../layouts/Layout.astro';
+import { breadcrumbJsonLd, serviceJsonLd } from '../../layouts/seo';
+
+export function getStaticPaths() {
+  return servicePages.map((page) => ({ params: { slug: page.slug } }));
+}
+
+const { slug } = Astro.params;
+const page = getServicePage(slug ?? '');
+if (!page) throw new Error(`No service page for "${slug}"`);
+
+const origin = (Astro.site ?? new URL(site.url)).toString();
+const related = page.related
+  .map((relatedSlug) => getServicePage(relatedSlug))
+  .filter((entry) => entry !== undefined);
+---
+
+<Layout
+  title={page.metaTitle}
+  description={page.description}
+  structuredData={[
+    serviceJsonLd(
+      { name: page.name, description: page.description, slug: page.slug },
+      site,
+      origin,
+    ),
+    breadcrumbJsonLd([{ name: page.name, path: `/services/${page.slug}` }], origin),
+  ]}
+>
+  <section class="service section" aria-labelledby="service-title" data-testid="service-page">
+    <div class="aura" style="--aura-color:rgb(124 124 255 / .3);top:-10rem;left:-20rem"></div>
+    <div class="aura" style="--aura-color:rgb(255 192 131 / .45);top:14rem;right:-22rem"></div>
+
+    <div class="container">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{page.name}</span>
+      </nav>
+
+      <header class="intro">
+        <h1 id="service-title">{page.heading}</h1>
+        <p class="lead">{page.lead}</p>
+        <FloatingObject
+          kind="bead"
+          tone="amber"
+          delay="-2s"
+          style="width:3.2rem;height:3.2rem;right:8%;top:0.5rem"
+        />
+      </header>
+
+      <div class="body">
+        {page.sections.map((section) => (
+          <section class="block">
+            <h2>{section.title}</h2>
+            {section.paragraphs.map((paragraph) => (
+              <p>{paragraph}</p>
+            ))}
+            {section.list && (
+              <ul>
+                {section.list.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            )}
+          </section>
+        ))}
+      </div>
+
+      <section class="cta panel" aria-labelledby="service-cta-title">
+        <div>
+          <h2 id="service-cta-title">Ready to talk?</h2>
+          <p>
+            Book a free consult with Aaron. No pressure, and a plain-English answer on what we would
+            build.
+          </p>
+        </div>
+        <a class="btn btn-primary btn-shine" data-magnetic href="/#contact">
+          {site.cta.label}
+        </a>
+      </section>
+
+      <nav class="more" aria-labelledby="more-title">
+        <h2 id="more-title">More from Corvis</h2>
+        <ul>
+          {related.map((entry) => (
+            <li>
+              <a href={`/services/${entry.slug}`}>{entry.name}</a>
+            </li>
+          ))}
+          <li>
+            <a href="/sandbox">Test drive finished websites in the sandbox</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .service {
+    padding-top: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--ink-mute);
+    font-size: 0.9rem;
+  }
+
+  .crumbs a {
+    color: var(--core-600);
+  }
+
+  .intro {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    max-width: 46rem;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    line-height: 1.05;
+  }
+
+  .lead {
+    max-width: 38rem;
+    color: var(--ink-soft);
+    font-size: 1.15rem;
+  }
+
+  .body {
+    display: grid;
+    gap: clamp(1.75rem, 3vw, 2.5rem);
+    max-width: 46rem;
+  }
+
+  .block {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .block h2 {
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    line-height: 1.15;
+  }
+
+  .block p {
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+  }
+
+  .block ul {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .block li {
+    position: relative;
+    padding-left: 1.7rem;
+    color: var(--ink);
+  }
+
+  .block li::before {
+    content: '';
+    position: absolute;
+    left: 0.15rem;
+    top: 0.45em;
+    width: 0.7rem;
+    height: 0.38rem;
+    border: solid var(--vision-500);
+    border-width: 0 0 2.5px 2.5px;
+    transform: rotate(-45deg);
+  }
+
+  .cta {
+    display: grid;
+    gap: 1.25rem;
+    align-items: center;
+    max-width: 46rem;
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .cta p {
+    color: var(--ink-soft);
+  }
+
+  .more {
+    max-width: 46rem;
+    margin-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  .more h2 {
+    font-size: 1.25rem;
+  }
+
+  .more ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.5rem;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .more a {
+    color: var(--core-600);
+    font-weight: 600;
+  }
+
+  @media (min-width: 48rem) {
+    .cta {
+      grid-template-columns: 1fr auto;
+    }
+  }
+</style>

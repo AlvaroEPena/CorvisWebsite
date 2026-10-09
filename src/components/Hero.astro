@@ -25,6 +25,9 @@ import HeroMark from './HeroMark.astro';
       <p class="lead hero-rise" style="--delay:.04s">
         {site.hero.lead}
       </p>
+      <p class="entity hero-rise" style="--delay:.06s" data-testid="hero-definition">
+        {site.coverage.definition}
+      </p>
       <div class="actions hero-rise" style="--delay:.08s">
         <a
           class="btn btn-primary btn-shine"
@@ -170,6 +173,13 @@ import HeroMark from './HeroMark.astro';
     color: var(--ink-soft);
     font-size: clamp(1.1rem, 1.6vw, 1.3rem);
     line-height: 1.55;
+  }
+
+  .entity {
+    max-width: 30rem;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
 
   .actions {

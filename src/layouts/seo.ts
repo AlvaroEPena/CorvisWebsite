@@ -18,8 +18,17 @@ interface BusinessFacts {
   description: string;
   email: string;
   phoneE164: string;
-  team: readonly { name: string; role: string }[];
+  team: readonly { id?: string; name: string; role: string }[];
   socials: Record<string, string>;
+  coverage?: { cities: readonly string[] };
+}
+
+/** The United States plus each city we have served, as schema.org places. */
+function areaServed(business: BusinessFacts): JsonLd[] {
+  return [
+    { '@type': 'Country', name: 'United States' },
+    ...(business.coverage?.cities ?? []).map((city) => ({ '@type': 'City', name: city })),
+  ];
 }
 
 /** No aggregateRating or review markup: testimonials and projects are placeholders. */
@@ -50,7 +59,7 @@ export function professionalServiceJsonLd(
       width: 512,
       height: 512,
     },
-    areaServed: 'Worldwide',
+    areaServed: areaServed(business),
     ...(sameAs.length > 0 ? { sameAs } : {}),
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
@@ -117,5 +126,56 @@ export function faqJsonLd(entries: readonly FaqEntry[]): JsonLd {
       name: entry.question,
       acceptedAnswer: { '@type': 'Answer', text: entry.answer },
     })),
+  };
+}
+
+/** One founder as a Person, tied to the business entity. No profile links are invented. */
+export function personJsonLd(
+  member: { id?: string; name: string; role: string },
+  origin: string,
+): JsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': `${origin}team#${member.id ?? member.name.toLowerCase().replace(/\W+/g, '-')}`,
+    name: member.name,
+    jobTitle: member.role,
+    url: absoluteUrl('/team', origin),
+    worksFor: { '@id': `${origin}#business` },
+  };
+}
+
+/** A breadcrumb trail: Home, then each item in order. */
+export function breadcrumbJsonLd(
+  items: readonly { name: string; path: string }[],
+  origin: string,
+): JsonLd {
+  const trail = [{ name: 'Home', path: '/' }, ...items];
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: trail.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: absoluteUrl(item.path, origin),
+    })),
+  };
+}
+
+/** One service page as a Service offered by the business, across the same area. */
+export function serviceJsonLd(
+  page: { name: string; description: string; slug: string },
+  business: BusinessFacts,
+  origin: string,
+): JsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: page.name,
+    description: page.description,
+    url: absoluteUrl(`/services/${page.slug}`, origin),
+    provider: { '@id': `${origin}#business` },
+    areaServed: areaServed(business),
   };
 }

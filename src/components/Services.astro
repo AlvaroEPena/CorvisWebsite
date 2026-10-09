@@ -1,5 +1,8 @@
 ---
+import { servicePages } from '../content/service-pages';
 import { services } from '../content/services';
+
+const pageFor = (serviceId: string) => servicePages.find((page) => page.serviceId === serviceId);
 import FloatingObject from './FloatingObject.astro';
 
 const decor = {
@@ -48,6 +51,12 @@ const decor = {
                 <li>{point}</li>
               ))}
             </ul>
+            {pageFor(service.id) && (
+              <a class="more" href={`/services/${pageFor(service.id)?.slug}`}>
+                Learn more
+                <span class="sr-only"> about {service.title}</span>
+              </a>
+            )}
           </li>
         );
       })}
@@ -85,6 +94,14 @@ const decor = {
   .summary {
     max-width: 30rem;
     font-size: 1.02rem;
+  }
+
+  .more {
+    width: fit-content;
+    color: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
   }
 
   .points {

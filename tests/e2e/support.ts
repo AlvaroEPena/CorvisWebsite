@@ -18,6 +18,10 @@ export const PAGES = [
   { name: 'privacy', path: '/privacy' },
   { name: 'sandbox', path: '/sandbox' },
   { name: 'team', path: '/team' },
+  { name: 'web-design', path: '/services/web-design' },
+  { name: 'local-search', path: '/services/local-search' },
+  { name: 'managed-hosting', path: '/services/managed-hosting' },
+  { name: 'website-redesign', path: '/services/website-redesign' },
   ...(reviewsOn ? [{ name: 'reviews', path: '/reviews' }] : []),
   { name: '404', path: '/this-page-does-not-exist' },
 ] as const;

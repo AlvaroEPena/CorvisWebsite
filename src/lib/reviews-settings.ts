@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import raw from '../content/reviews-settings.json';
+import raw from '../content/reviews-settings.json' with { type: 'json' };
 
 /**
  * The one switch for every public mention of reviews, edited in the admin ("Website settings").

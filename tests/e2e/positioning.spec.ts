@@ -83,7 +83,10 @@ test.describe('portfolio', () => {
 
     const html = await work.evaluate((node) => node.outerHTML);
     expect(html).not.toMatch(REAL_BUSINESS);
-    expect(html).not.toMatch(/href="https?:\/\/(?!corvis)/);
+    // The only outbound links are to the two live client sites (the concept is never linked).
+    expect(html).not.toMatch(
+      /href="https?:\/\/(?!corvis|refinedcelebrations\.co"|modlabs\.store")/,
+    );
   });
 
   test('images set dimensions so the section cannot shift layout', async ({ page }) => {
