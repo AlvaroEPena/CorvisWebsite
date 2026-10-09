@@ -34,7 +34,12 @@ const textFields: Field[] = [
     widget: 'string',
     hint: 'For example "Owner" or "Practice Manager".',
   },
-  { name: 'company', label: 'Business name', widget: 'string' },
+  {
+    name: 'industry',
+    label: 'Industry',
+    widget: 'string',
+    hint: 'For example "Dental practice" or "Plumbing and heating". Shown instead of the business name.',
+  },
   {
     name: 'quote',
     label: 'Quote',

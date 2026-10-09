@@ -120,3 +120,15 @@
 ## 2026-10-09 — Aaron's headshot
 
 - Added from `C:\Users\Alvaro\Desktop\Aaron_Pena-Diamond_Headshot.jpeg` (2528x1684) with `node scripts/make-team-photos.mjs aaron <path>`; crops in the CROPS table (card 4:5 centred on the face, square avatar around the head), polish off. The designed placeholder stays in `src/assets/team/aaron-placeholder.svg` as the fallback for any founder without photos. Tests updated for two real photos.
+
+## 2026-10-09 — Round 12: pricing, copy and structure pass
+
+- Prices are plain numbers site-wide (no `$`): Launchpad Foundation from 3,800 (up to 5 pages, up to 400 words each, two edit rounds), Market Leader from 4,940 ("Information visibility on up to 10 service and location pages", copy included), Fully Managed Digital Infrastructure 274 per month, worded as everything in both packages plus ongoing care. `formatPrice` no longer adds a currency symbol; contact budget labels too.
+- Removed: deposit buttons and checkout script/tests (the Worker `/api/checkout` and PandaDoc code stay, unused by the page), "Hosting included" and "You own everything" chips, spam-protection wording. Added "Instant email lead alerts" to both packages and the proof chips. "Book a free consult" is the only package button (also on the managed plan).
+- FAQ rewritten for subscription ownership (buy-out, minimum term written in the proposal).
+- Process: the route draws itself and the stops appear on scroll (CSS scroll-driven animation, longhand properties so the build cannot merge them into a shorthand old browsers reject; text always visible; reduced motion shows the finished route).
+- Reviews: `company` replaced by `industry` (schema, admin, files); `/reviews` page parked as `src/pages/_reviews.astro` (404), nav/footer links removed; "More reviews" became "View examples" to `/sandbox`.
+- Consult copy: "as fast as 15 minutes". Titles: Alvaro "Co-Founder & Tech Lead", Aaron "Co-Founder & Vision Lead" (footer, team page, JSON-LD, photo alt).
+- `settleAnimations` test helper now ignores scroll-driven animations.
+- Verified: typecheck 0 errors, lint/format clean, 254 unit, e2e all projects green after fixes, Lighthouse `/` mobile 100 / a11y 100 / BP 100 / SEO 100, LCP 1.5 s.
+- Open: no calendar/CRM is attached to "Book a free consult" yet (the form emails the owner).

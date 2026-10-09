@@ -20,7 +20,7 @@ const position = z.number().int().positive().nullish();
 export const reviewSchema = z.object({
   name: text(80),
   role: text(80),
-  company: text(80),
+  industry: text(80),
   quote: z.string().trim().min(QUOTE_MIN_LENGTH).max(QUOTE_MAX_LENGTH),
   /** Shown on the home page (the first MAX_HOME_REVIEWS, in home order). */
   featured: z.boolean(),

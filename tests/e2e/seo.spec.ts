@@ -29,7 +29,7 @@ test.describe('search basics on every public page', () => {
 
   test('the sitemap lists the public pages and nothing private', async ({ request }) => {
     const paths = await sitemapPaths(request);
-    expect(paths).toEqual(expect.arrayContaining(['/', '/reviews', '/sandbox', '/team']));
+    expect(paths).toEqual(expect.arrayContaining(['/', '/sandbox', '/team']));
     for (const path of paths) {
       expect(path).not.toMatch(/^\/(admin|demos|thanks|404)/);
     }

@@ -23,8 +23,8 @@ const reviewFolder = {
   folder: REVIEWS_FOLDER,
   format: 'json',
   extension: 'json',
-  identifier_field: 'company',
-  summary: '{{name}} - {{company}}',
+  identifier_field: 'name',
+  summary: '{{name}} - {{industry}}',
   // The preview pane repeats the form; one column is simpler to use.
   editor: { preview: false },
 } as const;

@@ -15,7 +15,7 @@ import {
 const valid = {
   name: 'Ana Ruiz',
   role: 'Owner',
-  company: 'Ruiz Bakery',
+  industry: 'Bakery',
   quote: 'A quote that is long enough to pass the minimum length check.',
   featured: false,
 };

@@ -14,16 +14,7 @@ const HERO_ELEMENTS = [
   '.hero .object',
 ];
 
-const LINK_LABELS = [
-  'Services',
-  'Work',
-  'Process',
-  'Pricing',
-  'FAQ',
-  'Meet the team',
-  'Sandbox',
-  'Reviews',
-];
+const LINK_LABELS = ['Services', 'Work', 'Process', 'Pricing', 'FAQ', 'Meet the team', 'Sandbox'];
 
 /** Product of opacity along the ancestor chain: 1 means fully visible. */
 function effectiveOpacity(page: Page, selector: string): Promise<number> {
@@ -37,13 +28,13 @@ function effectiveOpacity(page: Page, selector: string): Promise<number> {
 }
 
 test.describe('navigation order', () => {
-  test('desktop navbar ends with Reviews, after Sandbox', async ({ page, isMobile }) => {
+  test('desktop navbar ends with Sandbox', async ({ page, isMobile }) => {
     test.skip(isMobile, 'The link row only exists on desktop; the mobile menu is checked below.');
     await page.goto('/');
     expect(await page.locator('header .links a').allInnerTexts()).toEqual(LINK_LABELS);
   });
 
-  test('mobile menu ends with Reviews, after Sandbox', async ({ page, isMobile }) => {
+  test('mobile menu ends with Sandbox', async ({ page, isMobile }) => {
     test.skip(!isMobile, 'The menu only exists below the desktop breakpoint.');
     await page.goto('/');
     await page.getByRole('button', { name: 'Open menu' }).click();
@@ -53,7 +44,7 @@ test.describe('navigation order', () => {
   test('the footer keeps its own order', async ({ page }) => {
     await page.goto('/');
     const labels = await page.locator('body > footer nav a').allInnerTexts();
-    expect(labels.slice(0, 8)).toEqual([
+    expect(labels.slice(0, 7)).toEqual([
       'Services',
       'Work',
       'Sandbox',
@@ -61,7 +52,6 @@ test.describe('navigation order', () => {
       'Pricing',
       'FAQ',
       'Meet the team',
-      'Reviews',
     ]);
   });
 });

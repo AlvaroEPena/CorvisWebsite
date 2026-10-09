@@ -49,7 +49,7 @@ test.describe('portfolio', () => {
     await expect(work).toContainText('Refined Celebrations & Co.');
     await expect(work).toContainText('Indianapolis');
     await expect(work).toContainText('Mod Labs');
-    await expect(work).toContainText('from $100');
+    await expect(work).toContainText('from 100');
     await expect(work).toContainText('Seattle');
     const origins = work.getByTestId('project-origin');
     await expect(origins).toHaveCount(3);

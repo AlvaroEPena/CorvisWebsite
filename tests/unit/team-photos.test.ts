@@ -40,8 +40,8 @@ describe('team data', () => {
     expect(teamProfiles.map((profile) => profile.id)).toEqual(site.team.map((member) => member.id));
   });
   it('builds alt text from the name and role', () => {
-    expect(photoAltOf(site.team[0])).toBe('Alvaro Peña, Founder and Tech Lead');
-    expect(photoAltOf(site.team[1])).toBe('Aaron Peña-Diamond, Co-Founder');
+    expect(photoAltOf(site.team[0])).toBe('Alvaro Peña, Co-Founder and Tech Lead');
+    expect(photoAltOf(site.team[1])).toBe('Aaron Peña-Diamond, Co-Founder and Vision Lead');
   });
   it('ships a real photo for both founders', () => {
     expect(teamImages('alvaro')?.isPlaceholder).toBe(false);

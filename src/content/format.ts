@@ -1,10 +1,6 @@
-const usd = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  maximumFractionDigits: 0,
-});
+const plain = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 
-/** "5800" becomes "$5,800". Display prices always derive from the data, never typed twice. */
+/** "3800" becomes "3,800". Prices show as plain numbers site-wide, and always derive from the data. */
 export function formatPrice(amount: number): string {
-  return usd.format(amount);
+  return plain.format(amount);
 }

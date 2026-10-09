@@ -61,7 +61,9 @@ test.describe('sandbox page chrome', () => {
     page,
   }) => {
     await page.goto('/');
-    const outsideChrome = page.locator('main a[href*="sandbox"]');
+    const outsideChrome = page.locator(
+      'main a[href*="sandbox"]:not([data-testid="view-examples"])',
+    );
     await expect(outsideChrome).toHaveCount(1);
     await expect(outsideChrome).toHaveAttribute('href', '/sandbox#saltwater-row/after');
     await expect(outsideChrome).toHaveText('Explore this redesign site and more');

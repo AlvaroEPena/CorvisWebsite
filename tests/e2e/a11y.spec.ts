@@ -37,16 +37,9 @@ test.describe('axe WCAG 2.2 AA', () => {
     expect(await axeViolations(page)).toEqual([]);
   });
 
-  test('home has no violations with an FAQ item open and the checkout error showing', async ({
-    page,
-  }) => {
-    await page.route('**/api/checkout', (route) =>
-      route.fulfill({ status: 503, json: { ok: false, error: 'checkout_unavailable' } }),
-    );
+  test('home has no violations with an FAQ item open', async ({ page }) => {
     await page.goto('/');
     await page.locator('#faq summary').first().click();
-    await page.getByTestId('deposit-button-launchpad').click();
-    await expect(page.getByTestId('checkout-error')).toBeVisible();
     expect(await axeViolations(page)).toEqual([]);
   });
 });

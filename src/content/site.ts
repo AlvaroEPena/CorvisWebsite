@@ -15,8 +15,8 @@ export const site = {
   phoneE164: '+18017840475',
   /** Founders, in the order shown. Phone and email above are Aaron's: he is the point of contact. */
   team: [
-    { id: 'alvaro', name: 'Alvaro Peña', role: 'Founder & Tech Lead' },
-    { id: 'aaron', name: 'Aaron Peña-Diamond', role: 'Co-Founder' },
+    { id: 'alvaro', name: 'Alvaro Peña', role: 'Co-Founder & Tech Lead' },
+    { id: 'aaron', name: 'Aaron Peña-Diamond', role: 'Co-Founder & Vision Lead' },
   ],
   socials: {} as Record<string, string>,
   cta: { label: 'Book a free consult', href: '#contact' },
@@ -29,7 +29,6 @@ export const site = {
     { label: 'FAQ', href: '#faq' },
     { label: 'Meet the team', href: '/team' },
     { label: 'Sandbox', href: '/sandbox' },
-    { label: 'Reviews', href: '/reviews' },
   ],
   /** Footer keeps the Sandbox link next to the work it shows, ahead of Process. */
   footerNavigation: [
@@ -40,7 +39,6 @@ export const site = {
     { label: 'Pricing', href: '#pricing' },
     { label: 'FAQ', href: '#faq' },
     { label: 'Meet the team', href: '/team' },
-    { label: 'Reviews', href: '/reviews' },
   ],
   hero: {
     badge: 'Done-For-You Digital Real Estate',

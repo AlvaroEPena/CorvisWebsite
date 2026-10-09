@@ -112,7 +112,7 @@ export const projects: readonly WorkProject[] = [
       'A photo gallery of real jobs, sorted by console',
     ],
     whyItWorks: [
-      'Real prices up front, from $100, so nobody has to ask before they know if it fits.',
+      'Real prices up front, from 100, so nobody has to ask before they know if it fits.',
       'Bench photos of real jobs build trust faster than any promise.',
       'Short forms and quick turnaround make the next step easy, even on a phone.',
     ],

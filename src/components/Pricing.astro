@@ -1,5 +1,4 @@
 ---
-import { depositFor } from '../content/deposits';
 import { formatPrice } from '../content/format';
 import { managedPlan, pricing } from '../content/pricing';
 import { site } from '../content/site';
@@ -20,67 +19,42 @@ import { site } from '../content/site';
       </div>
 
       <ul class="cards">
-        {pricing.map((pkg) => {
-          const deposit = depositFor(pkg.id);
-          return (
-            <li
-              class:list={['card', pkg.featured ? 'featured' : 'glass-dark']}
-              data-placeholder={pkg.placeholder}
-              data-testid={`package-${pkg.id}`}
-            >
-              {pkg.featured && <span class="badge">Most chosen</span>}
-              <h3>{pkg.name}</h3>
-              <p class="audience">{pkg.audience}</p>
-              <p class="pitch">{pkg.pitch}</p>
-              <p class="price">
-                <span class="from">Starting at</span>
-                <span class="amount">{formatPrice(pkg.priceFrom)}</span>
-                {pkg.unit && <span class="unit">{pkg.unit}</span>}
-              </p>
-              {pkg.featuresLead && <p class="lead-in">{pkg.featuresLead}</p>}
-              <ul class="features">
-                {pkg.features.map((feature) => (
-                  <li>
-                    <strong>{feature.title}</strong>
-                    <span>{feature.text}</span>
-                    {feature.footnote && <small>{feature.footnote}</small>}
-                  </li>
-                ))}
-              </ul>
-              <div class="actions">
-                <a
-                  class:list={['btn', 'btn-shine', pkg.featured ? 'btn-primary' : 'btn-light']}
-                  href={site.cta.href}
-                >
-                  {site.cta.label}
-                </a>
-                {deposit && (
-                  <button
-                    class="btn btn-deposit"
-                    type="button"
-                    data-deposit={deposit.id}
-                    data-testid={`deposit-button-${deposit.id}`}
-                  >
-                    Pay project deposit
-                    <span class="deposit-amount" data-placeholder={deposit.placeholder}>
-                      Deposit {formatPrice(deposit.amountUsd)}
-                    </span>
-                  </button>
-                )}
-              </div>
-            </li>
-          );
-        })}
+        {pricing.map((pkg) => (
+          <li
+            class:list={['card', pkg.featured ? 'featured' : 'glass-dark']}
+            data-placeholder={pkg.placeholder}
+            data-testid={`package-${pkg.id}`}
+          >
+            {pkg.featured && <span class="badge">Most chosen</span>}
+            <h3>{pkg.name}</h3>
+            <p class="audience">{pkg.audience}</p>
+            <p class="pitch">{pkg.pitch}</p>
+            <p class="price">
+              <span class="from">Starting at</span>
+              <span class="amount">{formatPrice(pkg.priceFrom)}</span>
+              {pkg.unit && <span class="unit">{pkg.unit}</span>}
+            </p>
+            {pkg.featuresLead && <p class="lead-in">{pkg.featuresLead}</p>}
+            <ul class="features">
+              {pkg.features.map((feature) => (
+                <li>
+                  <strong>{feature.title}</strong>
+                  <span>{feature.text}</span>
+                  {feature.footnote && <small>{feature.footnote}</small>}
+                </li>
+              ))}
+            </ul>
+            <div class="actions">
+              <a
+                class:list={['btn', 'btn-shine', pkg.featured ? 'btn-primary' : 'btn-light']}
+                href={site.cta.href}
+              >
+                {site.cta.label}
+              </a>
+            </div>
+          </li>
+        ))}
       </ul>
-
-      <p
-        class="checkout-error"
-        role="alert"
-        data-checkout-error
-        data-testid="checkout-error"
-        data-email={site.email}
-        hidden
-      ></p>
 
       <section
         class="managed glass-dark reveal"
@@ -89,12 +63,12 @@ import { site } from '../content/site';
         data-placeholder={managedPlan.placeholder}
       >
         <div class="managed-head">
-          <p class="included">Required with both packages</p>
+          <p class="included">{managedPlan.badge}</p>
           <h3 id="managed-title">{managedPlan.name}</h3>
           <p class="managed-summary">{managedPlan.summary}</p>
           <p class="managed-price">
             <span class="amount">{formatPrice(managedPlan.priceMonthly)}</span>
-            <span class="unit">/ month</span>
+            <span class="unit">per month</span>
           </p>
           <a class="btn btn-light btn-shine" href={site.cta.href}>
             {site.cta.label}
@@ -111,16 +85,11 @@ import { site } from '../content/site';
       </section>
 
       <p class="trust reveal">
-        Secure payment by Stripe. Deposit is credited to your project. Not sure which fits? Book a
-        free consult first.
+        Not sure which fits? Book a free consult first. We will point you to the right one.
       </p>
     </div>
   </div>
 </section>
-
-<script>
-  import '../scripts/checkout';
-</script>
 
 <style>
   .pricing {
@@ -333,45 +302,6 @@ import { site } from '../content/site';
 
   .btn-light:hover {
     box-shadow: 0 0 0 6px rgb(255 138 43 / 0.3);
-  }
-
-  .btn-deposit {
-    flex-direction: column;
-    gap: 0.25rem;
-    padding-block: 0.65rem;
-    background: transparent;
-    color: #fff;
-    border: 1.5px solid rgb(255 255 255 / 0.5);
-    line-height: 1.15;
-  }
-
-  .btn-deposit:hover {
-    background: rgb(255 255 255 / 0.1);
-  }
-
-  .featured .btn-deposit {
-    color: var(--ink);
-    border-color: rgb(20 22 63 / 0.35);
-  }
-
-  .featured .btn-deposit:hover {
-    background: rgb(20 22 63 / 0.06);
-  }
-
-  .deposit-amount {
-    font-size: 0.85rem;
-    font-weight: 500;
-    opacity: 0.85;
-  }
-
-  .checkout-error {
-    margin-top: 1.5rem;
-    padding: 0.9rem 1.1rem;
-    border-radius: 16px;
-    background: #fff1ef;
-    border: 1.5px solid #b42318;
-    color: #7a1a12;
-    font-weight: 600;
   }
 
   .managed {

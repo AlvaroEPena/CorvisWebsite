@@ -33,7 +33,7 @@ export const services: readonly Service[] = [
     title: 'Fully Managed Digital Infrastructure',
     summary:
       'Premium hosting, proactive security and versioned backups, handled for you so the site never depreciates.',
-    points: ['Hosting included', 'One-click rollback'],
+    points: ['Premium global hosting', 'One-click rollback'],
     tone: 'glass',
   },
   {

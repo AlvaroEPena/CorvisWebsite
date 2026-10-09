@@ -42,8 +42,8 @@ describe('professionalServiceJsonLd', () => {
   });
   it('names both founders with their job titles', () => {
     expect(data.founder).toEqual([
-      { '@type': 'Person', name: 'Alvaro Peña', jobTitle: 'Founder & Tech Lead' },
-      { '@type': 'Person', name: 'Aaron Peña-Diamond', jobTitle: 'Co-Founder' },
+      { '@type': 'Person', name: 'Alvaro Peña', jobTitle: 'Co-Founder & Tech Lead' },
+      { '@type': 'Person', name: 'Aaron Peña-Diamond', jobTitle: 'Co-Founder & Vision Lead' },
     ]);
     expect(data.email).toBe(site.email);
     expect(data.telephone).toBe(site.phoneE164);
@@ -179,10 +179,10 @@ describe('content invariants', () => {
   });
   it('keeps package ids in step with the checkout contract and mentions no phone routing', () => {
     expect(pricing.map((pkg) => pkg.id)).toEqual(['launchpad', 'market-leader']);
-    expect(managedPlan.priceMonthly).toBe(149);
+    expect(managedPlan.priceMonthly).toBe(274);
     expect(JSON.stringify({ pricing, faq, services })).not.toMatch(/routes|text message|nightly/i);
   });
   it('formats prices from data', () => {
-    expect(formatPrice(5800)).toBe('$5,800');
+    expect(formatPrice(5800)).toBe('5,800');
   });
 });

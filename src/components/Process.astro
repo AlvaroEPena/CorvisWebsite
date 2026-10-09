@@ -11,7 +11,7 @@ import { processSteps } from '../content/process';
 
     <ol class="steps">
       {processSteps.map((step) => (
-        <li class="step reveal">
+        <li class="step">
           <span class="orb" aria-hidden="true"></span>
           <h3>{step.title}</h3>
           <p>{step.description}</p>
@@ -97,6 +97,89 @@ import { processSteps } from '../content/process';
       top: 0;
       width: 2.1rem;
       height: 2.1rem;
+    }
+  }
+
+  /*
+   * The route draws itself as you scroll: the thread grows and each stop appears when it comes into
+   * view, like exploring a map. Pure CSS (no script, no layout cost) and the text is always there.
+   * Longhands are used on purpose: the build would otherwise merge them into the `animation` shorthand,
+   * which older browsers reject. Browsers without scroll-driven animations, and reduced motion, simply show the finished route.
+   */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .steps::before {
+        transform-origin: top;
+        animation-name: thread-down;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: entry 25% cover 62%;
+      }
+
+      .orb {
+        animation-name: stop-appear;
+        animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: entry 55% entry 100%;
+      }
+    }
+  }
+
+  @keyframes thread-down {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  @keyframes thread-across {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes stop-appear {
+    from {
+      transform: scale(0);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {
+      .steps::before {
+        transform-origin: left;
+        animation-name: thread-across;
+        animation-range: entry 40% cover 55%;
+      }
+
+      /* The five stops share one row here, so they appear one after another along the route. */
+      .step:nth-child(1) .orb {
+        animation-range: entry 15% entry 45%;
+      }
+      .step:nth-child(2) .orb {
+        animation-range: entry 30% entry 60%;
+      }
+      .step:nth-child(3) .orb {
+        animation-range: entry 45% entry 75%;
+      }
+      .step:nth-child(4) .orb {
+        animation-range: entry 60% entry 90%;
+      }
+      .step:nth-child(5) .orb {
+        animation-range: entry 70% entry 100%;
+      }
     }
   }
 </style>

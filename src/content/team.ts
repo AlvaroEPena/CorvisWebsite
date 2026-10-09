@@ -14,7 +14,7 @@ export interface TeamProfile {
   bio: readonly string[];
 }
 
-/** Alt text for a real photo, from the facts in site.ts: "Alvaro Peña, Founder and Tech Lead". */
+/** Alt text for a real photo, from the facts in site.ts: "Alvaro Peña, Co-Founder and Tech Lead". */
 export const photoAltOf = (member: { name: string; role: string }): string =>
   `${member.name}, ${member.role.replace(' & ', ' and ')}`;
 
@@ -61,7 +61,7 @@ export const teamProfiles: readonly TeamProfile[] = [
     monogram: 'Al',
     summary: 'Designs and builds your site, and keeps it fast, hosted and secure.',
     bio: [
-      'Alvaro is the founder and tech lead. He designs and builds every Corvis site by hand, from the first screen to launch day.',
+      'Alvaro is the co-founder and tech lead. He designs and builds every Corvis site by hand, from the first screen to launch day.',
       'He also looks after performance, hosting and security, so your site stays quick and safe after it goes live.',
     ],
   },
@@ -70,7 +70,7 @@ export const teamProfiles: readonly TeamProfile[] = [
     monogram: 'Aa',
     summary: 'Your point of contact for scoping, pricing, proposals and everything business.',
     bio: [
-      'Aaron is the co-founder. He runs the business side and is the person you talk to, from your first call to launch day.',
+      'Aaron is the co-founder and vision lead. He runs the business side and is the person you talk to, from your first call to launch day.',
       'He scopes the project with you, agrees pricing, sends the proposal and keeps everything moving, so you never have to chase anyone.',
     ],
   },

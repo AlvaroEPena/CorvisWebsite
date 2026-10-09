@@ -10,7 +10,6 @@ export const PAGES = [
   { name: 'privacy', path: '/privacy' },
   { name: 'thanks', path: '/thanks' },
   { name: 'sandbox', path: '/sandbox' },
-  { name: 'reviews', path: '/reviews' },
   { name: 'team', path: '/team' },
   { name: '404', path: '/this-page-does-not-exist' },
 ] as const;
@@ -114,12 +113,13 @@ export async function waitForMinimumFillTime(page: Page): Promise<void> {
   await page.waitForFunction(() => performance.now() > 3200);
 }
 
-/** Waits for finite animations and transitions only; decorative loops (float) never finish. */
+/** Waits for finite time-based animations and transitions only; decorative loops (float) and scroll-driven ones never finish. */
 export async function settleAnimations(page: Page): Promise<void> {
   await page.evaluate(() =>
     Promise.all(
       document
         .getAnimations()
+        .filter((animation) => animation.timeline === document.timeline)
         .filter((animation) => animation.effect?.getComputedTiming().iterations !== Infinity)
         .map((animation) => animation.finished),
     ),

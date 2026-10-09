@@ -30,12 +30,13 @@ export const pricing: readonly PricingPackage[] = [
     audience: 'For the successful local business that customers cannot find online yet.',
     pitch:
       'Stop losing referrals to competitors just because they have a website. We launch your fully branded, conversion-optimized digital presence in 14 days.',
-    priceFrom: 4500,
+    priceFrom: 3800,
     unit: '',
     features: [
       {
-        title: 'Done-for-you copywriting',
-        text: 'You run your business; we write the words. Professional, industry-specific copywriting is included in every build.',
+        title: 'Up to 5 pages, fully written',
+        text: 'Home, About, Services, Gallery and Contact. We write the words (up to 400 per page, two rounds of edits) so you never face a blank page.',
+        footnote: 'Need more pages or longer copy? We quote it before we start.',
       },
       {
         title: 'Rapid deployment',
@@ -45,6 +46,10 @@ export const pricing: readonly PricingPackage[] = [
       {
         title: 'Mobile-first architecture',
         text: 'Built specifically for customers searching on their phones.',
+      },
+      {
+        title: 'Instant email lead alerts',
+        text: 'Your contact form emails you the moment someone writes, so no inquiry sits unseen.',
       },
     ],
     featured: false,
@@ -56,17 +61,17 @@ export const pricing: readonly PricingPackage[] = [
     audience: 'For businesses ready to capture local search traffic and automate lead generation.',
     pitch:
       'Dominate your local market with a robust digital hub designed to capture, educate, and convert high-value leads.',
-    priceFrom: 6800,
+    priceFrom: 4940,
     unit: '',
     featuresLead: 'Everything in Launchpad, plus',
     features: [
       {
-        title: 'Expanded footprint',
-        text: 'Up to 10 dedicated service and location pages to capture targeted local search traffic.',
+        title: 'Information visibility on up to 10 service and location pages',
+        text: 'One page for each service you sell or town you serve, written so people searching for exactly that can find you and understand what you offer. Copy included, up to 400 words per page.',
       },
       {
         title: 'Frictionless lead capture',
-        text: 'Integrated smart forms with spam protection and instant email alerts, so no inquiry sits unseen.',
+        text: 'Smart forms on every one of those pages, each sending an instant email alert.',
       },
     ],
     featured: true,
@@ -74,14 +79,16 @@ export const pricing: readonly PricingPackage[] = [
   },
 ];
 
-/** Mandatory care plan, presented as part of both packages (required, billed monthly). It has no checkout. */
+/** The all-in care plan: the offering of both packages plus ongoing care, billed monthly. It has no checkout. */
 export const managedPlan = {
   id: 'care',
   name: 'Fully Managed Digital Infrastructure',
-  /** USD per month. */
-  priceMonthly: 149,
+  /** Displayed on the badge above the name. */
+  badge: 'Everything in both packages, and more',
+  /** Per month, no currency symbol on the page. */
+  priceMonthly: 274,
   summary:
-    'Part of both packages and billed monthly, so your new asset never depreciates. You never touch a server, a patch or a backup.',
+    'Everything in The Launchpad Foundation and The Market Leader, kept running and improving for you, billed monthly so your new asset never depreciates. You never touch a server, a patch or a backup.',
   points: [
     {
       title: 'Premium global hosting',

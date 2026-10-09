@@ -93,7 +93,7 @@ describe('admin config', () => {
     expect(namesOf(all.fields)).toEqual([
       'name',
       'role',
-      'company',
+      'industry',
       'quote',
       'featured',
       'showOnReviewsPage',

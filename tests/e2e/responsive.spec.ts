@@ -43,14 +43,10 @@ test.describe('J6 responsive layout', () => {
     });
   }
 
-  test('the form and deposit buttons fit at 320px', async ({ page }) => {
+  test('the form fits at 320px', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 640 });
     await page.goto('/');
-    for (const locator of [
-      page.getByTestId('contact-form-panel'),
-      page.getByTestId('deposit-button-launchpad'),
-      page.getByTestId('deposit-button-market-leader'),
-    ]) {
+    for (const locator of [page.getByTestId('contact-form-panel')]) {
       await locator.scrollIntoViewIfNeeded();
       const box = await locator.boundingBox();
       expect(box).not.toBeNull();

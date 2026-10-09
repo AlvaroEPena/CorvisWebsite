@@ -66,7 +66,7 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
     page,
   }) => {
     const mock = await openEditor(page);
-    await expect(page.getByText('Marisol Okafor - Ridgeline Lawn & Garden')).toBeVisible();
+    await expect(page.getByText('Marisol Okafor - Lawn and garden care')).toBeVisible();
     await expect(rows(page)).toHaveCount(11);
     await shot(page, 'admin-all-reviews');
 
@@ -125,7 +125,7 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
     await expect(page.getByRole('button', { name: 'Delete Selected Entry' })).toBeDisabled();
     await rows(page).first().getByRole('checkbox').uncheck();
 
-    await page.getByText('Marisol Okafor - Ridgeline Lawn & Garden').click();
+    await page.getByText('Marisol Okafor - Lawn and garden care').click();
     await expect(page.getByRole('textbox', { name: 'Role' })).toBeVisible();
     await expect(page.getByRole('switch', { name: /Show on the home page/ })).toHaveCount(0);
     await page.getByRole('textbox', { name: 'Role' }).fill('Owner and founder');
@@ -149,7 +149,7 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
     page,
   }) => {
     const mock = await openEditor(page);
-    await page.getByText('Priya Venkataraman - Maison Fleur Hair Studio').click();
+    await page.getByText('Priya Venkataraman - Hair salon').click();
     await page.getByRole('switch', { name: /Show on the home page/ }).click();
     await page.getByRole('button', { name: 'Save' }).first().click();
     await expect.poll(() => mock.commits.length).toBe(1);
@@ -170,7 +170,7 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
     await page.getByRole('button', { name: 'Create New Entry' }).click();
     await page.getByRole('textbox', { name: 'Name', exact: true }).fill('Noor Haddad');
     await page.getByRole('textbox', { name: 'Role' }).fill('Owner');
-    await page.getByRole('textbox', { name: 'Business name' }).fill('Haddad Tile & Stone');
+    await page.getByRole('textbox', { name: 'Industry' }).fill('Tile and stone');
     await page
       .getByRole('textbox', { name: 'Quote' })
       .fill('A calm, clear process and a site that finally shows our finished work.');
@@ -183,7 +183,7 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
     const record = JSON.parse(change?.text ?? '{}') as Record_;
     expect(record).toMatchObject({
       name: 'Noor Haddad',
-      company: 'Haddad Tile & Stone',
+      industry: 'Tile and stone',
       featured: true,
     });
     expect(record).not.toHaveProperty('siteHref');
@@ -193,7 +193,7 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
     page,
   }) => {
     await openEditor(page);
-    await page.getByText('Marisol Okafor - Ridgeline Lawn & Garden').click();
+    await page.getByText('Marisol Okafor - Lawn and garden care').click();
     await expect(page.getByRole('switch', { name: /Show on the home page/ })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Remove from home screen' })).toHaveCount(0);
     await expect(page.getByRole('switch', { name: /Show on the reviews page/ })).toBeVisible();
@@ -201,7 +201,7 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
     await page.goBack();
 
     await home(page).click();
-    await page.getByText('Marisol Okafor - Ridgeline Lawn & Garden').click();
+    await page.getByText('Marisol Okafor - Lawn and garden care').click();
     await expect(page.getByRole('button', { name: 'Remove from home screen' })).toBeVisible();
     await expect(page.getByText('This review is on the home screen.')).toBeVisible();
     await expect(page.getByRole('switch', { name: /Show on the home page/ })).toHaveCount(0);
@@ -212,7 +212,7 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
   test('removing from the home screen asks first; cancel changes nothing', async ({ page }) => {
     const mock = await openEditor(page);
     await home(page).click();
-    await page.getByText('Marisol Okafor - Ridgeline Lawn & Garden').click();
+    await page.getByText('Marisol Okafor - Lawn and garden care').click();
 
     const messages: string[] = [];
     page.once('dialog', (dialog) => {
@@ -233,7 +233,7 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
   }) => {
     const mock = await openEditor(page);
     await home(page).click();
-    await page.getByText('Marisol Okafor - Ridgeline Lawn & Garden').click();
+    await page.getByText('Marisol Okafor - Lawn and garden care').click();
 
     page.once('dialog', (dialog) => void dialog.accept());
     await page.getByRole('button', { name: 'Remove from home screen' }).click();
@@ -254,7 +254,7 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
     await expect(page.getByText('Marisol Okafor')).toHaveCount(0);
     await shot(page, 'admin-home-after-removal');
     await page.getByText('All reviews', { exact: true }).first().click();
-    await page.getByText('Marisol Okafor - Ridgeline Lawn & Garden').click();
+    await page.getByText('Marisol Okafor - Lawn and garden care').click();
     await expect(page.getByRole('switch', { name: /Show on the home page/ })).not.toBeChecked();
   });
 
@@ -268,7 +268,7 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
       await page.getByRole('button', { name: 'Save' }).first().click();
     };
 
-    await toggleAndSave('Calvin Dubois - Bluewater Pool Builders'); // All reviews
+    await toggleAndSave('Calvin Dubois - Pool construction'); // All reviews
     await expect.poll(() => mock.commits.length).toBe(1);
     expect(changedKeys('bluewater-pools', mock.commits[0]?.[0]?.text)).toEqual([
       'showOnReviewsPage',
@@ -278,7 +278,7 @@ test.describe('/admin reviews editors (GitHub mocked, nothing leaves the machine
     });
 
     await home(page).click();
-    await toggleAndSave('Tomas Reyes - The Copper Kettle Cafe'); // Home reviews
+    await toggleAndSave('Tomas Reyes - Cafe'); // Home reviews
     await expect.poll(() => mock.commits.length).toBe(2);
     expect(mock.commits[1]).toHaveLength(1);
     expect(changedKeys('copper-kettle', mock.commits[1]?.[0]?.text)).toEqual(['showOnReviewsPage']);
