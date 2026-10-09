@@ -50,15 +50,13 @@ test.describe('home testimonials', () => {
     await expect(page.getByTestId('testimonials-sample-note')).toHaveCount(0);
   });
 
-  test('has a "View examples" button to the sandbox instead of a reviews page', async ({
-    page,
-  }) => {
+  test('has a "More reviews" button to /reviews', async ({ page }) => {
     await page.goto('/');
-    const button = page.getByTestId('testimonials').getByRole('link', { name: 'View examples' });
-    await expect(button).toHaveAttribute('href', '/sandbox');
-    await expect(page.getByRole('link', { name: 'More reviews' })).toHaveCount(0);
+    const button = page.getByTestId('testimonials').getByRole('link', { name: 'More reviews' });
+    await expect(button).toHaveAttribute('href', '/reviews');
     await button.click();
-    await expect(page).toHaveURL(/\/sandbox$/);
+    await expect(page).toHaveURL(/\/reviews$/);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   });
 
   test("shows each reviewer's industry, never a business name", async ({ page }) => {
@@ -69,14 +67,13 @@ test.describe('home testimonials', () => {
     expect(captions.join(' ')).not.toMatch(/Bluewater|Kettle|Halvorsen|Harborview|Ironcrest/);
   });
 
-  test('the reviews page and its links are hidden for now', async ({ page }) => {
-    const response = await page.goto('/reviews');
-    expect(response?.status()).toBe(404);
+  test('the navbar and footer do not list Reviews', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('a[href="/reviews"]')).toHaveCount(0);
+    await expect(page.locator('header a[href="/reviews"]')).toHaveCount(0);
+    await expect(page.locator('body > footer a[href="/reviews"]')).toHaveCount(0);
   });
 
-  test('has a "Meet the team" call to action to /team, more prominent than "View examples"', async ({
+  test('has a "Meet the team" call to action to /team, more prominent than "More reviews"', async ({
     page,
   }) => {
     await page.goto('/');
@@ -91,7 +88,7 @@ test.describe('home testimonials', () => {
     }
     const [teamBox, moreBox] = await Promise.all([
       team.boundingBox(),
-      section.getByTestId('view-examples').boundingBox(),
+      section.getByTestId('more-reviews').boundingBox(),
     ]);
     expect(teamBox && moreBox).toBeTruthy();
     expect((teamBox?.width ?? 0) * (teamBox?.height ?? 0)).toBeGreaterThan(
@@ -109,7 +106,7 @@ test.describe('home testimonials', () => {
     const section = page.getByTestId('testimonials');
     const [teamBox, moreBox] = await Promise.all([
       section.getByTestId('meet-the-team').boundingBox(),
-      section.getByTestId('view-examples').boundingBox(),
+      section.getByTestId('more-reviews').boundingBox(),
     ]);
     if (isMobile)
       expect(moreBox?.y ?? 0).toBeGreaterThan((teamBox?.y ?? 0) + (teamBox?.height ?? 0));

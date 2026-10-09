@@ -127,7 +127,7 @@
 - Removed: deposit buttons and checkout script/tests (the Worker `/api/checkout` and PandaDoc code stay, unused by the page), "Hosting included" and "You own everything" chips, spam-protection wording. Added "Instant email lead alerts" to both packages and the proof chips. "Book a free consult" is the only package button (also on the managed plan).
 - FAQ rewritten for subscription ownership (buy-out, minimum term written in the proposal).
 - Process: the route draws itself and the stops appear on scroll (CSS scroll-driven animation, longhand properties so the build cannot merge them into a shorthand old browsers reject; text always visible; reduced motion shows the finished route).
-- Reviews: `company` replaced by `industry` (schema, admin, files); `/reviews` page parked as `src/pages/_reviews.astro` (404), nav/footer links removed; "More reviews" became "View examples" to `/sandbox`.
+- Reviews: `company` replaced by `industry` (schema, admin, files); `/reviews` page kept but not linked from the nav or footer; the "More reviews" button on the home page stays.
 - Consult copy: "as fast as 15 minutes". Titles: Alvaro "Co-Founder & Tech Lead", Aaron "Co-Founder & Vision Lead" (footer, team page, JSON-LD, photo alt).
 - `settleAnimations` test helper now ignores scroll-driven animations.
 - Verified: typecheck 0 errors, lint/format clean, 254 unit, e2e all projects green after fixes, Lighthouse `/` mobile 100 / a11y 100 / BP 100 / SEO 100, LCP 1.5 s.
