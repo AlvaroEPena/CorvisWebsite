@@ -29,19 +29,6 @@ const year = new Date().getFullYear();
         <a class="mail" href={`tel:${site.phoneE164}`}>
           {site.phone}
         </a>
-        <p class="coverage" data-testid="footer-coverage">
-          {site.coverage.summary} Recent work: {site.coverage.cities.join(', ')}.
-        </p>
-        <p class="owner">
-          {site.team.map((member, index) => (
-            <>
-              {index > 0 && ' · '}
-              <span>
-                {member.name}, {member.role}
-              </span>
-            </>
-          ))}
-        </p>
       </div>
       <nav aria-label="Footer">
         <ul>
@@ -55,7 +42,22 @@ const year = new Date().getFullYear();
           </li>
         </ul>
       </nav>
-      <nav aria-label="Services">
+    </div>
+    <div class="meta">
+      <p class="coverage" data-testid="footer-coverage">
+        {site.coverage.summary} Recent work: {site.coverage.cities.join(', ')}.
+      </p>
+      <p class="owner">
+        {site.team.map((member, index) => (
+          <>
+            {index > 0 && ' · '}
+            <span>
+              {member.name}, {member.role}
+            </span>
+          </>
+        ))}
+      </p>
+      <nav aria-label="Services" class="services">
         <ul>
           {servicePages.map((page) => (
             <li>
@@ -83,7 +85,15 @@ const year = new Date().getFullYear();
   .top {
     display: grid;
     gap: 2.5rem;
-    padding-bottom: 3rem;
+    padding-bottom: 1.5rem;
+  }
+
+  /* Full-width details under the columns: where we work, who we are, and the service pages. */
+  .meta {
+    display: grid;
+    gap: 0.35rem;
+    padding-bottom: 1rem;
+    color: var(--ink-soft);
   }
 
   .about {
@@ -100,14 +110,16 @@ const year = new Date().getFullYear();
     border-radius: var(--radius-pill);
   }
 
-  .coverage {
+  .coverage,
+  .owner {
     margin: 0;
     font-size: 0.875rem;
   }
 
-  .owner {
-    margin: 0;
-    font-size: 0.875rem;
+  .services ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2rem;
   }
 
   .mail {
@@ -159,8 +171,16 @@ const year = new Date().getFullYear();
     .top {
       grid-template-columns: 1fr auto;
     }
-    ul {
+    nav:not(.services) ul {
       grid-template-columns: repeat(3, auto);
+    }
+  }
+
+  /* Wide enough for each line to sit on one line. */
+  @media (min-width: 72rem) {
+    .coverage,
+    .owner {
+      white-space: nowrap;
     }
   }
 </style>
