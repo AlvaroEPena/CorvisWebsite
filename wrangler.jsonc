@@ -3,6 +3,10 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "corvis",
   "main": "src/worker/index.ts",
+  // The site is served on thecorvis.com only. Without these, every deploy turns the public
+  // corvis.modlabs.workers.dev address (and per-version preview addresses) back on.
+  "workers_dev": false,
+  "preview_urls": false,
   "compatibility_date": "2026-09-30",
   "assets": {
     "directory": "./dist",
