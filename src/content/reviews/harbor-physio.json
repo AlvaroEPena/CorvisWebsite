@@ -1,10 +1,10 @@
 {
-  "order": 2,
+  "homeOrder": 3,
   "name": "Dr. Lena Brandt",
   "role": "Clinic Director",
   "industry": "Physiotherapy",
   "quote": "The local pages for each neighborhood we serve finally put us on the map. Patients tell us the booking page was the easiest they have used.",
   "featured": true,
   "showOnReviewsPage": true,
-  "homeOrder": 2
+  "order": 2
 }

@@ -1,10 +1,10 @@
 {
-  "order": 3,
+  "homeOrder": 2,
   "name": "Tomas Reyes",
   "role": "Co-owner",
   "industry": "Cafe",
   "quote": "Menu, hours and catering on one fast page that works on a phone in line at the counter. Hosting is simply handled, which is all I wanted.",
   "featured": true,
   "showOnReviewsPage": true,
-  "homeOrder": 3
+  "order": 3
 }
