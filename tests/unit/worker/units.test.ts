@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   TURNSTILE_TEST_SECRET,
   resolveMailConfig,
-  resolvePandaDocConfig,
   resolveTurnstileConfig,
 } from '../../../src/worker/env';
 import { escapeHtml } from '../../../src/worker/escape';
@@ -60,21 +59,6 @@ describe('resolveMailConfig', () => {
     expect(
       resolveMailConfig({ RESEND_API_KEY: 'k', CONTACT_FROM_EMAIL: 'hello@corvis.example' }),
     ).toEqual({ ok: false, problems: ['CONTACT_TO_EMAIL'] });
-  });
-});
-
-describe('resolvePandaDocConfig', () => {
-  it('is disabled unless both the key and template id are set', () => {
-    expect(resolvePandaDocConfig({})).toBeUndefined();
-    expect(resolvePandaDocConfig({ PANDADOC_API_KEY: 'k' })).toBeUndefined();
-    expect(resolvePandaDocConfig({ PANDADOC_TEMPLATE_ID: 't' })).toBeUndefined();
-  });
-
-  it('only auto-sends for the exact string "true"', () => {
-    const base = { PANDADOC_API_KEY: 'k', PANDADOC_TEMPLATE_ID: 't' };
-    expect(resolvePandaDocConfig({ ...base, PANDADOC_AUTO_SEND: 'true' })?.autoSend).toBe(true);
-    expect(resolvePandaDocConfig({ ...base, PANDADOC_AUTO_SEND: 'yes' })?.autoSend).toBe(false);
-    expect(resolvePandaDocConfig(base)?.autoSend).toBe(false);
   });
 });
 

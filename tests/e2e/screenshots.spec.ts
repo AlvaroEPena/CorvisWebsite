@@ -22,7 +22,7 @@ test.describe('screenshots for visual review', () => {
       await testInfo.attach(`${testInfo.project.name}-${id}`, { path, contentType: 'image/png' });
     }
 
-    for (const route of ['/privacy', '/thanks', '/missing']) {
+    for (const route of ['/privacy', '/missing']) {
       await page.goto(route);
       const name = route.slice(1);
       const path = testInfo.outputPath(`${testInfo.project.name}-${name}.png`);

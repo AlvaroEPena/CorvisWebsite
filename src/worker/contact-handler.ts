@@ -2,15 +2,9 @@ import { z } from 'zod';
 import { MIN_FILL_MS, contactInputSchema, type ContactInput } from '../lib/contracts/contact';
 import { readJsonBody } from './body';
 import { LOG_PREFIX, type Logger, type RouteHandler } from './deps';
-import {
-  resolveMailConfig,
-  resolvePandaDocConfig,
-  resolveTurnstileConfig,
-  type MailConfig,
-} from './env';
+import { resolveMailConfig, resolveTurnstileConfig, type MailConfig } from './env';
 import { clientIp, hasJsonContentType, isSameOrigin } from './guards';
 import { buildLeadEmail, createResendSender } from './mailer';
-import { createProposal } from './pandadoc';
 import type { RateLimiter } from './rate-limit';
 import { jsonResponse } from './response';
 import { verifyTurnstile } from './turnstile';
@@ -21,7 +15,6 @@ export interface ContactDeps {
   fetch: typeof fetch;
   rateLimiter: RateLimiter;
   logger: Logger;
-  sleep: (ms: number) => Promise<void>;
 }
 
 /** Body-level problems reuse the contract's `validation` shape under a `_form` key. */
@@ -90,7 +83,7 @@ async function deliverLead(lead: ContactInput, mail: MailConfig, deps: ContactDe
 }
 
 export function createContactHandler(deps: ContactDeps): RouteHandler {
-  return async (request, env, ctx) => {
+  return async (request, env) => {
     if (!isSameOrigin(request)) return jsonResponse({ ok: false, error: 'forbidden' }, 403);
 
     const ip = clientIp(request);
@@ -152,19 +145,6 @@ export function createContactHandler(deps: ContactDeps): RouteHandler {
       return jsonResponse({ ok: false, error: 'send_failed' }, 502);
     }
 
-    // Owner is already notified; the proposal runs after the response and cannot fail the lead.
-    const pandaDoc = resolvePandaDocConfig(env);
-    if (pandaDoc !== undefined) {
-      ctx.waitUntil(
-        createProposal({
-          lead,
-          config: pandaDoc,
-          fetch: deps.fetch,
-          logger: deps.logger,
-          sleep: deps.sleep,
-        }),
-      );
-    }
     return jsonResponse({ ok: true }, 200);
   };
 }

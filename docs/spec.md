@@ -70,7 +70,7 @@ No database. Typed content modules in `src/content/`: `site.ts` (name, slogan, e
 (must be empty), `elapsedMs` (number, ≥ 3000). Worker: `src/worker/` handles `/api/*`,
 all other paths fall through to static assets.
 
-### 6b. Payments and proposals (scope added 2026-10-08)
+### 6b. Payments and proposals (REMOVED 2026-10-09: Stripe and PandaDoc code was deleted; text below is history only)
 
 - **Stripe (deposit checkout).** `POST /api/checkout` with `CheckoutInput` (`package`: `launch` | `redesign`,
   optional `email`) returns `{ok:true,url}` of a Stripe-hosted Checkout Session (mode `payment`, USD,

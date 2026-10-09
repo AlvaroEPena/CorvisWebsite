@@ -1,4 +1,3 @@
-import { DEPOSIT_PACKAGES } from '../lib/contracts/checkout';
 import type { BUDGETS, SERVICES, ContactInput } from '../lib/contracts/contact';
 import { escapeHtml } from './escape';
 
@@ -84,53 +83,6 @@ export function buildLeadEmail(
     to: addresses.to,
     replyTo: lead.email,
     subject: singleLine(`New Corvis inquiry: ${lead.name} (${SERVICE_LABELS[lead.service]})`),
-    text,
-    html,
-  };
-}
-
-export function formatMoney(amountMinor: number, currency: string): string {
-  try {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency.toUpperCase(),
-    }).format(amountMinor / 100);
-  } catch {
-    return `${(amountMinor / 100).toFixed(2)} ${currency.toUpperCase()}`;
-  }
-}
-
-export interface PaidDeposit {
-  sessionId: string;
-  packageId: string | undefined;
-  amountTotal: number | null;
-  currency: string | null;
-  customerEmail: string | undefined;
-}
-
-/** Owner notification for a paid Stripe deposit. Values come from Stripe but are escaped anyway. */
-export function buildPaymentEmail(
-  deposit: PaidDeposit,
-  addresses: { from: string; to: string },
-): OutgoingEmail {
-  const knownPackage = Object.entries(DEPOSIT_PACKAGES).find(([id]) => id === deposit.packageId);
-  const packageName = knownPackage?.[1].name ?? deposit.packageId ?? 'Unknown package';
-  const amount =
-    deposit.amountTotal === null || deposit.currency === null
-      ? 'Unknown'
-      : formatMoney(deposit.amountTotal, deposit.currency);
-
-  const { text, html } = renderEmail([
-    ['Package', packageName],
-    ['Amount', amount],
-    ['Customer email', deposit.customerEmail ?? 'Not provided'],
-    ['Stripe session', deposit.sessionId],
-  ]);
-  return {
-    from: addresses.from,
-    to: addresses.to,
-    replyTo: deposit.customerEmail,
-    subject: singleLine(`Corvis deposit paid: ${packageName} (${amount})`),
     text,
     html,
   };

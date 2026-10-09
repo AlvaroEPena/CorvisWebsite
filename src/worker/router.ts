@@ -3,16 +3,12 @@ import { jsonResponse } from './response';
 
 interface Routes {
   contact: RouteHandler;
-  checkout: RouteHandler;
-  stripeWebhook: RouteHandler;
 }
 
 /** Every route is POST-only; this maps path to handler and owns the 404/405 answers. */
 export function createRouter(routes: Routes): RouteHandler {
   const handlers: Record<string, RouteHandler> = {
     '/api/contact': routes.contact,
-    '/api/checkout': routes.checkout,
-    '/api/stripe-webhook': routes.stripeWebhook,
   };
 
   return async (request, env, ctx) => {

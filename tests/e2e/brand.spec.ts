@@ -56,7 +56,7 @@ test.describe('logo', () => {
     isMobile,
   }) => {
     test.skip(isMobile, 'The large emblem is hidden on phones.');
-    for (const path of ['/this-page-does-not-exist', '/thanks']) {
+    for (const path of ['/this-page-does-not-exist']) {
       await page.goto(path);
       await expect(page.locator('main .emblem svg.mark')).toBeVisible();
     }

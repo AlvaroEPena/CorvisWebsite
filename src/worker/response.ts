@@ -1,19 +1,9 @@
-import type { CheckoutResponse } from '../lib/contracts/checkout';
 import type { ContactResponse, TransportError } from '../lib/contracts/contact';
 
 /** Non-contract failures; clients treat any `ok: false` as a failure. */
 export type TransportErrorBody = { ok: false; error: TransportError };
 
-/** Bodies of the Stripe webhook route (read by Stripe, never by the browser). */
-export type WebhookBody =
-  | { received: true }
-  | {
-      ok: false;
-      error: 'invalid_signature' | 'webhook_unavailable' | 'send_failed' | 'bad_request';
-    };
-
-export type WorkerResponseBody =
-  ContactResponse | CheckoutResponse | TransportErrorBody | WebhookBody;
+export type WorkerResponseBody = ContactResponse | TransportErrorBody;
 
 /** JSON response with no-store caching and no CORS headers (same-origin only). */
 export function jsonResponse(

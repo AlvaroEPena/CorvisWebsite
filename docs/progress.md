@@ -132,3 +132,9 @@
 - `settleAnimations` test helper now ignores scroll-driven animations.
 - Verified: typecheck 0 errors, lint/format clean, 254 unit, e2e all projects green after fixes, Lighthouse `/` mobile 100 / a11y 100 / BP 100 / SEO 100, LCP 1.5 s.
 - Open: no calendar/CRM is attached to "Book a free consult" yet (the form emails the owner).
+
+## 2026-10-09 — Stripe and PandaDoc removed; forms ready for live keys
+
+- Deleted all Stripe checkout/webhook and PandaDoc code, contracts, tests, env vars, README and privacy text, and the `/thanks` page. The Worker now serves only `POST /api/contact` (Turnstile, honeypot, rate limit, Resend email).
+- Going live needs the owner's values: build variable `PUBLIC_TURNSTILE_SITE_KEY`; Worker secrets `TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`; then delete the `ENVIRONMENT` secret. See README "Accounts and secrets".
+- Verified: typecheck 0 errors, lint/format clean, 204 unit, e2e 517 passed.

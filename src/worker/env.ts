@@ -6,11 +6,6 @@ export interface Env {
   CONTACT_TO_EMAIL?: string;
   CONTACT_FROM_EMAIL?: string;
   TURNSTILE_SECRET_KEY?: string;
-  STRIPE_SECRET_KEY?: string;
-  STRIPE_WEBHOOK_SECRET?: string;
-  PANDADOC_API_KEY?: string;
-  PANDADOC_TEMPLATE_ID?: string;
-  PANDADOC_AUTO_SEND?: string;
 }
 
 /** Cloudflare's published always-pass Turnstile secret. Dev only; never a real check. */
@@ -62,18 +57,4 @@ export function resolveMailConfig(env: Env): MailConfigResult {
     return { ok: false, problems };
   }
   return { ok: true, mail: { mode: 'live', apiKey, to, from } };
-}
-
-export interface PandaDocConfig {
-  apiKey: string;
-  templateId: string;
-  autoSend: boolean;
-}
-
-/** PandaDoc is optional: both the API key and the template id must be set. */
-export function resolvePandaDocConfig(env: Env): PandaDocConfig | undefined {
-  const apiKey = optionalValue(env.PANDADOC_API_KEY);
-  const templateId = optionalValue(env.PANDADOC_TEMPLATE_ID);
-  if (apiKey === undefined || templateId === undefined) return undefined;
-  return { apiKey, templateId, autoSend: optionalValue(env.PANDADOC_AUTO_SEND) === 'true' };
 }

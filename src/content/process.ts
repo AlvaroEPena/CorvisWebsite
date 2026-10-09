@@ -12,7 +12,7 @@ export const processSteps: readonly ProcessStep[] = [
   {
     title: 'Agree the plan',
     description:
-      'We boil the business down to one clear idea, then send a plain-English proposal you can e-sign.',
+      'We boil the business down to one clear idea, then send a plain-English proposal with a fixed price.',
   },
   {
     title: 'Write and design',

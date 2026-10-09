@@ -177,7 +177,7 @@ describe('content invariants', () => {
     });
     expect(copy).not.toMatch(/template|framework|\bAI\b/i);
   });
-  it('keeps package ids in step with the checkout contract and mentions no phone routing', () => {
+  it('keeps the package ids and monthly price and mentions no phone routing', () => {
     expect(pricing.map((pkg) => pkg.id)).toEqual(['launchpad', 'market-leader']);
     expect(managedPlan.priceMonthly).toBe(274);
     expect(JSON.stringify({ pricing, faq, services })).not.toMatch(/routes|text message|nightly/i);

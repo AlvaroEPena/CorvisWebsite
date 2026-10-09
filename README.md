@@ -1,14 +1,12 @@
 # Corvis — The Core Vision
 
 Single-page marketing site for Corvis, a web design studio. Light frosted-glass design,
-Astro 7 static output, and a small Cloudflare Worker for the contact form, Stripe deposit
-checkout and PandaDoc proposals.
+Astro 7 static output, and a small Cloudflare Worker for the contact form (Turnstile check, email through Resend).
 
 ## Stack
 
 Astro 7 · TypeScript 6 strict · Tailwind 4 + `glass.css` · CSS scroll animations + lazy GSAP ·
-Zod 4 · Cloudflare Workers (static assets + `src/worker`) · Resend · Turnstile · Stripe ·
-PandaDoc · Vitest 5 · Playwright + axe.
+Zod 4 · Cloudflare Workers (static assets + `src/worker`) · Resend · Turnstile · Vitest 5 · Playwright + axe.
 
 ## Setup
 
@@ -35,7 +33,7 @@ For the Worker locally create `.dev.vars` (git-ignored) from the Worker section 
 ## Replace before launch
 
 - `src/content/site.ts`: real site URL and contact email (release:check blocks `.example`).
-- Prices, deposits (`src/lib/contracts/checkout.ts` and `src/content/pricing.ts`), testimonials
+- Prices (`src/content/pricing.ts`), testimonials
   (shown with a "Sample feedback" label), and portfolio projects are placeholders.
 - Set `PUBLIC_SITE_URL` and `PUBLIC_TURNSTILE_SITE_KEY` at build time.
 
@@ -46,14 +44,7 @@ Set Worker secrets with `wrangler secret put <NAME>`:
 - **Resend:** `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL` (verified sending domain).
 - **Turnstile:** widget with your domain + `localhost`; `PUBLIC_TURNSTILE_SITE_KEY` (build) and
   `TURNSTILE_SECRET_KEY` (Worker; required in production, the Worker fails closed without it).
-- **Stripe (test mode first):** `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`. Add a webhook
-  endpoint `https://<domain>/api/stripe-webhook` for `checkout.session.completed`. Confirm the
-  `Stripe-Version` in `src/worker/stripe-checkout.ts` exists in your account before going live.
-- **PandaDoc (sandbox first):** `PANDADOC_API_KEY`, `PANDADOC_TEMPLATE_ID`, `PANDADOC_AUTO_SEND`.
-  Template needs a recipient role `Client` and tokens `[Client.Name]`, `[Client.Company]`,
-  `[Client.Service]`, `[Client.Budget]`, `[Client.Message]`, `[Client.Website]`. Keep
-  `PANDADOC_AUTO_SEND=false` (drafts for your review) until you add your own safeguards.
-- **Cloudflare:** add WAF rate-limit rules for POST `/api/contact` and `/api/checkout`
+- **Cloudflare:** add WAF rate-limit rules for POST `/api/contact`
   (the in-Worker limiters are best effort per isolate).
 
 ## Deployment (Cloudflare Workers static assets)
@@ -63,5 +54,4 @@ HSTS preload only once the domain is final (`public/_headers`).
 
 ## Known follow-ups
 
-CSP still allows inline scripts (move to hashes), webhook duplicate protection is per isolate
-(use KV), `/thanks` copy is not tied to a verified Stripe session.
+CSP still allows inline scripts (move to hashes). No calendar or CRM is attached to "Book a free consult" yet.

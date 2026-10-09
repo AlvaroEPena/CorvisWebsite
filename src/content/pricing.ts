@@ -79,7 +79,7 @@ export const pricing: readonly PricingPackage[] = [
   },
 ];
 
-/** The all-in care plan: the offering of both packages plus ongoing care, billed monthly. It has no checkout. */
+/** The all-in care plan: the offering of both packages plus ongoing care, billed monthly. */
 export const managedPlan = {
   id: 'care',
   name: 'Fully Managed Digital Infrastructure',

@@ -8,7 +8,6 @@ import { expect, type Page, type Request } from '@playwright/test';
 export const PAGES = [
   { name: 'home', path: '/' },
   { name: 'privacy', path: '/privacy' },
-  { name: 'thanks', path: '/thanks' },
   { name: 'sandbox', path: '/sandbox' },
   { name: 'team', path: '/team' },
   { name: '404', path: '/this-page-does-not-exist' },
@@ -39,7 +38,7 @@ export async function mockTurnstile(page: Page): Promise<void> {
 /** Records every request made to the endpoint and answers it with the given JSON. */
 export async function mockApi(
   page: Page,
-  path: '/api/contact' | '/api/checkout',
+  path: '/api/contact',
   status: number,
   json: unknown,
 ): Promise<Request[]> {

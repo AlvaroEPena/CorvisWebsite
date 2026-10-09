@@ -2,24 +2,6 @@ import { expect, test } from '@playwright/test';
 
 import { PAGES } from './support';
 
-test.describe('/thanks', () => {
-  test('is noindex, has one h1 and links back home', async ({ page }) => {
-    await page.goto('/thanks');
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Thank you/);
-    await expect(page.getByRole('heading', { name: 'What happens next' })).toBeVisible();
-    await page.getByRole('link', { name: 'Back to the homepage' }).click();
-    await expect(page).toHaveURL(/localhost:4329\/$/);
-  });
-
-  test('keeps session_id query strings without breaking the page', async ({ page }) => {
-    const response = await page.goto('/thanks?session_id=cs_test_123');
-    expect(response?.status()).toBe(200);
-    await expect(page.getByTestId('thanks')).toBeVisible();
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/thanks$/);
-  });
-});
-
 test.describe('/privacy', () => {
   test('renders the privacy note, indexable, with a working way home', async ({ page }) => {
     await page.goto('/privacy');
