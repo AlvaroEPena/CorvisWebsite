@@ -162,3 +162,9 @@
 
 - See docs/seo-checklist.md "Round 2". New: location/definition copy, four service pages, Person and BreadcrumbList schema, llms.txt, sitemap lastmod, live client links, redesign section retitled.
 - Verified: typecheck 0 errors, lint/format clean, 222 unit, e2e green after fixing the tests the changes touched (title, Work outbound links), Lighthouse `/` and `/services/web-design` 100 on all categories, `/team` 99.
+
+## 2026-10-09 - Performance pass (no visual change)
+
+- Measured first: home 163 KB total, TBT 0, CLS 0, Lighthouse 100; the large scripts in `dist/_astro` belong to /admin only and are not loaded by public pages.
+- Change: the body font (Inter 400 and 600) is now preloaded like the display font (`<Font cssVariable="--face-body" preload />` in Layout.astro). Measured over 6 runs each: home FCP 1.51 s to 1.21 s (LCP unchanged at 1.51 s); /team FCP about 1.4 s to 1.1 s, CLS 0.02 to 0, score 99 to 100. Same fonts, same look.
+- Looked at and left alone because they would change how it looks or feels: `content-visibility` on sections (risks scroll jumps and the pinned timeline maths), replacing the lazy GSAP parallax, longer caches on the unhashed demo files.
