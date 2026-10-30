@@ -13,7 +13,7 @@ export const faq: readonly FaqEntry[] = [
   {
     question: 'What does it cost?',
     answer:
-      'The Launchpad Foundation starts at 3,800 and The Market Leader at 4,940. Our Fully Managed Digital Infrastructure is 274 a month and brings both packages together with hosting, security and backups. Prices are in US dollars, and your quote is fixed after the free consult.',
+      'The Launchpad Foundation starts at 2,799 and The Market Leader at 3,599. Our Fully Managed Digital Infrastructure is 199 a month and brings both packages together with hosting, security and backups. Prices are in US dollars, and your quote is fixed after the free consult.',
   },
   {
     question: 'Who writes the content?',
@@ -23,7 +23,7 @@ export const faq: readonly FaqEntry[] = [
   {
     question: 'What is Fully Managed Digital Infrastructure?',
     answer:
-      'It is the care plan that keeps your site running: premium global hosting, proactive security and versioned backups with one-click rollback. It combines everything in both packages with that ongoing care, billed at 274 a month, so you never manage a server.',
+      'It is the care plan that keeps your site running: premium global hosting, proactive security and versioned backups with one-click rollback. It combines everything in both packages with that ongoing care, billed at 199 a month, so you never manage a server.',
   },
   {
     question: 'Will my site rank first on Google?',

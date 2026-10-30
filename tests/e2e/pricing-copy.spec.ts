@@ -3,9 +3,9 @@ import { expect, test } from '@playwright/test';
 test.describe('pricing and proof copy', () => {
   test('shows plain numbers with no dollar sign anywhere on the home page', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByTestId('package-launchpad')).toContainText('3,800');
-    await expect(page.getByTestId('package-market-leader')).toContainText('4,940');
-    await expect(page.getByTestId('managed-plan')).toContainText('274');
+    await expect(page.getByTestId('package-launchpad')).toContainText('2,799');
+    await expect(page.getByTestId('package-market-leader')).toContainText('3,599');
+    await expect(page.getByTestId('managed-plan')).toContainText('199');
     expect(await page.locator('main').innerText()).not.toMatch(/\$\s?\d/);
   });
 

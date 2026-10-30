@@ -113,9 +113,9 @@ test.describe('more search signals', () => {
     expect(response.headers()['content-type']).toContain('text/plain');
     const text = await response.text();
     expect(text).toContain(site.coverage.definition);
-    expect(text).toContain('3,800');
-    expect(text).toContain('4,940');
-    expect(text).toContain('274 per month');
+    expect(text).toContain('2,799');
+    expect(text).toContain('3,599');
+    expect(text).toContain('199 per month');
     expect(text).toContain('/services/web-design');
     expect(text).not.toMatch(/\$\d/);
   });

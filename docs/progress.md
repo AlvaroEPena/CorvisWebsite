@@ -168,3 +168,7 @@
 - Measured first: home 163 KB total, TBT 0, CLS 0, Lighthouse 100; the large scripts in `dist/_astro` belong to /admin only and are not loaded by public pages.
 - Change: the body font (Inter 400 and 600) is now preloaded like the display font (`<Font cssVariable="--face-body" preload />` in Layout.astro). Measured over 6 runs each: home FCP 1.51 s to 1.21 s (LCP unchanged at 1.51 s); /team FCP about 1.4 s to 1.1 s, CLS 0.02 to 0, score 99 to 100. Same fonts, same look.
 - Looked at and left alone because they would change how it looks or feels: `content-visibility` on sections (risks scroll jumps and the pinned timeline maths), replacing the lazy GSAP parallax, longer caches on the unhashed demo files.
+
+## 2026-10-30 - New prices
+
+- Launchpad Foundation from 2,799; Market Leader from 3,599; Fully Managed Digital Infrastructure 199 per month (src/content/pricing.ts, FAQ text, tests). llms.txt follows the data automatically.

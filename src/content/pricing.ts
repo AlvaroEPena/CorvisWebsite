@@ -30,7 +30,7 @@ export const pricing: readonly PricingPackage[] = [
     audience: 'For the successful local business that customers cannot find online yet.',
     pitch:
       'Stop losing referrals to competitors just because they have a website. We launch your fully branded, conversion-optimized digital presence in 14 days.',
-    priceFrom: 3800,
+    priceFrom: 2799,
     unit: '',
     features: [
       {
@@ -61,7 +61,7 @@ export const pricing: readonly PricingPackage[] = [
     audience: 'For businesses ready to capture local search traffic and automate lead generation.',
     pitch:
       'Dominate your local market with a robust digital hub designed to capture, educate, and convert high-value leads.',
-    priceFrom: 4940,
+    priceFrom: 3599,
     unit: '',
     featuresLead: 'Everything in Launchpad, plus',
     features: [
@@ -86,7 +86,7 @@ export const managedPlan = {
   /** Displayed on the badge above the name. */
   badge: 'Everything in both packages, and more',
   /** Per month, no currency symbol on the page. */
-  priceMonthly: 274,
+  priceMonthly: 199,
   summary:
     'Everything in The Launchpad Foundation and The Market Leader, kept running and improving for you, billed monthly so your new asset never depreciates. You never touch a server, a patch or a backup.',
   points: [

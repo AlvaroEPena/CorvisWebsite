@@ -184,7 +184,7 @@ describe('content invariants', () => {
   });
   it('keeps the package ids and monthly price and mentions no phone routing', () => {
     expect(pricing.map((pkg) => pkg.id)).toEqual(['launchpad', 'market-leader']);
-    expect(managedPlan.priceMonthly).toBe(274);
+    expect(managedPlan.priceMonthly).toBe(199);
     expect(JSON.stringify({ pricing, faq, services })).not.toMatch(/routes|text message|nightly/i);
   });
   it('formats prices from data', () => {
