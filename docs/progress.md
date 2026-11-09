@@ -172,3 +172,7 @@
 ## 2026-10-30 - New prices
 
 - Launchpad Foundation from 2,799; Market Leader from 3,599; Fully Managed Digital Infrastructure 199 per month (src/content/pricing.ts, FAQ text, tests). llms.txt follows the data automatically.
+
+## 2026-11-09 - Prices cut
+
+- Launchpad Foundation from 1,874; Market Leader from 2,409; Fully Managed Digital Infrastructure 139 per month (src/content/pricing.ts, FAQ text, tests). llms.txt follows the data.
