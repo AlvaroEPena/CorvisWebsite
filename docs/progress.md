@@ -176,3 +176,4 @@
 ## 2026-11-09 - Prices cut
 
 - Launchpad Foundation from 1,874; Market Leader from 2,409; Fully Managed Digital Infrastructure 139 per month (src/content/pricing.ts, FAQ text, tests). llms.txt follows the data.
+- Contact budget brackets now start below the cheapest package: Under 2,000 / 2,000 to 3,000 / 3,000 to 5,000 / 5,000 and up / Not sure yet (`BUDGETS` in src/lib/contracts/contact.ts, labels in contact-options.ts and the owner email in worker/mailer.ts).

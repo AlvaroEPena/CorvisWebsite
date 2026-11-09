@@ -12,10 +12,10 @@ const serviceLabels = {
 } satisfies Record<Service, string>;
 
 const budgetLabels = {
-  'under-3k': 'Under 3,000',
-  '3k-6k': '3,000 to 6,000',
-  '6k-12k': '6,000 to 12,000',
-  '12k-plus': '12,000 and up',
+  'under-2k': 'Under 2,000',
+  '2k-3k': '2,000 to 3,000',
+  '3k-5k': '3,000 to 5,000',
+  '5k-plus': '5,000 and up',
   'not-sure': 'Not sure yet',
 } satisfies Record<Budget, string>;
 

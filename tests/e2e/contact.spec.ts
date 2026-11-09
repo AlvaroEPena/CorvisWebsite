@@ -8,7 +8,7 @@ async function fillValidForm(page: Page): Promise<void> {
   await page.getByLabel(/Company/).fill('Analytical Engines');
   await page.getByLabel(/Current website/).fill('example.com');
   await page.getByLabel(/What do you need/).selectOption('redesign');
-  await page.getByLabel(/Budget/).selectOption('3k-6k');
+  await page.getByLabel(/Budget/).selectOption('2k-3k');
   await page.getByLabel(/Tell us about the project/).fill('We sell engines and our site is dated.');
   await page.getByRole('checkbox', { name: /I agree to Corvis/ }).check();
 }
@@ -42,7 +42,7 @@ test.describe('J2 valid submission', () => {
       company: 'Analytical Engines',
       website: 'https://example.com',
       service: 'redesign',
-      budget: '3k-6k',
+      budget: '2k-3k',
       consent: true,
       turnstileToken: 'e2e-token',
       nickname: '',

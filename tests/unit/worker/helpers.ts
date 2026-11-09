@@ -24,7 +24,7 @@ export function validPayload(overrides: Record<string, unknown> = {}): Record<st
     company: 'Analytical Engines',
     website: 'https://example.com',
     service: 'redesign',
-    budget: '3k-6k',
+    budget: '2k-3k',
     message: 'We would like a calm, fast new site.',
     consent: true,
     turnstileToken: 'token-123',

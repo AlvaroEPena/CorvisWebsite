@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const SERVICES = ['redesign', 'new-build', 'care-plan', 'not-sure'] as const;
-export const BUDGETS = ['under-3k', '3k-6k', '6k-12k', '12k-plus', 'not-sure'] as const;
+export const BUDGETS = ['under-2k', '2k-3k', '3k-5k', '5k-plus', 'not-sure'] as const;
 
 /** Minimum time (ms) between form render and submit; faster submits are treated as bots. */
 export const MIN_FILL_MS = 3000;

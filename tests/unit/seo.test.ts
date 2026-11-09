@@ -287,3 +287,18 @@ describe('service pages', () => {
     expect(copy).not.toMatch(/we guarantee|guaranteed (rank|result)|rank (first|#1)|5-star|rated/i);
   });
 });
+
+describe('contact budget brackets', () => {
+  it('start below the cheapest package and have no currency symbol on the page', async () => {
+    const { budgetOptions } = await import('../../src/content/contact-options');
+    expect(budgetOptions.map((option) => option.label)).toEqual([
+      'Under 2,000',
+      '2,000 to 3,000',
+      '3,000 to 5,000',
+      '5,000 and up',
+      'Not sure yet',
+    ]);
+    expect(Math.min(...pricing.map((pkg) => pkg.priceFrom))).toBeLessThan(2000);
+    expect(JSON.stringify(budgetOptions)).not.toContain('$');
+  });
+});

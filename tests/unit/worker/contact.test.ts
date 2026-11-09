@@ -43,7 +43,7 @@ describe('POST /api/contact: success path', () => {
       subject: 'New Corvis inquiry: Ada Lovelace (Website redesign)',
     });
     expect(mail.text).toContain('Company: Analytical Engines');
-    expect(mail.text).toContain('Budget: $3k to $6k');
+    expect(mail.text).toContain('Budget: $2k to $3k');
     expect(mail.text).toContain('We would like a calm, fast new site.');
     expect(mail.html).toContain('Ada Lovelace');
   });

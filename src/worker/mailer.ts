@@ -12,10 +12,10 @@ export const SERVICE_LABELS: Record<(typeof SERVICES)[number], string> = {
 };
 
 export const BUDGET_LABELS: Record<(typeof BUDGETS)[number], string> = {
-  'under-3k': 'Under $3k',
-  '3k-6k': '$3k to $6k',
-  '6k-12k': '$6k to $12k',
-  '12k-plus': '$12k+',
+  'under-2k': 'Under $2k',
+  '2k-3k': '$2k to $3k',
+  '3k-5k': '$3k to $5k',
+  '5k-plus': '$5k+',
   'not-sure': 'Not sure yet',
 };
 
